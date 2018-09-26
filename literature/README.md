@@ -7,7 +7,7 @@ Dumitru Erhan. 2015. Show and tell: a neural image
 caption generator. In _Proceedings of the IEEE Conference
 on Computer Vision and Pattern Recognition_ . 3156–3164.
 
-- [ ] Alessandro Sordoni, Michel Galley, Michael Auli, Chris
+- [x] Alessandro Sordoni, Michel Galley, Michael Auli, Chris
 Brockett, Yangfeng Ji, Margaret Mitchell, Jian-Yun Nie,
 Jianfeng Gao, and Bill Dolan. 2015. A neural netowrk
 approach to context-sensitive generation of
