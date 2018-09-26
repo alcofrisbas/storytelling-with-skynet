@@ -2,7 +2,7 @@
 
 ## citations of literature to find and read:
 
-- [ ] Oriol Vinyals, Alexander Toshev, Samy Bengio, and
+- [x] Oriol Vinyals, Alexander Toshev, Samy Bengio, and
 Dumitru Erhan. 2015. Show and tell: a neural image
 caption generator. In _Proceedings of the IEEE Conference
 on Computer Vision and Pattern Recognition_ . 3156–3164.
