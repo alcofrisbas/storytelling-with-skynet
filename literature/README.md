@@ -22,3 +22,9 @@ of ACL_ . 1183–1191.
 Cernockˇy, and Sanjeev Khudanpur. 2010. Recurrent `
 neural network based language model. In _Proceedings of
 Interspeech_
+
+## other resources
+
+- [x] Yoshua Bengio, Réjean Ducharme, Pascal Vincent, Christian Jauvin;
+A Neural Probabilistic Language Model
+3(Feb):1137-1155, 2003.
