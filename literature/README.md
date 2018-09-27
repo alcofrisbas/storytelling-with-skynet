@@ -29,3 +29,8 @@ Interspeech_
 - [x] Yoshua Bengio, Réjean Ducharme, Pascal Vincent, Christian Jauvin;
 A Neural Probabilistic Language Model
 3(Feb):1137-1155, 2003. **bengio03a.pdf**
+
+-Robin Sloan. 2016. Writing with the machine. (2016).
+https://www.robinsloan.com/notes/writing- with- the- machine/ 
+-Andrea Karpathy blog, The Unreasonable Effectiveness of Recurrent Neural Networks, 2015.  http://karpathy.github.io/2015/05/21/rnn-effectiveness/  
+gitHub - https://github.com/karpathy/char-rnn  
