@@ -21,10 +21,10 @@ conversational responses. In _Proceedings of ACL_ .
 Knight. 2016. Generating topical poetry. In _Proceedings
 of ACL_ . 1183–1191. **D16-1126.pdf**
 
-- [ ] Tomáš Mikolov, Martin Karafát, Lukáš Burget, Jan
+- [X] Tomáš Mikolov, Martin Karafát, Lukáš Burget, Jan
 Cernockˇy, and Sanjeev Khudanpur. 2010. Recurrent
 neural network based language model. In _Proceedings of
-Interspeech_
+Interspeech_. **NeuralNetworkLanguageModel.pdf**
 
 - [x] Melissa Roemmele and Andrew S. Gordon. 2015.
 Creative Help: A Story Writing Assistant. **ICIDS15.PDF**
@@ -51,7 +51,7 @@ Representations (Workshop Track) **DocumentContextLanguageModels.pdf**
 A Neural Probabilistic Language Model
 3(Feb):1137-1155, 2003. **bengio03a.pdf**
 
-- [ ] Andrea Karpathy blog, The Unreasonable Effectiveness of Recurrent Neural Networks, 2015.  http://karpathy.github.io/2015/05/21/rnn-effectiveness/  
+- [x] Andrea Karpathy blog, The Unreasonable Effectiveness of Recurrent Neural Networks, 2015.  http://karpathy.github.io/2015/05/21/rnn-effectiveness/  
 gitHub - https://github.com/karpathy/char-rnn  
 
 - [x] Roemmele, M. and Gordon, A. (2018) An Encoder-decoder 
