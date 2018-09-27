@@ -29,6 +29,9 @@ Interspeech_
 - [x] Melissa Roemmele and Andrew S. Gordon. 2015.
 Creative Help: A Story Writing Assistant. **ICIDS15.PDF**
 
+- [x] Robin Sloan. 2016. Writing with the machine. (2016).
+https://www.robinsloan.com/notes/writing-with-the-machine/
+
 
 ## other resources(not in original paper):
 
@@ -38,5 +41,6 @@ A Neural Probabilistic Language Model
 
 - [x] Robin Sloan. 2016. Writing with the machine. (2016).
 https://www.robinsloan.com/notes/writing- with- the- machine/ 
+
 - [ ] Andrea Karpathy blog, The Unreasonable Effectiveness of Recurrent Neural Networks, 2015.  http://karpathy.github.io/2015/05/21/rnn-effectiveness/  
 gitHub - https://github.com/karpathy/char-rnn  
