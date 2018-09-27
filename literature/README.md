@@ -41,6 +41,13 @@ and Jacob Eisenstein. 2016. Document context language models.
 In Proceedings of the 4th International Conference on Learning 
 Representations (Workshop Track)
 
+- [x] Roemmele, M. and Gordon, A. (2018) An Encoder-decoder 
+Approach to Predicting Causal Relations in Stories. Storytelling 
+Workshop at the 16th Annual Conference of the North American Chapter 
+of the Association for Computational Linguistics: Human Language 
+Technologies (NAACL 2018), New Orleans, LA, June 5, 2018.
+**NAACL-WS18A.PDF**
+
 
 ## other resources(not in original paper):
 
