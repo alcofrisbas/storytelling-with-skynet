@@ -32,6 +32,15 @@ Creative Help: A Story Writing Assistant. **ICIDS15.PDF**
 - [x] Robin Sloan. 2016. Writing with the machine. (2016).
 https://www.robinsloan.com/notes/writing-with-the-machine/
 
+- [ ] Joy Kim, Justin Cheng, and Michael S. Bernstein. 2014. 
+Ensemble: exploring complementary strengths of leaders and 
+crowds in creative collaboration. In Proceedings of CSCW. 22
+
+- [ ] Yangfeng Ji, Trevor Cohn, Lingpeng Kong, Chris Dyer, 
+and Jacob Eisenstein. 2016. Document context language models. 
+In Proceedings of the 4th International Conference on Learning 
+Representations (Workshop Track)
+
 
 ## other resources(not in original paper):
 
