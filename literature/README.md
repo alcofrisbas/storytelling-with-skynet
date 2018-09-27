@@ -1,6 +1,8 @@
 # Literature 
 
-## citations of literature to find and read:
+## citations of literature to find and read(in original paper):
+
+##### check means found/accessible
 
 - [x] Oriol Vinyals, Alexander Toshev, Samy Bengio, and
 Dumitru Erhan. 2015. Show and tell: a neural image
@@ -24,7 +26,7 @@ Cernockˇy, and Sanjeev Khudanpur. 2010. Recurrent
 neural network based language model. In _Proceedings of
 Interspeech_
 
-## other resources
+## other resources(not in original paper):
 
 - [x] Yoshua Bengio, Réjean Ducharme, Pascal Vincent, Christian Jauvin;
 A Neural Probabilistic Language Model
