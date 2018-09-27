@@ -26,7 +26,7 @@ Cernockˇy, and Sanjeev Khudanpur. 2010. Recurrent
 neural network based language model. In _Proceedings of
 Interspeech_
 
-- [ ] Melissa Roemmele and Andrew S. Gordon. 2015.
+- [x] Melissa Roemmele and Andrew S. Gordon. 2015.
 Creative Help: A Story Writing Assistant. **ICIDS15.PDF**
 
 
