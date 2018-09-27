@@ -32,14 +32,15 @@ Creative Help: A Story Writing Assistant. **ICIDS15.PDF**
 - [x] Robin Sloan. 2016. Writing with the machine. (2016).
 https://www.robinsloan.com/notes/writing-with-the-machine/
 
-- [ ] Joy Kim, Justin Cheng, and Michael S. Bernstein. 2014. 
+- [x] Joy Kim, Justin Cheng, and Michael S. Bernstein. 2014. 
 Ensemble: exploring complementary strengths of leaders and 
 crowds in creative collaboration. In Proceedings of CSCW. 22
+**Ensemble.pdf**
 
-- [ ] Yangfeng Ji, Trevor Cohn, Lingpeng Kong, Chris Dyer, 
+- [x] Yangfeng Ji, Trevor Cohn, Lingpeng Kong, Chris Dyer, 
 and Jacob Eisenstein. 2016. Document context language models. 
 In Proceedings of the 4th International Conference on Learning 
-Representations (Workshop Track)
+Representations (Workshop Track) **DocumentContextLanguageModels.pdf**
 
 
 
@@ -49,9 +50,6 @@ Representations (Workshop Track)
 - [x] Yoshua Bengio, Réjean Ducharme, Pascal Vincent, Christian Jauvin;
 A Neural Probabilistic Language Model
 3(Feb):1137-1155, 2003. **bengio03a.pdf**
-
-- [x] Robin Sloan. 2016. Writing with the machine. (2016).
-https://www.robinsloan.com/notes/writing- with- the- machine/ 
 
 - [ ] Andrea Karpathy blog, The Unreasonable Effectiveness of Recurrent Neural Networks, 2015.  http://karpathy.github.io/2015/05/21/rnn-effectiveness/  
 gitHub - https://github.com/karpathy/char-rnn  
