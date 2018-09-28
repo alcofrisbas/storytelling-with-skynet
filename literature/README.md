@@ -60,3 +60,6 @@ Workshop at the 16th Annual Conference of the North American Chapter
 of the Association for Computational Linguistics: Human Language 
 Technologies (NAACL 2018), New Orleans, LA, June 5, 2018.
 **NAACL-WS18A.PDF**
+
+- [x] Trung Tran. 2016. Creating A Text Generator Using Recurrent Neural Network.
+https://chunml.github.io/ChunML.github.io/project/Creating-Text-Generator-Using-Recurrent-Neural-Network/
