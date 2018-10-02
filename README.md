@@ -8,6 +8,6 @@ Tenzin
 ### Meeting Schedule:
 | Day | Time|
 |-----|-----|
-|Tuesday||
+|Tuesday|13:15|
 |Thursday| 14:00|
 |Saturday| 14:00|
