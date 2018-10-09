@@ -12,3 +12,5 @@
 **.fls
 **.fdb_latexmk
 *.pyc
+
+._*
