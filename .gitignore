@@ -13,4 +13,5 @@
 **.fdb_latexmk
 *.pyc
 
-._*
+.*
+!.gitignore

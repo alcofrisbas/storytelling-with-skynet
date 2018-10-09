@@ -1,0 +1,47 @@
+\section{Deliverables}\label{sec:deliverables}
+\subsection{Minimumm Viable Product}\label{subsec:mvp}
+Our most basic possible deliverable will be a webapp with a simple interface that:
+\begin{enumerate}
+  \item Prompts the user with an image
+  \item Takes input from the user one sentence at a time
+  \item After each sentence of input:
+  \begin{enumerate}
+    \item Generates a reasonable next sentence using a context-sensitive neural
+        language model
+    \item Displays it to the user for review and editing
+  \end{enumerate}
+\end{enumerate}
+\subsection{Extensions}\label{subsec:extensions}
+Below are a selection of possible improvements to our minimum deliverable as
+described above, ranging from trivial to wildly optimistic. Depending on how
+closely we are able to follow our roadmap, we expect to implement at least 2-4 of these.
+\subsubsection{Core Improvements}\label{subsubsec:core_imp}
+\begin{itemize}
+  \item Modern, professional-looking interface design
+  \item Variable context-sensitivity in the language model, so it can take more than the previous sentence into account when generating the next sentence
+  \item Additional language models trained on different genres
+  \item More in-depth writing prompt generator (possibly using our language model or the beam search approach\cite{clark})
+  \item Opt-in account system to save users’ stories and preferences (and to facilitate the implementation of several additional features below)
+\end{itemize}
+\subsubsection{Extended Functionality}\label{subsubsec:ext_fun}
+\begin{itemize}
+  \item Export a completed story in multiple formats
+  \item Save a story in progress and come back to it later
+  \item Share a completed story on social media
+  \item Option to choose when to ask AI for a suggestion rather than automatically
+  getting one after every sentence
+\end{itemize}
+\subsubsection{Extra Modes}\label{subsubsec:extra_modes}
+\begin{itemize}
+  \item Multiplayer mode to allow collaboration with another human rather than
+  the AI
+  \item Timed mode to help break down writer’s block
+  \item AI mode to watch multiple AI collaborate on a story without human input
+  (for entertainment value)
+\end{itemize}
+\subsubsection{Additional Platforms}\label{subsubsec:addtnl_pltfm}
+\begin{itemize}
+  \item iOS
+  \item Android
+  \item Desktop app(MacOS or Windows)
+\end{itemize}
