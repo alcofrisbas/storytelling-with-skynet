@@ -11,7 +11,11 @@
 **.blg
 **.fls
 **.fdb_latexmk
+**.pdf
+
 *.pyc
 
 .*
 !.gitignore
+
+
