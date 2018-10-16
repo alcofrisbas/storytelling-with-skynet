@@ -27,7 +27,7 @@ def elapsed(sec):
 
 
 # Target log path
-logs_path = 'models'
+logs_path = 'models\\'
 
 # Text file containing words for training
 training_file = 'belling_the_cat.txt'
@@ -56,7 +56,7 @@ vocab_size = len(dictionary)
 
 # Parameters
 learning_rate = 0.001
-training_iters = 10000
+training_iters = 2000
 display_step = 1000
 n_input = 3
 
