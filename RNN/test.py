@@ -45,7 +45,7 @@ with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     placeholder = sess.graph.get_operation_by_name("Placeholder")
     x = tf.placeholder(float, [None, 3, 1])
-    print(sess.graph.get_operations())
+    print(sess.graph)
     pred = sess.graph.get_operation_by_name("add")
 
     #sess.run(placeholder)
