@@ -19,7 +19,7 @@ def build_dataset(words):
     reverse_dictionary = dict(zip(dictionary.values(), dictionary.keys()))
     return dictionary, reverse_dictionary
 
-checkpoint = tf.train.latest_checkpoint("")
+checkpoint = tf.train.latest_checkpoint("models\\")
 file = 'belling_the_cat.txt'
 #data = read_data(file)
 #dictionary, reverse_dictionary = build_dataset(data)
