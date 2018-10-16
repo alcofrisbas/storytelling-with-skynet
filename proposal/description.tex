@@ -1,11 +1,28 @@
 \section{Description}\label{sec:description}
 To generate WriterBot’s suggestions, we will use a recurrent neural network based
 language model (RNN LM). RNNs are very efficient in predicting results in sequential
-data. They allow information to cycle inside the network for a very long time,
-allowing access to more contextual information than just the previous sentence
-to predict the next sentence, and provide output from the entire text as input to
-processing subsequent data.
+data. In particular, we will be using Long Short Term Memory network which is a
+special kind of RNN, capable of learning long term dependencies. They allow
+information to cycle inside the network for a very long time, allowing access
+to more contextual information than just the current sentence to predict the next
+sentence.
 
-We will use a simple recurrent neural network architecture\cite{RNN_language_model},
+WriterBot will be trained on a library of popular public-domain novels. It will
+be
+constructed as a RNN LM that will take input from both the sentence that the dataset
+has input (also known as the context) and the words that it has generated.
+\cite{RNN_language_model}. Once the sentence has been processed and the output
+generated, the weights attributed to each RNN cell will be updated according to
+the loss and how accurately the cell predicted the correct output.
+
+When the user interacts with the trained RNN their sentence will function like
+the dataset does, as the context, for each RNN cell and each cell will feed into
+the next with the word it has generated. When this process is completed, the RNN
+will have output a complete sentence that the user can then edit or delete at their
+leisure. The user will then type another sentence and the RNN will take the new
+sentence as input and follow the same process.
+
+We will use a simple recurrent neural network architecture (Mikolov et al., 2010),
 which is relatively easy to implement and train. We will also explore different
-optimization techniques to improve the performance of the neural network.
+optimization techniques to improve the performance of the neural network like
+optimizing the learning rate schedule. 

@@ -1,20 +1,23 @@
 \section{Resources}\label{sec:resources}
+We expect our training data (a few hundred of the most popular books from Project
+Gutenberg) to be no larger than a few hundred megabytes--a gigabyte at most.
 For our initial training and testing of our neural language model on fairly small
-subsets of our data, we plan to request a dedicated lab machine in CMC 307.
+subsets of this data, we plan to request a dedicated lab machine in CMC 307.
 This machine will eventually also allow us to serve our webapp until we agree
-upon a longer-term solution.
+upon a longer-term solution (using Heroku, for instance).
 
-As the computational requirements of the training process become clearer to us
-over the second half of fall term, we will likely need more processing power
-than a single iMac can offer.  There are two possible ways for us to get this
-increased power. First, we can work with Mike Tie to gain access to the new
-research cluster (summer18.dmz.carleton.edu).  This option is limited due to the
-cluster being primarily intended for faculty research, but we may be able to get
-our tasks in at a lower priority. Second, we plan on using the Jetson TX2 Dev Kit
-for our more advanced training. It’s a machine-learning-specific graphics card
-developed by Nvidia and will allow us to train more advanced neural networks
-faster and better than our other options. Malcolm has access to this resource
-through the St. Olaf - Carleton Engineering team, which has two available for use.
+As the computational requirements of the training process become clearer to
+us over the second half of fall term, we may find ourselves bottlenecked by
+the limited capacity of the lab machine.  If we become unable to get the training
+results we need in a timely fashion, we plan to use the Jetson TX2 Dev Kit for
+more advanced training, a machine-learning-specific graphics card developed by
+Nvidia that will allow us to train more advanced neural networks faster and
+better than our other options.  Malcolm has access to this resource through
+the St. Olaf - Carleton Engineering team, which has two available for use.
+Once our network is fully trained by the end of fall term, we will no longer
+need this increased power and can return to working on our personal machines
+and our lab machine (barring additional training-related extensions we may
+choose to implement).
 
 To build mockups for our web UI (as well as for any other platforms we may extend
 onto), we plan on using Balsamiq, a wireframing program.  We should be able to
