@@ -56,7 +56,7 @@ vocab_size = len(dictionary)
 
 # Parameters
 learning_rate = 0.001
-training_iters = 2000
+training_iters = 50000
 display_step = 1000
 n_input = 3
 
@@ -150,7 +150,8 @@ with tf.Session() as session:
             print("%s - [%s] vs [%s]" % (symbols_in,symbols_out,symbols_out_pred))
         step += 1
         offset += (n_input+1)
-    saver.save(session, logs_path)
+    saver.save(session, logs_path + "model")
+
     print("Optimization Finished!")
     print("Elapsed time: ", elapsed(time.time() - start_time))
     print("Run on command line.")
@@ -173,5 +174,6 @@ with tf.Session() as session:
                 symbols_in_keys = symbols_in_keys[1:]
                 symbols_in_keys.append(onehot_pred_index)
             print(sentence)
+
         except:
             print("Word not in dictionary")
