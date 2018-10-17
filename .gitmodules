@@ -1,0 +1,4 @@
+[submodule "websrape-gutenberg"]
+	path = websrape-gutenberg
+	url = https://github.com/alcofrisbas/websrape-gutenberg.git
+	branch = master
