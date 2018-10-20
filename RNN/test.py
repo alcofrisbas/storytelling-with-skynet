@@ -21,13 +21,21 @@ def build_dataset(words):
 
 checkpoint = tf.train.latest_checkpoint('.\models')
 
-file = 'belling_the_cat.txt'
+file = 'ptb.train.txt'
 
 
 tf.reset_default_graph()
 
 #tf.placeholder("float", [None, 3, 1])
 with tf.Session() as sess:
+    # import the saved graph
+    saver = tf.train.import_meta_graph(checkpoint + '.meta')
+    # get the graph for this session
+    graph = tf.get_default_graph()
+    sess.run(tf.global_variables_initializer())
+    placeholders = tf.contrib.framework.get_placeholders(graph)
+    add = sess.graph.get_tensor_by_name("add:0")
+
     data = read_data(file)
     dictionary, reverse_dictionary = build_dataset(data)
     sentence = input("enter:")
@@ -35,15 +43,7 @@ with tf.Session() as sess:
     words = sentence.split(' ')
     symbols_in_keys = [dictionary[str(words[i])] for i in range(len(words))]
 
-    # import the saved graph
-    saver = tf.train.import_meta_graph(checkpoint + '.meta')
-    # get the graph for this session
-    graph = tf.get_default_graph()
-    placeholders = tf.contrib.framework.get_placeholders(graph)
-    add = sess.graph.get_tensor_by_name("add:0")
-    sess.run(tf.global_variables_initializer())
-    pred = sess.graph.get_operation_by_name("add")
-    for i in range(10):
+    for i in range(32):
         keys = np.reshape(np.array(symbols_in_keys, dtype=float), [-1, 3, 1])
         onehot_pred = sess.run(add, {placeholders[0] : keys})
         onehot_pred_index = int(tf.argmax(onehot_pred, 1).eval())
