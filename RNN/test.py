@@ -1,58 +1,70 @@
 import tensorflow as tf
 import numpy as np
 import collections
+import rnn_run
+import reader
 
-def read_data(fname):
-    with open(fname) as f:
-        content = f.readlines()
-    content = [x.strip() for x in content]
-    content = [word for i in range(len(content)) for word in content[i].split()]
-    content = np.array(content)
-    return content
+FLAGS = tf.flags.FLAGS
+FLAGS.model = "small"
 
+def sample_from_pmf(probas):
+    t = np.cumsum(probas)
+    s = np.sum(probas)
+    return int(np.searchsorted(t, np.random.rand(1) * s))
 
-def build_dataset(words):
-    count = collections.Counter(words).most_common()
-    dictionary = dict()
-    for word, _ in count:
-        dictionary[word] = len(dictionary)
-    reverse_dictionary = dict(zip(dictionary.values(), dictionary.keys()))
-    return dictionary, reverse_dictionary
+def generate_text(sess, model, word_to_index, index_to_word,
+    seed='.', n_sentences= 20):
+    sentence_cnt = 0
+    input_seeds_id = [word_to_index[w] for w in seed.split()]
+    state = sess.run(model.initial_state)
 
-checkpoint = tf.train.latest_checkpoint('.\models')
+    # Initiate network with seeds up to the before last word:
+    for x in input_seeds_id[:-1]:
+        feed_dict = {model.initial_state: state,
+                    model.input.input_data: [[x]]}
+        state = sess.run([model.final_state], feed_dict)
 
-file = 'ptb.train.txt'
+    text = seed
+    # Generate a new sample from previous, starting at last word seed
+    input_id = [[input_seeds_id[-1]]]
+    while sentence_cnt < n_sentences:
+        feed_dict = {model.input.input_data: input_id,
+                    model.initial_state: state}
+        probas, state = sess.run([model.probas, model.final_state],
+                                feed_dict=feed_dict)
+        sampled_word = sample_from_pmf(probas[0])
+        if sampled_word == word_to_index['.']:
+            text += '.\n'
+            sentence_cnt += 1
+        else:
+            text += ' ' + index_to_word[sampled_word]
+            sentence_cnt += 1
+        input_wordid = [[sampled_word]]
+    print(text)
 
+if __name__ == '__main__':
+    word_to_id = reader._build_vocab('ptb.train.txt') # here we load the word -> id dictionnary ()
+    id_to_word = dict(zip(word_to_id.values(), word_to_id.keys())) # and transform it into id -> word dictionnary
+    _, _, test_data, vocab_size = reader.ptb_raw_data()
 
-tf.reset_default_graph()
+    eval_config = rnn_run.get_config()
+    eval_config.num_steps = 1
+    eval_config.batch_size = 1
+    model_input = rnn_run.Input(eval_config, test_data)
+    sess  = tf.Session()
+    initializer = tf.random_uniform_initializer(-eval_config.init_scale,
+        eval_config.init_scale)
+    with tf.variable_scope("Model", reuse=None, initializer=initializer):
+        tf.global_variables_initializer()
+        mtest = rnn_run.RNNModel(is_training=False, config=eval_config, input_=model_input, vocab_size=vocab_size)
+        sess.run(tf.global_variables_initializer())
+    saver = tf.train.Saver()
+    saver.restore(sess, tf.train.latest_checkpoint('./models'))
 
-#tf.placeholder("float", [None, 3, 1])
-with tf.Session() as sess:
-    # import the saved graph
-    saver = tf.train.import_meta_graph(checkpoint + '.meta')
-    # get the graph for this session
-    graph = tf.get_default_graph()
-    sess.run(tf.global_variables_initializer())
-    placeholders = tf.contrib.framework.get_placeholders(graph)
-    add = sess.graph.get_tensor_by_name("add:0")
-
-    data = read_data(file)
-    dictionary, reverse_dictionary = build_dataset(data)
-    sentence = input("enter:")
-    sentence = sentence.strip()
-    words = sentence.split(' ')
-    symbols_in_keys = [dictionary[str(words[i])] for i in range(len(words))]
-
-    for i in range(32):
-        keys = np.reshape(np.array(symbols_in_keys, dtype=float), [-1, 3, 1])
-        onehot_pred = sess.run(add, {placeholders[0] : keys})
-        onehot_pred_index = int(tf.argmax(onehot_pred, 1).eval())
-        sentence = "%s %s" % (sentence,reverse_dictionary[onehot_pred_index])
-        symbols_in_keys = symbols_in_keys[1:]
-        symbols_in_keys.append(onehot_pred_index)
-    print(sentence)
-
-    #print(sess.run(pred, {placeholders[0]: keys}))
-    #print(sess.graph.get_operations())
-    #print(sess.run(pred, {placeholders[0] : keys}))
-    #sess.run(placeholder)
+    while True:
+        print(generate_text(sess, mtest, word_to_id, id_to_word, seed="the quarter was a good one"))
+        try:
+            input('press Enter to continue ... \n')
+        except KeyboardInterrupt:
+            print('\b\bQuiting now...')
+            break

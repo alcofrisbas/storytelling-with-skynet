@@ -14,6 +14,7 @@ import tensorflow as tf
 import random
 import collections
 import time
+import reader
 
 flags = tf.flags
 logging = tf.logging
@@ -138,32 +139,6 @@ def with_prefix(prefix, name):
   """Adds prefix to name."""
   return "/".join((prefix, name))
 
-start_time = time.time()
-def elapsed(sec):
-    if sec<60:
-        return str(sec) + " sec"
-    elif sec<(60*60):
-        return str(sec/60) + " min"
-    else:
-        return str(sec/(60*60)) + " hr"
-
-
-def read_data(fname):
-    with open(fname) as f:
-        content = f.readlines()
-    content = [x.strip() for x in content]
-    content = [word for i in range(len(content)) for word in content[i].split()]
-    content = np.array(content)
-    return content
-
-
-def build_dataset(words):
-    count = collections.Counter(words).most_common()
-    dictionary = dict()
-    for word, _ in count:
-        dictionary[word] = len(dictionary)
-    reverse_dictionary = dict(zip(dictionary.values(), dictionary.keys()))
-    return dictionary, reverse_dictionary
 
 class Input(object):
     """The input data."""
@@ -172,36 +147,12 @@ class Input(object):
         self.batch_size = batch_size = config.batch_size
         self.num_steps = num_steps = config.num_steps
         self.epoch_size = ((len(data) // batch_size) - 1) // num_steps
-        self.input_data, self.targets = shape_dataset(data, batch_size, num_steps, name)
-
-def shape_dataset(data, batch_size, num_steps, name=None):
-    with tf.name_scope(name, "DataShaper", [data, batch_size, num_steps]):
-        data = tf.convert_to_tensor(data, name="data", dtype=tf.int32)
-
-        data_len = tf.size(data)
-        batch_len = data_len // batch_size
-        data = tf.reshape(data[0 : batch_size * batch_len],
-            [batch_size, batch_len])
-
-        epoch_size = (batch_len - 1) // num_steps
-        assertion = tf.assert_positive(
-            epoch_size,
-            message= "epoch_size == 0, decrease batch_size or num_steps")
-        with tf.control_dependencies([assertion]):
-            epcoh_size = tf.identity(epoch_size, name="epoch_size")
-
-        i = tf.train.range_input_producer(epoch_size, shuffle=False).dequeue()
-        x = tf.strided_slice(data, [0, i*num_steps],
-            [batch_size, (i+1)*num_steps])
-        x.set_shape([batch_size, num_steps])
-        y = tf.strided_slice(data, [0, i * num_steps + 1],
-            [batch_size, (i+1) * num_steps + 1])
-        y.set_shape([batch_size, num_steps])
-        return x, y
+        self.input_data, self.targets = reader.ptb_producer(data, batch_size,
+            num_steps, name=name)
 
 class RNNModel(object):
     """model"""
-    def __init__(self, is_training, config, input_, vocab_size):
+    def __init__(self, is_training, config, input_, vocab_size ):
         self._is_training = is_training
         self._input = input_
         self._rnn_params = None
@@ -227,6 +178,7 @@ class RNNModel(object):
         logits = tf.nn.xw_plus_b(output, softmax_w, softmax_b)
         # Reshape logits to be a 3-D tensor for sequence loss
         logits = tf.reshape(logits, [self.batch_size, self.num_steps, vocab_size])
+        self.probas = tf.nn.softmax(logits, name='probas')
 
         # Use the contrib sequence loss and average over the batches
         loss = tf.contrib.seq2seq.sequence_loss(
@@ -394,8 +346,7 @@ def run_epoch(sess, model, eval_op=None, verbose=False):
 
         costs += cost
         iters += model.input.num_steps
-
-        if verbose and step % (model.input.epoch_size // 10) == 10:
+        if verbose and step % (model.input.epoch_size // 10) == 7:
             print("%.3f perplexity: %.3f speed: %.0f wps" %
                 (step * 1.0 /model.input.epoch_size, np.exp(costs /iters),
                 iters * model.input.batch_size / (time.time() - start_time)))
@@ -403,12 +354,8 @@ def run_epoch(sess, model, eval_op=None, verbose=False):
 
 
 def main():
-    data = read_data(training_file)
-    print("Loaded training data...")
-
-    dictionary, reverse_dictionary = build_dataset(data)
-    vocab_size = len(dictionary)
-    training_data = [dictionary[word] for word in data if word in dictionary]
+    raw_data = reader.ptb_raw_data(FLAGS.data_path)
+    train_data, valid_data, test_data, _ = raw_data
 
     config = get_config()
     eval_config = get_config()
@@ -417,24 +364,26 @@ def main():
     writer = tf.summary.FileWriter(FLAGS.save_path)
 
     with tf.Graph().as_default():
-        initializer = tf.random_uniform_initializer(-config.init_scale, config.init_scale)
+        initializer = tf.random_uniform_initializer(-config.init_scale,
+            config.init_scale)
+
         with tf.name_scope("Train"):
-            train_input = Input(config = config, data=training_data, name="TrainInput")
+            train_input = Input(config = config, data=train_data, name="TrainInput")
             with tf.variable_scope("Model", reuse=tf.AUTO_REUSE, initializer=initializer):
-                m = RNNModel(is_training=True, config = config, input_= train_input, vocab_size=vocab_size)
+                m = RNNModel(is_training=True, config = config, input_= train_input, vocab_size= _)
             tf.summary.scalar("Training Loss", m.cost)
             tf.summary.scalar("Learning Rate", m.lr)
 
         with tf.name_scope("Valid"):
-            valid_input = Input(config=config, data=training_data, name="ValidInput")
+            valid_input = Input(config=config, data=valid_data, name="ValidInput")
             with tf.variable_scope("Model", reuse=tf.AUTO_REUSE, initializer=initializer):
-                mvalid = RNNModel(is_training=False, config=config, input_= valid_input, vocab_size=vocab_size)
+                mvalid = RNNModel(is_training=False, config=config, input_= valid_input, vocab_size= _)
             tf.summary.scalar("Validation Loss", mvalid.cost)
 
         with tf.name_scope("Test"):
-            test_input = Input(config=eval_config, data=training_data, name="TestInput")
+            test_input = Input(config=eval_config, data=test_data, name="TestInput")
             with tf.variable_scope("Model", reuse=tf.AUTO_REUSE, initializer=initializer):
-                mtest = RNNModel(is_training=False, config=eval_config, input_=test_input, vocab_size=vocab_size)
+                mtest = RNNModel(is_training=False, config=eval_config, input_=test_input, vocab_size= _)
 
         models = {"Train": m, "Valid": mvalid, "Test": mtest}
         for name, model in models.items():
@@ -446,9 +395,8 @@ def main():
         tf.train.import_meta_graph(metagraph)
         for model in models.values():
             model.import_ops()
-        sv = tf.train.Supervisor(logdir=FLAGS.save_path)
         config_proto = tf.ConfigProto(allow_soft_placement=soft_placement)
-        with sv.managed_session(config=config_proto) as sess:
+        with tf.train.MonitoredTrainingSession(checkpoint_dir=FLAGS.save_path, config=config_proto) as sess:
             for i in range(config.max_max_epoch):
                 lr_decay = config.lr_decay ** max(i + 1 - config.max_epoch, 0.0)
                 m.assign_lr(sess, config.learning_rate * lr_decay)
@@ -461,94 +409,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    """
-    # tf Graph input
-    x = tf.placeholder("float", [None, n_input, 1])
-    y = tf.placeholder("float", [None, vocab_size])
-
-    # RNN output node weights and biases
-    weights = tf.Variable(tf.random_normal([n_hidden, vocab_size]))
-    biases = tf.Variable(tf.random_normal([vocab_size]))
-
-    saver = tf.train.Saver()
-
-    pred = RNN(x, weights, biases)
-
-    # Loss and optimizer
-    cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=pred, labels=y))
-    optimizer = tf.train.RMSPropOptimizer(learning_rate=learning_rate).minimize(cost)
-
-    # Model evaluation
-    correct_pred = tf.equal(tf.argmax(pred,1), tf.argmax(y,1))
-    accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
-
-    # Initializing the variables
-    init = tf.global_variables_initializer()
-
-    # Launch the graph
-    with tf.Session() as session:
-        session.run(init)
-        step = 0
-        offset = random.randint(0,n_input+1)
-        end_offset = n_input + 1
-        acc_total = 0
-        loss_total = 0
-
-        writer.add_graph(session.graph)
-
-        while step < training_iters:
-            # Generate a minibatch. Add some randomness on selection process.
-            if offset > (len(training_data)-end_offset):
-                offset = random.randint(0, n_input+1)
-
-            symbols_in_keys = [ [dictionary[ str(training_data[i])]] for i in range(offset, offset+n_input) ]
-            symbols_in_keys = np.reshape(np.array(symbols_in_keys), [-1, n_input, 1])
-
-            symbols_out_onehot = np.zeros([vocab_size], dtype=float)
-            symbols_out_onehot[dictionary[str(training_data[offset+n_input])]] = 1.0
-            symbols_out_onehot = np.reshape(symbols_out_onehot,[1,-1])
-
-            _, acc, loss, onehot_pred = session.run([optimizer, accuracy, cost, pred], \
-                                                    feed_dict={x: symbols_in_keys, y: symbols_out_onehot})
-            loss_total += loss
-            acc_total += acc
-            if (step+1) % display_step == 0:
-                print("Iter= " + str(step+1) + ", Average Loss= " + \
-                      "{:.6f}".format(loss_total/display_step) + ", Average Accuracy= " + \
-                      "{:.2f}%".format(100*acc_total/display_step))
-                acc_total = 0
-                loss_total = 0
-                symbols_in = [training_data[i] for i in range(offset, offset + n_input)]
-                symbols_out = training_data[offset + n_input]
-                symbols_out_pred = reverse_dictionary[int(tf.argmax(onehot_pred, 1).eval())]
-                print("%s - [%s] vs [%s]" % (symbols_in,symbols_out,symbols_out_pred))
-            step += 1
-            offset += (n_input+1)
-        saver.save(session, logs_path + "model")
-
-        print("Optimization Finished!")
-        print("Elapsed time: ", elapsed(time.time() - start_time))
-        print("Run on command line.")
-        print("\ttensorboard --logdir=%s" % (logs_path))
-        print("Point your web browser to: http://localhost:6006/")
-        while True:
-            prompt = "%s words: " % n_input
-            sentence = input(prompt)
-            sentence = sentence.strip()
-            words = sentence.split(' ')
-            if len(words) != n_input:
-                continue
-            try:
-                symbols_in_keys = [dictionary[str(words[i])] for i in range(len(words))]
-                for i in range(32):
-                    keys = np.reshape(np.array(symbols_in_keys), [-1, n_input, 1])
-                    onehot_pred = session.run(pred, feed_dict={x: keys})
-                    onehot_pred_index = int(tf.argmax(onehot_pred, 1).eval())
-                    sentence = "%s %s" % (sentence,reverse_dictionary[onehot_pred_index])
-                    symbols_in_keys = symbols_in_keys[1:]
-                    symbols_in_keys.append(onehot_pred_index)
-                print(sentence)
-
-            except:
-                print("Word not in dictionary")
-        """
