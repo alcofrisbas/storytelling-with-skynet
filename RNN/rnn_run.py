@@ -405,7 +405,7 @@ def main():
                 train_perplexity = run_epoch(sess, m, eval_op=m.train_op,
                     verbose=True)
                 print("Epoch: %d Learning rate: %.3f" % (i + 1, train_perplexity))
-            sv.saver.save(sess, FLAGS.save_path, global_step=sv.global_step)
+            #sv.saver.save(sess, FLAGS.save_path, global_step=sv.global_step)
 
 if __name__ == "__main__":
     main()
