@@ -199,7 +199,10 @@ class RNNModel(object):
         tvars = tf.trainable_variables()
         grads, _ = tf.clip_by_global_norm(tf.gradients(self._cost, tvars),
             config.max_grad_norm)
-        optimizer = tf.train.GradientDescentOptimizer(self._lr)
+
+        # Do testing with different optimizer methods
+        #optimizer = tf.train.GradientDescentOptimizer(self._lr)
+        optimizer = tf.train.AdamOptimizer(self._lr, beta1=0.9, beta2=0.999, epsilon=10e-8)
         self._train_op = optimizer.apply_gradients(
             zip(grads, tvars),
             global_step = tf.train.get_or_create_global_step())
@@ -245,7 +248,7 @@ class RNNModel(object):
 
     def _get_lstm_cell(self, config, is_training):
         return tf.contrib.rnn.LSTMBlockCell(
-            config.hidden_size, forget_bias=0.0)
+            config.hidden_size, forget_bias=1.0)
 
     def assign_lr(self, sess, lr_value):
         sess.run(self._lr_update, feed_dict={self._new_lr: lr_value})
@@ -405,6 +408,7 @@ def main():
                 train_perplexity = run_epoch(sess, m, eval_op=m.train_op,
                     verbose=True)
                 print("Epoch: %d Learning rate: %.3f" % (i + 1, train_perplexity))
+
             #sv.saver.save(sess, FLAGS.save_path, global_step=sv.global_step)
 
 if __name__ == "__main__":
