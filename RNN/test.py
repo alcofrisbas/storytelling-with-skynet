@@ -63,7 +63,10 @@ if __name__ == '__main__':
 
     while True:
         sentence = input('Write your sentence: ')
-        print(generate_text(sess, mtest, word_to_id, id_to_word, seed=sentence))
+        try:
+            print(generate_text(sess, mtest, word_to_id, id_to_word, seed=sentence))
+        except:
+            print("Word not in dictionary.")
         try:
             input('press Enter to continue ... \n')
         except KeyboardInterrupt:
