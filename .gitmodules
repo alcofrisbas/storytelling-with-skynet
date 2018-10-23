@@ -1,0 +1,3 @@
+[submodule "webscrape-gutenberg"]
+	path = webscrape-gutenberg
+	url = https://github.com/alcofrisbas/webscrape-gutenberg.git
