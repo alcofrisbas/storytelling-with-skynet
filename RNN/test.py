@@ -62,7 +62,8 @@ if __name__ == '__main__':
     saver.restore(sess, tf.train.latest_checkpoint('./models'))
 
     while True:
-        print(generate_text(sess, mtest, word_to_id, id_to_word, seed="the quarter was a good one"))
+        sentence = input('Write your sentence: ')
+        print(generate_text(sess, mtest, word_to_id, id_to_word, seed=sentence))
         try:
             input('press Enter to continue ... \n')
         except KeyboardInterrupt:
