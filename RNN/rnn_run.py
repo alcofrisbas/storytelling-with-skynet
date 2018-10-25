@@ -402,7 +402,7 @@ def main():
         with tf.train.MonitoredTrainingSession(checkpoint_dir=FLAGS.save_path, config=config_proto) as sess:
             for i in range(config.max_max_epoch):
                 lr_decay = config.lr_decay ** max(i + 1 - config.max_epoch, 0.0)
-                m.assign_lr(sess, config.learning_rate * lr_decay)
+                m.assign_lr(sess, config.learning_rate) #* lr_decay)
 
                 print("Epoch: %d Learning rate: %.3f" % (i + 1, sess.run(m.lr)))
                 train_perplexity = run_epoch(sess, m, eval_op=m.train_op,
