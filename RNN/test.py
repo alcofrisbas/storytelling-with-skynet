@@ -64,7 +64,7 @@ if __name__ == '__main__':
     while True:
         sentence = input('Write your sentence: ')
         try:
-            print(generate_text(sess, mtest, word_to_id, id_to_word, seed=sentence))
+            generate_text(sess, mtest, word_to_id, id_to_word, seed=sentence)
         except:
             print("Word not in dictionary.")
         try:
