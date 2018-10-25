@@ -202,7 +202,7 @@ class RNNModel(object):
 
         # Do testing with different optimizer methods
         #optimizer = tf.train.GradientDescentOptimizer(self._lr)
-        optimizer = tf.train.AdamOptimizer(self._lr, beta1=0.9, beta2=0.999, epsilon=10e-4)
+        optimizer = tf.train.AdamOptimizer(learning_rate=0.001, beta1=0.9, beta2=0.999, epsilon=10e-4)
         self._train_op = optimizer.apply_gradients(
             zip(grads, tvars),
             global_step = tf.train.get_or_create_global_step())
