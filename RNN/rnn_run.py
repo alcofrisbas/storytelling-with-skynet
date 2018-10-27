@@ -202,7 +202,7 @@ class RNNModel(object):
 
         # Do testing with different optimizer methods
         #optimizer = tf.train.GradientDescentOptimizer(self._lr)
-        optimizer = tf.train.AdamOptimizer(self._lr, beta1=0.9, beta2=0.999, epsilon=10e-8)
+        optimizer = tf.train.AdamOptimizer(learning_rate=0.001, beta1=0.9, beta2=0.999, epsilon=10e-4)
         self._train_op = optimizer.apply_gradients(
             zip(grads, tvars),
             global_step = tf.train.get_or_create_global_step())
@@ -402,7 +402,7 @@ def main():
         with tf.train.MonitoredTrainingSession(checkpoint_dir=FLAGS.save_path, config=config_proto) as sess:
             for i in range(config.max_max_epoch):
                 lr_decay = config.lr_decay ** max(i + 1 - config.max_epoch, 0.0)
-                m.assign_lr(sess, config.learning_rate * lr_decay)
+                m.assign_lr(sess, config.learning_rate) #* lr_decay)
 
                 print("Epoch: %d Learning rate: %.3f" % (i + 1, sess.run(m.lr)))
                 train_perplexity = run_epoch(sess, m, eval_op=m.train_op,
