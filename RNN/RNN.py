@@ -122,24 +122,7 @@ class RNNModel(object):
             tf.reshape(self.output_batch, [-1]), logits = logits) \
             * tf.cast(tf.reshape(non_zero_weights, [-1]), tf.float32)
 
-        '''
-        softmax_w = tf.get_variable(
-            "softmax_w", [size, vocab_size], dtype=tf.float32)
-        softmax_b =tf.get_variable("softmax_b", [vocab_size], dtype=tf.float32)
-        logits = tf.nn.xw_plus_b(output, softmax_w, softmax_b)
-        # Reshape logits to be a 3-D tensor for sequence loss
-        logits = tf.reshape(logits, [self.batch_size, self.num_steps, vocab_size])
-        self.probas = tf.nn.softmax(logits, name='probas')
-        #target = tf.reshape(target,(self.batch_size, self.num_steps))
-        # Use the contrib sequence loss and average over the batches
 
-        loss = tf.contrib.seq2seq.sequence_loss(
-            logits,
-            target,
-            tf.ones([self.batch_size, self.num_steps], dtype=tf.float32),
-            average_across_timesteps=False,
-            average_across_batch=True)
-        '''
 
         self.loss = loss
 
@@ -176,8 +159,8 @@ class RNNModel(object):
 
                         train_loss /= train_valid_words
                         train_ppl = math.exp(train_loss)
-                        print("Training Step: %d, LR: %d" % (global_step, current_learning_rate))
-                        print("Training PPL: %d" % (train_ppl))
+                        print("Training Step: %d, LR: %.3f" % (global_step, current_learning_rate))
+                        print("Training PPL: %.3f" % (train_ppl))
 
                         train_loss = 0.0
                         train_valid_words = 0
@@ -197,10 +180,10 @@ class RNNModel(object):
                     dev_loss += np.sum(_dev_loss)
                     dev_valid_words += _dev_valid_words
 
-                except tf.error.OutOfRangeError:
+                except tf.errors.OutOfRangeError:
                     dev_loss /= dev_valid_words
                     dev_ppl = math.exp(dev_loss)
-                    print("Validation PPL: %d" % (dev_ppl))
+                    print("Validation PPL: %.3f" % (dev_ppl))
                     if dev_ppl < bets_score:
                         patience = 5
                         saver.save(sess, "model/best_model.ckpt" )
@@ -241,8 +224,8 @@ class RNNModel(object):
                     if verbose:
                         dev_loss /= dev_valid_words
                         dev_ppl = math.exp(dev_loss)
-                        print(raw_line + " Test PPL: %d" % (dev_ppl))
+                        print(raw_line + " Test PPL: %.3f" % (dev_ppl))
 
                 global_dev_loss /= global_dev_valid_words
                 global_dev_ppl = math.exp(global_dev_loss)
-                print("Global Test PPL: %d" % (global_dev_ppl))
+                print("Global Test PPL: %.3f" % (global_dev_ppl))
