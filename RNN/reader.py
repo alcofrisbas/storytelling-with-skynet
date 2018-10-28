@@ -23,6 +23,7 @@ import collections
 import os
 import re
 import sys
+import numpy as np
 
 import tensorflow as tf
 
@@ -34,7 +35,7 @@ def _read_words(filename):
             full = []
             words = re.split('(\.)', f.read())
             for line in words:
-                full.append(line.split())
+                full.append(line.strip().replace("<unk>", "__UNK__").split())
             full = [item for sublist in full for item in sublist]
             return full
 
@@ -42,96 +43,39 @@ def _read_words(filename):
             return f.read().decode("utf-8").split()
 
 
-def _build_vocab(filename):
-      data = _read_words(filename)
+def gen_vocab(filename):
+    word_list = _read_words(filename)
+    word_list = list(set(word_list))
 
-      counter = collections.Counter(data)
-      count_pairs = sorted(counter.items(), key=lambda x: (-x[1], x[0]))
+     # We need to tell LSTM the start and the end of a sentence.
+    # And to deal with input sentences with variable lengths,
+    # we also need padding position as 0.
+    word_list = ["_PAD_", "_BOS_", "_EOS_"] + word_list
 
-      words, _ = list(zip(*count_pairs))
-      word_to_id = dict(zip(words, range(len(words))))
-
-      return word_to_id
-
-
-def _file_to_word_ids(filename, word_to_id):
-    data = _read_words(filename)
-    return [word_to_id[word] for word in data if word in word_to_id]
+    with open("data/vocab.txt", "w") as vocab_file:
+        for word in word_list:
+            vocab_file.write(word + '\n')
 
 
-def ptb_raw_data(data_path=None):
-    """Load PTB raw data from data directory "data_path".
 
-    Reads PTB text files, converts strings to integer ids,
-    and performs mini-batching of the inputs.
+def gen_id_seqs(filepath="C:\\Users\Malcolm\Desktop\Classes\comps\comps2018-19\RNN"):
 
-    The PTB dataset comes from Tomas Mikolov's webpage:
+    def word_to_id(word, word_dict):
+        id = word_dict.get(word)
+        return id if id is not None else word_dict.get("_UNK_")
 
-    http://www.fit.vutbr.cz/~imikolov/rnnlm/simple-examples.tgz
+    with open("data/vocab.txt", "r") as vocab_file:
+        lines = [line.strip() for line in vocab_file.readlines()]
+        word_dict = dict([(b,a) for (a,b) in enumerate(lines)])
 
-    Args:
-        data_path: string path to the directory where simple-examples.tgz has
-        been extracted.
-
-    Returns:
-        tuple (train_data, valid_data, test_data, vocabulary)
-        where each of the data objects can be passed to PTBIterator.
-    """
-    if data_path is not None:
-        train_path = os.path.join(data_path, "ptb.train.txt")
-        valid_path = os.path.join(data_path, "ptb.valid.txt")
-        test_path = os.path.join(data_path, "ptb.test.txt")
-    else:
-        train_path = "ptb.train.txt"
-        valid_path = "ptb.valid.txt"
-        test_path ="ptb.test.txt"
-    word_to_id = _build_vocab(train_path)
-    train_data = _file_to_word_ids(train_path, word_to_id)
-    valid_data = _file_to_word_ids(valid_path, word_to_id)
-    test_data = _file_to_word_ids(test_path, word_to_id)
-    vocabulary = len(word_to_id)
-    return train_data, valid_data, test_data, vocabulary
+    with open(filepath, 'r') as raw_file:
+        with open("data/" + filepath.split("/")[-1]+".ids", "w") as current_file:
+            for line in raw_file.readlines():
+                line = [word_to_id(word, word_dict) for word in line.strip().replace("<unk>","_UNK_").split()]
+                # each sentence has the start and the end
+                line_word_ids = [1] + line + [2]
+                current_file.write(" ".join([str(id) for id in line_word_ids]) + "\n")
 
 
-def ptb_producer(raw_data, batch_size, num_steps, name=None):
-    """Iterate on the raw PTB data.
-
-    This chunks up raw_data into batches of examples and returns Tensors that
-    are drawn from these batches.
-
-    Args:
-        raw_data: one of the raw data outputs from ptb_raw_data.
-        batch_size: int, the batch size.
-        num_steps: int, the number of unrolls.
-        name: the name of this operation (optional).
-
-    Returns:
-        A pair of Tensors, each shaped [batch_size, num_steps]. The second element
-        of the tuple is the same data time-shifted to the right by one.
-
-    Raises:
-        tf.errors.InvalidArgumentError: if batch_size or num_steps are too high.
-    """
-    with tf.name_scope(name, "PTBProducer", [raw_data, batch_size, num_steps]):
-        raw_data = tf.convert_to_tensor(raw_data, name="raw_data", dtype=tf.int32)
-
-        data_len = tf.size(raw_data)
-        batch_len = data_len // batch_size
-        data = tf.reshape(raw_data[0 : batch_size * batch_len],
-                        [batch_size, batch_len])
-
-        epoch_size = (batch_len - 1) // num_steps
-        assertion = tf.assert_positive(
-            epoch_size,
-            message="epoch_size == 0, decrease batch_size or num_steps")
-        with tf.control_dependencies([assertion]):
-            epoch_size = tf.identity(epoch_size, name="epoch_size")
-
-        i = tf.train.range_input_producer(epoch_size, shuffle=False).dequeue()
-        x = tf.strided_slice(data, [0, i * num_steps],
-                            [batch_size, (i + 1) * num_steps])
-        x.set_shape([batch_size, num_steps])
-        y = tf.strided_slice(data, [0, i * num_steps + 1],
-                            [batch_size, (i + 1) * num_steps + 1])
-        y.set_shape([batch_size, num_steps])
-        return x, y
+if __name__ == "__main__":
+    gen_id_seqs()
