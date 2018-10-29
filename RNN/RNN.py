@@ -164,7 +164,7 @@ class RNNModel(object):
                         iters * self.batch_size / (time.time() - start_time)))
                 train_valid_words = 0
 
-            print("Epoch: %d Learning rate: %.3f" % (i + 1, self.learning_rate))
+            print("Epoch: %d Learning rate: %.3f" % (i + 1, sess.run(self.learning_rate)))
             sess.run(self.validation_init_op, {self.file_name_validation: "./data/ptb.valid.txt.ids"})
             dev_costs = 0.0
             dev_valid_words = 0
@@ -182,7 +182,7 @@ class RNNModel(object):
                         (step % 1.0/self.valid_epoch, np.exp(dev_costs/iters),
                         iters * self.batch_size /(time.time() - start_time)))
 
-            print("Epoch: %d Learning rate: %.3f" % (i + 1, self.learning_rate))
+            print("Epoch: %d Learning rate: %.3f" % (i + 1, sess.run(self.learning_rate)))
             saver.save(sess, "model/best_model.ckpt")
 
         def predict(self, sess, input_file, raw_file, verbose=False):
