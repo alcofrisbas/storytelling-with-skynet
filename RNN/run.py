@@ -119,14 +119,11 @@ if not os.path.isfile("data/vocab.tx"):
 if not os.path.isfile("data/" + FLAGS.train_file + ".ids"):
     reader.gen_id_seqs(FLAGS.train_file)
     reader.gen_id_seqs(FLAGS.valid_file)
-    reader.gen_id_seqs(FLAGS.test_file)
 
 with open("data/" + FLAGS.train_file + ".ids") as fp:
     num_train_samples = len(fp.readlines())
 with open("data/" + FLAGS.valid_file + ".ids") as fp:
     num_valid_samples = len(fp.readlines())
-with open("data/" + FLAGS.test_file + ".ids") as fp:
-    num_test_samples = len(fp.readlines())
 
 with open("data/vocab.txt") as vocab:
     vocab_size = len(vocab.readlines())
@@ -148,3 +145,12 @@ if TRAIN:
         model.batch_train(sess, saver)
 
 tf.reset_default_graph()
+gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.35)
+with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
+    model = create_model(sess)
+    saver = tf.train.Saver()
+    saver.restore(sess, "model/best_model.ckpt")
+    predict_id_file = os.path.join("data/" + FLAGS.test_file + ".ids")
+    if not os.path.isfile(predict_id_file):
+        gen_id_seqs(test_file)
+    model.predict(sess,predict_id_file, test_file, verbose=VERBOSE)
