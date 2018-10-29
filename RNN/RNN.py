@@ -30,30 +30,26 @@ class RNNModel(object):
         self.max_epoch = config.max_epoch
         self.max_max_epoch = config.max_max_epoch
         self.num_train_samples = num_train_samples
-        self.checkpoint_step = 100
         self.num_valid_samples = num_valid_samples
         self._rnn_params = None
         self._cell = None
         self.num_layers = config.num_layers
         self.num_steps = config.num_steps
-        self.max_gradient_norm=5.0
+        self.max_gradient_norm= config.max_grad_norm
+        self.learning_rate = config.learning_rate
+        self.lr_decay = config.lr_decay
         size = config.hidden_size
 
-        self.global_step = tf.Variable(0, trainable=False)
         # We set a dynamic learining rate, it decays every time the model has gone through 150 batches.
         # A minimum learning rate has also been set.
-        self.learning_rate = tf.train.exponential_decay(config.learning_rate, self.global_step,
-                                           150, 0.96, staircase=True)
-        self.learning_rate = tf.cond(tf.less(self.learning_rate, 0.001), lambda: tf.constant(0.001),
-            lambda: self.learning_rate)
-
         self.dropout_rate = tf.placeholder(tf.float32, name="dropout_rate")
 
         self.file_name_train = tf.placeholder(tf.string)
         self.file_name_validation = tf.placeholder(tf.string)
         self.file_name_test = tf.placeholder(tf.string)
 
-
+        self.train_epoch = (self.num_train_samples - 1) // self.num_steps
+        self.valid_epoch = (self.num_valid_samples - 1) // self.num_steps
 
         def parse(line):
             line_split = tf.string_split([line])
@@ -98,10 +94,10 @@ class RNNModel(object):
 
 
         # output embedding
-        output_embedding_mat = tf.get_variable("output_embedding_mat",
+        self.output_embedding_mat = tf.get_variable("output_embedding_mat",
                                                 [vocab_size, size], dtype=tf.float32)
 
-        output_embedding_bias = tf.get_variable("output_embedding_bias",
+        self.output_embedding_bias = tf.get_variable("output_embedding_bias",
                                                 [vocab_size], dtype=tf.float32)
 
         output, _ = tf.nn.dynamic_rnn(cell=cell, inputs=inputs,
@@ -109,8 +105,8 @@ class RNNModel(object):
 
 
         def output_embedding(current_output):
-            return tf.add(tf.matmul(current_output, tf.transpose(output_embedding_mat)),
-                            output_embedding_bias)
+            return tf.add(tf.matmul(current_output, tf.transpose(self.output_embedding_mat)),
+                            self.output_embedding_bias)
 
         # Compute logits
 
@@ -123,78 +119,71 @@ class RNNModel(object):
 
 
         self.loss = loss
+        self.cost = tf.reduce_sum(loss)
 
         # Train
-
+        self.learning_rate = tf.Variable(0.0, trainable=False)
         params = tf.trainable_variables()
 
         #optimizer = tf.train.GradientDescentOptimizer(self._lr)
         opt= tf.train.AdamOptimizer(learning_rate=0.001, beta1=0.9, beta2=0.999, epsilon=10e-4)
-        gradients = tf.gradients(self.loss, params, colocate_gradients_with_ops=True)
+        gradients = tf.gradients(self.cost, params)
         clipped_gradients, _ = tf.clip_by_global_norm(gradients, self.max_gradient_norm)
-        self.updates = opt.apply_gradients(zip(clipped_gradients, params), global_step=self.global_step)
+        self.updates = opt.apply_gradients(zip(clipped_gradients, params),
+            global_step=tf.train.get_or_create_global_step())
 
-    def batch_train(self, sess, saver):
+    def assign_lr(self, lr_value):
+        return tf.assign(self.learning_rate, lr_value)
+
+    def batch_train(self, sess, saver, config):
         """Runs the model on the given data."""
         best_score = np.inf
         patience = 5
         epoch = 0
 
-        while epoch < self.max_max_epoch:
+        for i in range(self.max_max_epoch):
+
+            lr_decay = self.lr_decay ** max(i + 1 - self.max_epoch, 0.0)
+            self.learning_rate = self.assign_lr(config.learning_rate * lr_decay)
             print("Epoch: %d" % (epoch))
             sess.run(self.training_init_op, {self.file_name_train: "./data/ptb.train.txt.ids"})
-            train_loss = 0.0
+            costs = 0.0
             train_valid_words = 0
-            while True:
+            iters = 0
+            for step in range(self.train_epoch):
+                start_time = time.time()
+                cost, _valid_words, current_learning_rate, _ = sess.run(
+                    [self.cost, self.valid_words, self.learning_rate, self.updates],
+                    {self.dropout_rate:0.5})
+                costs += cost
 
-                try:
-                    _loss, _valid_words, global_step, current_learning_rate, _ = sess.run(
-                        [self.loss, self.valid_words, self.global_step, self.learning_rate, self.updates],
-                        {self.dropout_rate:0.5})
-                    train_loss += np.sum(_loss)
-                    train_valid_words += _valid_words
+                iters += self.num_steps
+                if step % (self.train_epoch // 10) == 10:
+                    print("%.3f perplexity: %.3f speed: %.0f wps" %
+                        (step * 1.0 /self.train_epoch, np.exp(costs/iters),
+                        iters * self.batch_size / (time.time() - start_time)))
+                train_valid_words = 0
 
-                    if global_step % self.checkpoint_step == 0:
-
-                        train_loss /= train_valid_words
-                        train_ppl = math.exp(train_loss)
-                        print("Training Step: %d, LR: %.3f" % (global_step, current_learning_rate))
-                        print("Training PPL: %.3f" % (train_ppl))
-
-                        train_loss = 0.0
-                        train_valid_words = 0
-
-                except tf.errors.OutOfRangeError:
-                    # The end of one epoch
-                    break
-
+            print("Epoch: %d Learning rate: %.3f" % (i + 1, self.learning_rate))
             sess.run(self.validation_init_op, {self.file_name_validation: "./data/ptb.valid.txt.ids"})
-            dev_loss = 0.0
+            dev_costs = 0.0
             dev_valid_words = 0
-            while True:
-                try:
-                    _dev_loss, _dev_valid_words = sess.run(
-                        [self.loss, self.valid_words], {self.dropout_rate: 1.0})
+            iters = 0
+            for step in range(self.valid_epoch):
+                start_time = time.time()
+                dev_cost, _dev_valid_words = sess.run(
+                    [self.cost, self.valid_words], {self.dropout_rate: 1.0})
 
-                    dev_loss += np.sum(_dev_loss)
-                    dev_valid_words += _dev_valid_words
+                dev_costs += dev_cost
+                dev_valid_words += _dev_valid_words
+                iters += self.num_steps
+                if step % (self.valid_epoch // 10) == 10:
+                    print("%.3f perplexity: %.3f speed: %.0f wps" %
+                        (step % 1.0/self.valid_epoch, np.exp(dev_costs/iters),
+                        iters * self.batch_size /(time.time() - start_time)))
 
-                except tf.errors.OutOfRangeError:
-                    dev_loss /= dev_valid_words
-                    dev_ppl = math.exp(dev_loss)
-                    print("Validation PPL: %.3f" % (dev_ppl))
-                    if dev_ppl < best_score:
-                        patience = 5
-                        saver.save(sess, "model/best_model.ckpt" )
-                        best_score = dev_ppl
-                    else:
-                        patience -= 1
-
-                    if patience == 0:
-                        epoch = self.max_max_epochs
-
-                    break
-
+            print("Epoch: %d Learning rate: %.3f" % (i + 1, self.learning_rate))
+            saver.save(sess, "model/best_model.ckpt")
 
         def predict(self, sess, input_file, raw_file, verbose=False):
             # if verbose is trrue, then we print the ppl of every sequence
