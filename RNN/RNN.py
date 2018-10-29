@@ -184,7 +184,7 @@ class RNNModel(object):
                     dev_loss /= dev_valid_words
                     dev_ppl = math.exp(dev_loss)
                     print("Validation PPL: %.3f" % (dev_ppl))
-                    if dev_ppl < bets_score:
+                    if dev_ppl < best_score:
                         patience = 5
                         saver.save(sess, "model/best_model.ckpt" )
                         best_score = dev_ppl
