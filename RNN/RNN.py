@@ -143,6 +143,7 @@ class RNNModel(object):
         epoch = 0
 
         while epoch < self.max_max_epoch:
+            print("Epoch: %d" % (epoch))
             sess.run(self.training_init_op, {self.file_name_train: "./data/ptb.train.txt.ids"})
             train_loss = 0.0
             train_valid_words = 0
