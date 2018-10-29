@@ -132,8 +132,7 @@ config = get_config()
 
 def create_model(sess):
     model = RNN.RNNModel(vocab_size = vocab_size, config=config,
-        num_train_samples=num_train_samples, num_valid_samples=num_valid_samples,
-        num_test_samples=num_test_samples)
+        num_train_samples=num_train_samples, num_valid_samples=num_valid_samples)
     sess.run(tf.global_variables_initializer())
     return model
 

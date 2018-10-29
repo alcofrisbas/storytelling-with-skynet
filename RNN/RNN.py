@@ -24,8 +24,7 @@ import math
 
 class RNNModel(object):
     """model"""
-    def __init__(self, vocab_size, config, num_train_samples, num_valid_samples,
-        num_test_samples):
+    def __init__(self, vocab_size, config, num_train_samples, num_valid_samples):
         self.vocab_size = vocab_size
         self.batch_size = config.batch_size
         self.max_epoch = config.max_epoch
@@ -33,7 +32,6 @@ class RNNModel(object):
         self.num_train_samples = num_train_samples
         self.checkpoint_step = 100
         self.num_valid_samples = num_valid_samples
-        self.num_test_samples = num_test_samples
         self._rnn_params = None
         self._cell = None
         self.num_layers = config.num_layers
