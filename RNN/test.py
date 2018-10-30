@@ -3,10 +3,22 @@ import numpy as np
 import collections
 import RNN
 import reader
-import run
 
-FLAGS = tf.flags.FLAGS
-FLAGS.model = "small"
+class SmallConfig(object):
+    """Small config."""
+    init_scale = 0.1
+    learning_rate = 1.0
+    max_grad_norm = 5
+    num_layers = 2
+    num_steps = 20
+    hidden_size = 200
+    max_epoch = 4
+    max_max_epoch = 13
+    keep_prob = 1.0
+    lr_decay = 0.5
+    batch_size = 20
+    vocab_size = 10000
+
 
 def sample_from_pmf(probas):
     t = np.cumsum(probas)
@@ -16,9 +28,12 @@ def sample_from_pmf(probas):
 def generate_text(sess, model, word_to_index, index_to_word,
     seed='.', n_sentences= 20):
     sentence_cnt = 0
+    print(word_to_index)
     input_seeds_id = [word_to_index[w] for w in seed.split()]
 
+
     # Initiate network with seeds up to the before last word:
+    
     for x in input_seeds_id[:-1]:
         feed_dict = {model.initial_state: state,
                     model.input.input_data: [[x]]}
@@ -43,13 +58,13 @@ def generate_text(sess, model, word_to_index, index_to_word,
     print(text)
 
 if __name__ == '__main__':
-    with open("data/vocab.txt") as vocab:
-        vocab_size =len(vocab.readlines())
+    with open("data/vocab.txt", "r") as vocab_file:
         lines = [line.strip() for line in vocab_file.readlines()]
+        vocab_size = len(lines)
         word_to_id = dict([(b,a) for (a,b) in enumerate(lines)])
         id_to_word = dict([(a,b) for (a,b) in enumerate(lines)])
 
-    eval_config = run.get_config()
+    eval_config = SmallConfig()
     eval_config.num_steps = 1
     eval_config.batch_size = 1
     with tf.Session() as sess:
@@ -61,10 +76,10 @@ if __name__ == '__main__':
 
         while True:
             sentence = input('Write your sentence: ')
-            try:
-                generate_text(sess, model, word_to_id, id_to_word, seed=sentence)
-            except:
-                print("Word not in dictionary.")
+            #try:
+            generate_text(sess, model, word_to_id, id_to_word, seed=sentence)
+            #except:
+                #print("Word not in dictionary.")
             try:
                 input('press Enter to continue ... \n')
             except KeyboardInterrupt:
