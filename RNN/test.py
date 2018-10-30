@@ -1,8 +1,7 @@
 import tensorflow as tf
 import numpy as np
-import collections
 import RNN
-import reader
+import os
 
 class SmallConfig(object):
     """Small config."""
@@ -56,6 +55,27 @@ def generate_text(sess, model, word_to_index, index_to_word,
             sentence_cnt += 1
         input_wordid = [[sampled_word]]
     print(text)
+    return text
+
+
+def load_model():
+    with open("../RNN/data/vocab.txt", "r") as vocab_file:
+        lines = [line.strip() for line in vocab_file.readlines()]
+        vocab_size = len(lines)
+        word_to_id = dict([(b,a) for (a,b) in enumerate(lines)])
+        id_to_word = dict([(a,b) for (a,b) in enumerate(lines)])
+
+    eval_config = SmallConfig()
+    eval_config.num_steps = 1
+    eval_config.batch_size = 1
+    sess = tf.Session()
+    model = RNN.RNN.RNNModel(vocab_size=vocab_size,config=eval_config,
+        num_train_samples=1, num_valid_samples=1)
+    sess.run(tf.global_variables_initializer())
+    saver = tf.train.Saver()
+    saver.restore(sess, tf.train.latest_checkpoint('../RNN/model'))
+    return sess, model, word_to_id, id_to_word
+
 
 if __name__ == '__main__':
     with open("data/vocab.txt", "r") as vocab_file:

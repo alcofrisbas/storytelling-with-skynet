@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from webapp.models import Story
+from RNN.test import load_model, generate_text
 import random
 
 
@@ -56,4 +57,6 @@ def generatePrompt(curPrompt=""):
 
 
 def generateSuggestion(newSentence):
-    return "Placeholder suggestion from WriterBot"
+    sess, model, word_to_id, id_to_word = load_model()
+    suggestion = generate_text(sess, model, word_to_id, id_to_word, newSentence)
+    return suggestion
