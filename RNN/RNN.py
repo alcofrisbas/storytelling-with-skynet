@@ -86,12 +86,14 @@ class RNNModel(object):
 
         batch_length = get_length(non_zero_weights)
 
-        self.initial_state = cell.zero_state(config.batch_size, data_type())
-        state = self.initial_state
+
 
         cell = tf.contrib.rnn.LSTMBlockCell(size, forget_bias = 1)
         cell = tf.contrib.rnn.DropoutWrapper(cell, input_keep_prob=self.dropout_rate)
         cell = tf.contrib.rnn.MultiRNNCell(cells=[cell]*self.num_layers, state_is_tuple=True)
+
+        self.initial_state = cell.zero_state(self.batch_size, tf.float32)
+        state = self.initial_state
 
         self.cell = cell
 
@@ -150,7 +152,7 @@ class RNNModel(object):
             lr_decay = self.lr_decay ** max(i + 1 - self.max_epoch, 0.0)
             self.learning_rate = self.assign_lr(config.learning_rate * lr_decay)
             sess.run(self.training_init_op, {self.file_name_train: "./data/ptb.train.txt.ids"})
-            state = sess.run(model.initial_state)
+            state = sess.run(self.initial_state)
             costs = 0.0
             train_valid_words = 0
             iters = 0
@@ -158,7 +160,7 @@ class RNNModel(object):
                 start_time = time.time()
 
                 cost, _valid_words, current_learning_rate, final_state, _ = sess.run(
-                    [self.cost, self.valid_words, self.learning_rate, model.final_state self.updates],
+                    [self.cost, self.valid_words, self.learning_rate, self.final_state, self.updates],
                     {self.dropout_rate:0.5})
                 costs += cost
 
@@ -173,12 +175,12 @@ class RNNModel(object):
             sess.run(self.validation_init_op, {self.file_name_validation: "./data/ptb.valid.txt.ids"})
             dev_costs = 0.0
             dev_valid_words = 0
-            state = sess.run(model.initial_state)
+            state = sess.run(self.initial_state)
             iters = 0
             for step in range(self.valid_epoch):
                 start_time = time.time()
                 dev_cost, _dev_valid_words, final_state = sess.run(
-                    [self.cost, self.valid_words, model.final_state], {self.dropout_rate: 1.0})
+                    [self.cost, self.valid_words, self.final_state], {self.dropout_rate: 1.0})
 
                 dev_costs += dev_cost
                 dev_valid_words += _dev_valid_words
