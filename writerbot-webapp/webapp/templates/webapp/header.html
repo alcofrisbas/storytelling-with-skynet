@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WriterBot</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+{#    <link rel="stylesheet" href="{% static 'css/cover.css' %}">#}
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+<body class="body">
+    <div class="container">
+      <header>
+          <h3>WriterBot</h3>
+          <nav>
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+          </nav>
+      </header>
+
+      {% block content %}
+      {% endblock %}
+    </div>
+</body>
+</html>
