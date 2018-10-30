@@ -32,6 +32,7 @@ class RNNModel(object):
         self.num_train_samples = num_train_samples
         self.num_valid_samples = num_valid_samples
         self._rnn_params = None
+        self.keep_prob = config.keep_prob
         self._cell = None
         self.num_layers = config.num_layers
         self.num_steps = config.num_steps
@@ -42,7 +43,6 @@ class RNNModel(object):
 
         # We set a dynamic learining rate, it decays every time the model has gone through 150 batches.
         # A minimum learning rate has also been set.
-        self.dropout_rate = tf.placeholder(tf.float32, name="dropout_rate")
 
         self.file_name_train = tf.placeholder(tf.string)
         self.file_name_validation = tf.placeholder(tf.string)
@@ -89,7 +89,7 @@ class RNNModel(object):
 
 
         cell = tf.contrib.rnn.LSTMBlockCell(size, forget_bias = 1)
-        cell = tf.contrib.rnn.DropoutWrapper(cell, input_keep_prob=self.dropout_rate)
+        cell = tf.contrib.rnn.DropoutWrapper(cell, input_keep_prob=self.keep_prob)
         cell = tf.contrib.rnn.MultiRNNCell(cells=[cell]*self.num_layers, state_is_tuple=True)
 
         self.initial_state = cell.zero_state(self.batch_size, tf.float32)
@@ -117,7 +117,7 @@ class RNNModel(object):
 
         logits = tf.map_fn(output_embedding, output)
         logits = tf.reshape(logits, [-1, vocab_size])
-        self.probas = tf.nn.softmax(logits, name='probas')
+        self.probas = tf.nn.softmax(logits, name='p')
         loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=
             tf.reshape(self.output_batch, [-1]), logits = logits) \
             * tf.cast(tf.reshape(non_zero_weights, [-1]), tf.float32)
@@ -144,25 +144,18 @@ class RNNModel(object):
 
     def batch_train(self, sess, saver, config):
         """Runs the model on the given data."""
-        best_score = np.inf
-        patience = 5
-        epoch = 0
-
         for i in range(self.max_max_epoch):
-
             lr_decay = self.lr_decay ** max(i + 1 - self.max_epoch, 0.0)
             self.learning_rate = self.assign_lr(config.learning_rate * lr_decay)
             sess.run(self.training_init_op, {self.file_name_train: "./data/ptb.train.txt.ids"})
             state = sess.run(self.initial_state)
             costs = 0.0
-            train_valid_words = 0
             iters = 0
             for step in range(self.train_epoch):
                 start_time = time.time()
 
-                cost, _valid_words, current_learning_rate, final_state, _ = sess.run(
-                    [self.cost, self.valid_words, self.learning_rate, self.final_state, self.updates],
-                    {self.dropout_rate:0.5})
+                cost, current_learning_rate, final_state, _ = sess.run(
+                    [self.cost, self.learning_rate, self.final_state, self.updates])
                 costs += cost
 
                 iters += self.num_steps
@@ -170,21 +163,18 @@ class RNNModel(object):
                     print("%.3f perplexity: %.3f speed: %.0f wps" %
                         (step * 1.0 /self.train_epoch, np.exp(costs/iters),
                         iters * self.batch_size / (time.time() - start_time)))
-                train_valid_words = 0
 
             print("Epoch: %d Learning rate: %.3f" % (i + 1, sess.run(self.learning_rate)))
             sess.run(self.validation_init_op, {self.file_name_validation: "./data/ptb.valid.txt.ids"})
             dev_costs = 0.0
-            dev_valid_words = 0
             state = sess.run(self.initial_state)
             iters = 0
             for step in range(self.valid_epoch):
                 start_time = time.time()
-                dev_cost, _dev_valid_words, final_state = sess.run(
-                    [self.cost, self.valid_words, self.final_state], {self.dropout_rate: 1.0})
+                dev_cost, final_state = sess.run(
+                    [self.cost, self.final_state])
 
                 dev_costs += dev_cost
-                dev_valid_words += _dev_valid_words
                 iters += self.num_steps
                 if step % (self.valid_epoch // 10) == 10:
                     print("%.3f perplexity: %.3f speed: %.0f wps" %
@@ -202,27 +192,21 @@ class RNNModel(object):
         with open(raw_file) as fp:
 
             global_dev_loss = 0.0
-            global_dev_valid_words = 0
 
             for raw_line in fp.readlines():
 
                 raw_line = raw_line.strip()
 
-                _dev_loss, _dev_valid_words, input_line = ses.run(
-                    [self.loss, self.valid_words, self.input_batch],
-                    {self.dropout_rate: 1.0})
+                dev_cost, input_line = ses.run(
+                    [self.cost, self.input_batch])
 
-                dev_loss = np.sum(_dev_loss)
-                dev_valid_words = _dev_valid_words
 
-                global_dev_loss += dev_loss
-                global_dev_valid_words += dev_valid_words
+
+                dev_costs += dev_cost
 
                 if verbose:
-                    dev_loss /= dev_valid_words
-                    dev_ppl = math.exp(dev_loss)
+                    dev_ppl = np.exp(dev_cost)
                     print(raw_line + " Test PPL: %.3f" % (dev_ppl))
 
-            global_dev_loss /= global_dev_valid_words
-            global_dev_ppl = math.exp(global_dev_loss)
-            print("Global Test PPL: %.3f" % (global_dev_ppl))
+            dev_ppl = math.exp(dev_costs)
+            print("Global Test PPL: %.3f" % (dev_ppl))
