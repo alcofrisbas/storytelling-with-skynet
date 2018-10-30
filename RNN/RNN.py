@@ -145,7 +145,6 @@ class RNNModel(object):
 
             lr_decay = self.lr_decay ** max(i + 1 - self.max_epoch, 0.0)
             self.learning_rate = self.assign_lr(config.learning_rate * lr_decay)
-            print("Epoch: %d" % (epoch))
             sess.run(self.training_init_op, {self.file_name_train: "./data/ptb.train.txt.ids"})
             costs = 0.0
             train_valid_words = 0
@@ -185,35 +184,35 @@ class RNNModel(object):
             print("Epoch: %d Learning rate: %.3f" % (i + 1, sess.run(self.learning_rate)))
             saver.save(sess, "model/best_model.ckpt")
 
-        def predict(self, sess, input_file, raw_file, verbose=False):
-            # if verbose is trrue, then we print the ppl of every sequence
+    def predict(self, sess, input_file, raw_file, verbose=False):
+        # if verbose is trrue, then we print the ppl of every sequence
 
-            sess.run(self.test_init_op, {self.file_name_test: input_file})
+        sess.run(self.test_init_op, {self.file_name_test: input_file})
 
-            with open(raw_file) as fp:
+        with open(raw_file) as fp:
 
-                global_dev_loss = 0.0
-                global_dev_valid_words = 0
+            global_dev_loss = 0.0
+            global_dev_valid_words = 0
 
-                for raw_line in fp.readlines():
+            for raw_line in fp.readlines():
 
-                    raw_line = raw_line.strip()
+                raw_line = raw_line.strip()
 
-                    _dev_loss, _dev_valid_words, input_line = ses.run(
-                        [self.loss, self.valid_words, self.input_batch],
-                        {self.dropout_rate: 1.0})
+                _dev_loss, _dev_valid_words, input_line = ses.run(
+                    [self.loss, self.valid_words, self.input_batch],
+                    {self.dropout_rate: 1.0})
 
-                    dev_loss = np.sum(_dev_loss)
-                    dev_valid_words = _dev_valid_words
+                dev_loss = np.sum(_dev_loss)
+                dev_valid_words = _dev_valid_words
 
-                    global_dev_loss += dev_loss
-                    global_dev_valid_words += dev_valid_words
+                global_dev_loss += dev_loss
+                global_dev_valid_words += dev_valid_words
 
-                    if verbose:
-                        dev_loss /= dev_valid_words
-                        dev_ppl = math.exp(dev_loss)
-                        print(raw_line + " Test PPL: %.3f" % (dev_ppl))
+                if verbose:
+                    dev_loss /= dev_valid_words
+                    dev_ppl = math.exp(dev_loss)
+                    print(raw_line + " Test PPL: %.3f" % (dev_ppl))
 
-                global_dev_loss /= global_dev_valid_words
-                global_dev_ppl = math.exp(global_dev_loss)
-                print("Global Test PPL: %.3f" % (global_dev_ppl))
+            global_dev_loss /= global_dev_valid_words
+            global_dev_ppl = math.exp(global_dev_loss)
+            print("Global Test PPL: %.3f" % (global_dev_ppl))

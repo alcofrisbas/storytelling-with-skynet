@@ -57,12 +57,11 @@ def gen_vocab(filename):
             vocab_file.write(word + '\n')
 
 
+def word_to_id(word, word_dict):
+    id = word_dict.get(word)
+    return id if id is not None else word_dict.get("_UNK_")
 
-def gen_id_seqs(filepath="C:\\Users\Malcolm\Desktop\Classes\comps\comps2018-19\RNN"):
-
-    def word_to_id(word, word_dict):
-        id = word_dict.get(word)
-        return id if id is not None else word_dict.get("_UNK_")
+def gen_id_seqs(filepath=""):
 
     with open("data/vocab.txt", "r") as vocab_file:
         lines = [line.strip() for line in vocab_file.readlines()]

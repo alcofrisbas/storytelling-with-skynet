@@ -1,8 +1,9 @@
 import tensorflow as tf
 import numpy as np
 import collections
-import rnn_run
+import RNN
 import reader
+import run
 
 FLAGS = tf.flags.FLAGS
 FLAGS.model = "small"
@@ -16,7 +17,6 @@ def generate_text(sess, model, word_to_index, index_to_word,
     seed='.', n_sentences= 20):
     sentence_cnt = 0
     input_seeds_id = [word_to_index[w] for w in seed.split()]
-    state = sess.run(model.initial_state)
 
     # Initiate network with seeds up to the before last word:
     for x in input_seeds_id[:-1]:
@@ -43,32 +43,30 @@ def generate_text(sess, model, word_to_index, index_to_word,
     print(text)
 
 if __name__ == '__main__':
-    word_to_id = reader._build_vocab('ptb.train.txt') # here we load the word -> id dictionnary ()
-    id_to_word = dict(zip(word_to_id.values(), word_to_id.keys())) # and transform it into id -> word dictionnary
-    _, _, test_data, vocab_size = reader.ptb_raw_data()
+    with open("data/vocab.txt") as vocab:
+        vocab_size =len(vocab.readlines())
+        lines = [line.strip() for line in vocab_file.readlines()]
+        word_to_id = dict([(b,a) for (a,b) in enumerate(lines)])
+        id_to_word = dict([(a,b) for (a,b) in enumerate(lines)])
 
-    eval_config = rnn_run.get_config()
+    eval_config = run.get_config()
     eval_config.num_steps = 1
     eval_config.batch_size = 1
-    model_input = rnn_run.Input(eval_config, test_data)
-    sess  = tf.Session()
-    initializer = tf.random_uniform_initializer(-eval_config.init_scale,
-        eval_config.init_scale)
-    with tf.variable_scope("Model", reuse=None, initializer=initializer):
-        tf.global_variables_initializer()
-        mtest = rnn_run.RNNModel(is_training=False, config=eval_config, input_=model_input, vocab_size=vocab_size)
+    with tf.Session() as sess:
+        model = RNN.RNNModel(vocab_size=vocab_size,config=eval_config,
+            num_train_samples=1, num_valid_samples=1)
         sess.run(tf.global_variables_initializer())
-    saver = tf.train.Saver()
-    saver.restore(sess, tf.train.latest_checkpoint('./models'))
+        saver = tf.train.Saver()
+        saver.restore(sess, tf.train.latest_checkpoint('./model'))
 
-    while True:
-        sentence = input('Write your sentence: ')
-        try:
-            generate_text(sess, mtest, word_to_id, id_to_word, seed=sentence)
-        except:
-            print("Word not in dictionary.")
-        try:
-            input('press Enter to continue ... \n')
-        except KeyboardInterrupt:
-            print('\b\bQuiting now...')
-            break
+        while True:
+            sentence = input('Write your sentence: ')
+            try:
+                generate_text(sess, model, word_to_id, id_to_word, seed=sentence)
+            except:
+                print("Word not in dictionary.")
+            try:
+                input('press Enter to continue ... \n')
+            except KeyboardInterrupt:
+                print('\b\bQuiting now...')
+                break
