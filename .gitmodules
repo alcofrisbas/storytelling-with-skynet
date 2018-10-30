@@ -1,6 +1,3 @@
 [submodule "webscrape-gutenberg"]
 	path = webscrape-gutenberg
 	url = https://github.com/alcofrisbas/webscrape-gutenberg.git
-[submodule "writerbot-webapp"]
-	path = writerbot-webapp
-	url = https://github.com/GalenWQ/writerbot-webapp.git
