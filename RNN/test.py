@@ -28,22 +28,22 @@ def sample_from_pmf(probas):
 def generate_text(sess, model, word_to_index, index_to_word,
     seed='.', n_sentences= 20):
     sentence_cnt = 0
-    print(word_to_index)
     input_seeds_id = [word_to_index[w] for w in seed.split()]
+    state = sess.run(model.initial_state)
 
 
     # Initiate network with seeds up to the before last word:
-    
+
     for x in input_seeds_id[:-1]:
         feed_dict = {model.initial_state: state,
-                    model.input.input_data: [[x]]}
+                    model.input_batch: [[x]]}
         state = sess.run([model.final_state], feed_dict)
 
     text = seed
     # Generate a new sample from previous, starting at last word seed
     input_id = [[input_seeds_id[-1]]]
     while sentence_cnt < n_sentences:
-        feed_dict = {model.input.input_data: input_id,
+        feed_dict = {model.input_batch: input_id,
                     model.initial_state: state}
         probas, state = sess.run([model.probas, model.final_state],
                                 feed_dict=feed_dict)
