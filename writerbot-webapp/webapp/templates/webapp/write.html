@@ -1,0 +1,21 @@
+{%  extends "webapp/header.html" %}
+
+{% block content %}
+
+    <h5>Prompt: {{ prompt }}</h5>
+    <p>Start writing here: <br>
+    {% for sentence in sentences %}
+        <br>{{ sentence }}
+    {% endfor %}
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+        <textarea name="text">{{ suggestion }}</textarea><br>
+        <input type="submit" name="add-sentence" value="Add Sentence">
+    </form>
+
+    <form>
+        <button type="submit" name="new" value="true">Start a new story</button>
+    </form>
+{% endblock %}
