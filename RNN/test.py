@@ -38,7 +38,7 @@ def generate_text(sess, model, word_to_index, index_to_word,
                     model.input_batch: [[x]]}
         state = sess.run([model.final_state], feed_dict)
 
-    text = seed
+    text = ''
     # Generate a new sample from previous, starting at last word seed
     input_id = [[input_seeds_id[-1]]]
     while sentence_cnt < n_sentences:
