@@ -35,7 +35,7 @@ def _read_words(filename):
             full = []
             words = re.split('(\.)', f.read())
             for line in words:
-                full.append(line.strip().replace("<unk>", "__UNK__").split())
+                full.append(line.strip().replace("<unk>", "_UNK_").split())
             full = [item for sublist in full for item in sublist]
             return full
 
@@ -50,7 +50,7 @@ def gen_vocab(filename):
      # We need to tell LSTM the start and the end of a sentence.
     # And to deal with input sentences with variable lengths,
     # we also need padding position as 0.
-    word_list = ["_PAD_", "_BOS_", "_EOS_"] + word_list
+    word_list = ["_UNK_","_PAD_", "_BOS_", "_EOS_"] + word_list
 
     with open("data/vocab.txt", "w") as vocab_file:
         for word in word_list:

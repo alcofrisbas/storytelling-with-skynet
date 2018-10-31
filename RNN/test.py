@@ -27,7 +27,12 @@ def sample_from_pmf(probas):
 def generate_text(sess, model, word_to_index, index_to_word,
     seed='.', n_sentences= 20):
     sentence_cnt = 0
-    input_seeds_id = [word_to_index[w] for w in seed.split()]
+    input_seeds_id = []
+    for w in seed.split():
+        try:
+            input_seeds_id.append(word_to_index[w])
+        except:   # if word is not in vocabulary, processed as _UNK_
+            input_seeds_id.append(word_to_index["_UNK_"])
     state = sess.run(model.initial_state)
 
 

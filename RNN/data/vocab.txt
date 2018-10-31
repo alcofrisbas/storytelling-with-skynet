@@ -1,6 +1,7 @@
 _PAD_
 _BOS_
 _EOS_
+_UNK_
 short-lived
 horses
 spurring
