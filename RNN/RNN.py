@@ -64,13 +64,16 @@ class RNNModel(object):
         iterator = tf.data.Iterator.from_structure(training_dataset.output_types,
             training_dataset.output_shapes)
 
+        self.prev_sentence = None
         self.input_batch, self.output_batch = iterator.get_next()
+
 
         self.training_init_op = iterator.make_initializer(training_dataset)
         self.validation_init_op = iterator.make_initializer(validation_dataset)
         self.test_init_op = iterator.make_initializer(test_dataset)
 
         # input embedding
+
         embedding = tf.get_variable(
             "embedding", [self.vocab_size, size], dtype=tf.float32)
         inputs = tf.nn.embedding_lookup(embedding, self.input_batch)
@@ -87,15 +90,20 @@ class RNNModel(object):
         batch_length = get_length(non_zero_weights)
 
 
+        cell0 = tf.contrib.rnn.LSTMBlockCell(size, forget_bias = 1, reuse=tf.AUTO_REUSE)
+        cell0 = tf.contrib.rnn.DropoutWrapper(cell0, input_keep_prob=self.keep_prob)
 
-        cell = tf.contrib.rnn.LSTMBlockCell(size, forget_bias = 1)
-        cell = tf.contrib.rnn.DropoutWrapper(cell, input_keep_prob=self.keep_prob)
-        cell = tf.contrib.rnn.MultiRNNCell(cells=[cell]*self.num_layers, state_is_tuple=True)
+        cell1 = tf.contrib.rnn.LSTMBlockCell(size, forget_bias = 1, reuse=tf.AUTO_REUSE)
+        cell1 = tf.contrib.rnn.DropoutWrapper(cell1, input_keep_prob=self.keep_prob)
 
-        self.initial_state = cell.zero_state(self.batch_size, tf.float32)
+
+        #cell = tf.contrib.rnn.MultiRNNCell(cells=[cell]*self.num_layers, state_is_tuple=True)
+
+        self.initial_state = cell0.zero_state(self.batch_size, tf.float32)
         state = self.initial_state
 
-        self.cell = cell
+        self.cell0 = cell0
+        self.cell1 = cell1
 
 
         # output embedding
@@ -105,9 +113,11 @@ class RNNModel(object):
         self.output_embedding_bias = tf.get_variable("output_embedding_bias",
                                                 [vocab_size], dtype=tf.float32)
 
-        output, _ = tf.nn.dynamic_rnn(cell=cell, inputs=inputs,
+        output, state0 = tf.nn.dynamic_rnn(cell=cell0, inputs = inputs,
             sequence_length=batch_length, initial_state=state, dtype=tf.float32)
 
+        output, state = tf.nn.dynamic_rnn(cell=cell1, inputs = inputs,
+            sequence_length=batch_length, initial_state=state0, dtype=tf.float32)
 
         def output_embedding(current_output):
             return tf.add(tf.matmul(current_output, tf.transpose(self.output_embedding_mat)),

@@ -1,8 +1,7 @@
 import tensorflow as tf
 import numpy as np
-import collections
 import RNN
-import reader
+import os
 
 class SmallConfig(object):
     """Small config."""
@@ -28,7 +27,12 @@ def sample_from_pmf(probas):
 def generate_text(sess, model, word_to_index, index_to_word,
     seed='.', n_sentences= 20):
     sentence_cnt = 0
-    input_seeds_id = [word_to_index[w] for w in seed.split()]
+    input_seeds_id = []
+    for w in seed.split():
+        try:
+            input_seeds_id.append(word_to_index[w])
+        except:   # if word is not in vocabulary, processed as _UNK_
+            input_seeds_id.append(word_to_index["_UNK_"])
     state = sess.run(model.initial_state)
 
 
@@ -39,7 +43,7 @@ def generate_text(sess, model, word_to_index, index_to_word,
                     model.input_batch: [[x]]}
         state = sess.run([model.final_state], feed_dict)
 
-    text = seed
+    text = ''
     # Generate a new sample from previous, starting at last word seed
     input_id = [[input_seeds_id[-1]]]
     while sentence_cnt < n_sentences:
@@ -56,6 +60,27 @@ def generate_text(sess, model, word_to_index, index_to_word,
             sentence_cnt += 1
         input_wordid = [[sampled_word]]
     print(text)
+    return text
+
+
+def load_model():
+    with open("../RNN/data/vocab.txt", "r") as vocab_file:
+        lines = [line.strip() for line in vocab_file.readlines()]
+        vocab_size = len(lines)
+        word_to_id = dict([(b,a) for (a,b) in enumerate(lines)])
+        id_to_word = dict([(a,b) for (a,b) in enumerate(lines)])
+
+    eval_config = SmallConfig()
+    eval_config.num_steps = 1
+    eval_config.batch_size = 1
+    sess = tf.Session()
+    model = RNN.RNN.RNNModel(vocab_size=vocab_size,config=eval_config,
+        num_train_samples=1, num_valid_samples=1)
+    sess.run(tf.global_variables_initializer())
+    saver = tf.train.Saver()
+    saver.restore(sess, tf.train.latest_checkpoint('../RNN/model'))
+    return sess, model, word_to_id, id_to_word
+
 
 if __name__ == '__main__':
     with open("data/vocab.txt", "r") as vocab_file:

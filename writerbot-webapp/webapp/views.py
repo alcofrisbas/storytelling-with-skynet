@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from webapp.models import Story
+from RNN.test import load_model, generate_text
 import random
 
+sess, model, word_to_id, id_to_word = None, None, None, None
 
 # Create your views here.
 def home(request):
@@ -18,6 +20,11 @@ def write(request):
 
     if "sentences" not in request.session.keys():
         request.session["sentences"] = []
+
+    global sess, model, word_to_id, id_to_word
+
+    if not model:
+        sess, model, word_to_id, id_to_word = load_model()
 
     suggestion = ""
 
@@ -56,4 +63,5 @@ def generatePrompt(curPrompt=""):
 
 
 def generateSuggestion(newSentence):
-    return "Placeholder suggestion from WriterBot"
+    suggestion = generate_text(sess, model, word_to_id, id_to_word, newSentence)
+    return suggestion
