@@ -33,10 +33,10 @@ def _read_words(filename):
     with tf.gfile.GFile(filename, "r") as f:
         if Py3:
             full = []
-            words = re.split('(\.)', f.read())
+            words = re.split(r'([;|, |.|,|:|?|!])', f.read())
             for line in words:
-                full.append(line.strip().replace("<unk>", "_UNK_").split())
-            full = [item for sublist in full for item in sublist]
+                if line not in ['', ' ']:
+                    full.append(line)
             return full
 
         else:
@@ -51,6 +51,10 @@ def gen_vocab(filename):
     # And to deal with input sentences with variable lengths,
     # we also need padding position as 0.
     word_list = ["_UNK_","_PAD_", "_BOS_", "_EOS_"] + word_list
+    punctuation = ['.', '?', '!']
+    for i in punctuation:
+        if i not in word_list:
+            word_list.append(i)
 
     with open("data/vocab.txt", "w") as vocab_file:
         for word in word_list:

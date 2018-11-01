@@ -8,6 +8,8 @@ theories
 refining
 delay
 function
+?
+!
 grow
 ruth
 access
@@ -1455,8 +1457,6 @@ tea
 outlined
 snow
 operator
-drafted
-fray
 tiny
 old-fashioned
 placement

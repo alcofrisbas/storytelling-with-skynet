@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import RNN
+import re
 import os
 
 class SmallConfig(object):
@@ -25,10 +26,17 @@ def sample_from_pmf(probas):
     return int(np.searchsorted(t, np.random.rand(1) * s))
 
 def generate_text(sess, model, word_to_index, index_to_word,
-    seed='.', n_sentences= 20):
+    seed='.', n_sentences= 1):
     sentence_cnt = 0
     input_seeds_id = []
-    for w in seed.split():
+    seed = seed.lower()
+    seed = re.split(r'([;|, |.|,|:|?|!])', seed)
+    new_seed = []
+    for word in seed:
+        if word not in ['', ' ']:
+            new_seed.append(word)
+
+    for w in seed:
         try:
             input_seeds_id.append(word_to_index[w])
         except:   # if word is not in vocabulary, processed as _UNK_
@@ -52,12 +60,20 @@ def generate_text(sess, model, word_to_index, index_to_word,
         probas, state = sess.run([model.probas, model.final_state],
                                 feed_dict=feed_dict)
         sampled_word = sample_from_pmf(probas[0])
-        if sampled_word == word_to_index['.']:
+        punctuation = [word_to_index['.'], word_to_index['?'], word_to_index['!']]
+        print(index_to_word[sampled_word])
+        if sampled_word in punctuation:
             text += '.\n'
             sentence_cnt += 1
         else:
-            text += ' ' + index_to_word[sampled_word]
-            sentence_cnt += 1
+            if index_to_word[sampled_word] in ["_UNK_","_PAD_", "_BOS_", "_EOS_"]:
+                text += ''
+            else:
+                # case if processing the first word
+                if text == '':
+                    text += index_to_word[sampled_word].capitalize()
+                else:
+                    text += ' ' + index_to_word[sampled_word]
         input_wordid = [[sampled_word]]
     print(text)
     return text
