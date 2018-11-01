@@ -63,9 +63,13 @@ class RNNModel(object):
 
         iterator = tf.data.Iterator.from_structure(training_dataset.output_types,
             training_dataset.output_shapes)
-
-        self.prev_sentence = None
-        self.input_batch, self.output_batch = iterator.get_next()
+        self.input_batch0 = self.output_batch0 = None
+        if self.input_batch0 == None:
+            self.input_batch0, self.output_batch0 = iterator.get_next()
+        else:
+            self.input_batch0 = self.input_batch1
+            self.output_batch0 = self.otuput_batch1
+        self.input_batch1, self.output_batch1 = iterator.get_next()
 
 
         self.training_init_op = iterator.make_initializer(training_dataset)
@@ -76,9 +80,11 @@ class RNNModel(object):
 
         embedding = tf.get_variable(
             "embedding", [self.vocab_size, size], dtype=tf.float32)
-        inputs = tf.nn.embedding_lookup(embedding, self.input_batch)
+        inputs0 = tf.nn.embedding_lookup(embedding, self.input_batch0)
+        inputs1 = tf.nn.embedding_lookup(embedding, self.input_batch1)
 
-        non_zero_weights = tf.sign(self.input_batch)
+        non_zero_weights = tf.sign(self.input_batch0)
+        non_zero_weights1 = tf.sign(self.input_batch1)
         self.valid_words = tf.reduce_sum(non_zero_weights)
 
         # Compute sequence length
@@ -90,14 +96,12 @@ class RNNModel(object):
         batch_length = get_length(non_zero_weights)
 
 
-        cell0 = tf.contrib.rnn.LSTMBlockCell(size, forget_bias = 1, reuse=tf.AUTO_REUSE)
+        cell0 = tf.contrib.rnn.LSTMBlockCell(size, forget_bias = 1, use_peephole=True, reuse=tf.AUTO_REUSE)
         cell0 = tf.contrib.rnn.DropoutWrapper(cell0, input_keep_prob=self.keep_prob)
 
-        cell1 = tf.contrib.rnn.LSTMBlockCell(size, forget_bias = 1, reuse=tf.AUTO_REUSE)
+        cell1 = tf.contrib.rnn.LSTMBlockCell(size, forget_bias = 1, use_peephole=True, reuse=tf.AUTO_REUSE)
         cell1 = tf.contrib.rnn.DropoutWrapper(cell1, input_keep_prob=self.keep_prob)
 
-
-        #cell = tf.contrib.rnn.MultiRNNCell(cells=[cell]*self.num_layers, state_is_tuple=True)
 
         self.initial_state = cell0.zero_state(self.batch_size, tf.float32)
         state = self.initial_state
@@ -112,10 +116,10 @@ class RNNModel(object):
         self.output_embedding_bias = tf.get_variable("output_embedding_bias",
                                                 [vocab_size], dtype=tf.float32)
 
-        output, state0 = tf.nn.dynamic_rnn(cell=cell0, inputs = inputs,
+        output0, state0 = tf.nn.dynamic_rnn(cell=cell0, inputs = inputs0,
             sequence_length=batch_length, initial_state=state, dtype=tf.float32)
 
-        output, state = tf.nn.dynamic_rnn(cell=cell1, inputs = inputs,
+        output1, state = tf.nn.dynamic_rnn(cell=cell1, inputs = inputs1,
             sequence_length=batch_length, initial_state=state0, dtype=tf.float32)
 
         def output_embedding(current_output):
@@ -124,12 +128,12 @@ class RNNModel(object):
 
         # Compute logits
 
-        logits = tf.map_fn(output_embedding, output)
+        logits = tf.map_fn(output_embedding, output1)
         logits = tf.reshape(logits, [-1, vocab_size])
         self.probas = tf.nn.softmax(logits, name='p')
         loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=
-            tf.reshape(self.output_batch, [-1]), logits = logits) \
-            * tf.cast(tf.reshape(non_zero_weights, [-1]), tf.float32)
+            tf.reshape(self.output_batch1, [-1]), logits = logits) \
+            * tf.cast(tf.reshape(non_zero_weights1, [-1]), tf.float32)
 
 
 

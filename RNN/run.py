@@ -61,7 +61,7 @@ class SmallConfig(object):
     max_max_epoch = 13
     keep_prob = 1.0
     lr_decay = 0.5
-    batch_size = 20
+    batch_size = 1
     vocab_size = 10000
 
 
@@ -77,7 +77,7 @@ class MediumConfig(object):
     max_max_epoch = 39
     keep_prob = 0.5
     lr_decay = 0.8
-    batch_size = 20
+    batch_size = 1
     vocab_size = 10000
 
 
@@ -93,7 +93,7 @@ class LargeConfig(object):
     max_max_epoch = 55
     keep_prob = 0.35
     lr_decay = 1 / 1.15
-    batch_size = 20
+    batch_size = 1
     vocab_size = 10000
 
 def get_config():
