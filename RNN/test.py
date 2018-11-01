@@ -48,14 +48,14 @@ def generate_text(sess, model, word_to_index, index_to_word,
 
     for x in input_seeds_id[:-1]:
         feed_dict = {model.initial_state: state,
-                    model.input_batch: [[x]]}
+                    model.input_batch0: [[x]]}
         state = sess.run([model.final_state], feed_dict)
 
     text = ''
     # Generate a new sample from previous, starting at last word seed
     input_id = [[input_seeds_id[-1]]]
     while sentence_cnt < n_sentences:
-        feed_dict = {model.input_batch: input_id,
+        feed_dict = {model.input_batch1: input_id,
                     model.initial_state: state}
         probas, state = sess.run([model.probas, model.final_state],
                                 feed_dict=feed_dict)
