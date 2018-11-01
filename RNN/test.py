@@ -61,7 +61,6 @@ def generate_text(sess, model, word_to_index, index_to_word,
                                 feed_dict=feed_dict)
         sampled_word = sample_from_pmf(probas[0])
         punctuation = [word_to_index['.'], word_to_index['?'], word_to_index['!']]
-        print(index_to_word[sampled_word])
         if sampled_word in punctuation:
             text += '.\n'
             sentence_cnt += 1

@@ -105,7 +105,6 @@ class RNNModel(object):
         self.cell0 = cell0
         self.cell1 = cell1
 
-
         # output embedding
         self.output_embedding_mat = tf.get_variable("output_embedding_mat",
                                                 [vocab_size, size], dtype=tf.float32)
