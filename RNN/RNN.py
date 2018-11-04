@@ -51,30 +51,60 @@ class RNNModel(object):
         self.train_epoch = (self.num_train_samples - 1) // self.num_steps
         self.valid_epoch = (self.num_valid_samples - 1) // self.num_steps
 
+
         def parse(line):
             line_split = tf.string_split([line])
             input_seq = tf.string_to_number(line_split.values[:-1], out_type=tf.int32)
             output_seq = tf.string_to_number(line_split.values[1:], out_type=tf.int32)
             return input_seq, output_seq
+        '''
+        with tf.gfile.GFile("data/ptb.train.txt.ids") as f:
+            lines = f.readlines()
+            print(lines)
+            train_data = []
+            for line in lines:
+                train_data.append((parse(line)))
+        print(1)
+        '''
+        training_dataset0 = tf.data.TextLineDataset(self.file_name_train).map(parse).padded_batch(config.batch_size, padded_shapes=([None],[None]))
+        # gets next batch so that wen can combine the two datasets into one
+        training_dataset1 = training_dataset0.skip(1)
+        training_dataset = tf.data.Dataset.zip((training_dataset0, training_dataset1))
 
-        training_dataset = tf.data.TextLineDataset(self.file_name_train).map(parse).padded_batch(config.batch_size, padded_shapes=([None],[None]))
-        validation_dataset = tf.data.TextLineDataset(self.file_name_validation).map(parse).padded_batch(config.batch_size, padded_shapes=([None],[None]))
-        test_dataset = tf.data.TextLineDataset(self.file_name_test).map(parse).batch(1)
+        validation_dataset0 = tf.data.TextLineDataset(self.file_name_validation).map(parse).padded_batch(config.batch_size, padded_shapes=([None],[None]))
+        validation_dataset1 = validation_dataset0.skip(1)
+        validation_dataset = tf.data.Dataset.zip((validation_dataset0, validation_dataset1))
+
+        test_dataset0 = tf.data.TextLineDataset(self.file_name_test).map(parse).batch(1)
+        test_dataset1 = test_dataset0.skip(1)
+        test_dataset = tf.data.Dataset.zip((test_dataset0, test_dataset1))
+
+        temp_iter = tf.data.Iterator.from_structure(training_dataset0.output_types,
+            training_dataset0.output_shapes)
 
         iterator = tf.data.Iterator.from_structure(training_dataset.output_types,
             training_dataset.output_shapes)
-        self.input_batch0 = self.output_batch0 = None
-        if self.input_batch0 == None:
-            self.input_batch0, self.output_batch0 = iterator.get_next()
-        else:
-            self.input_batch0 = self.input_batch1
-            self.output_batch0 = self.otuput_batch1
-        self.input_batch1, self.output_batch1 = iterator.get_next()
 
 
+
+
+        t_ = temp_iter.make_initializer(training_dataset0)
+        t__ = temp_iter.make_initializer(training_dataset1)
+        v_ = temp_iter.make_initializer(validation_dataset0)
+        v__ = temp_iter.make_initializer(validation_dataset1)
+        te_ = temp_iter.make_initializer(test_dataset0)
+        te__ = temp_iter.make_initializer(test_dataset1)
         self.training_init_op = iterator.make_initializer(training_dataset)
         self.validation_init_op = iterator.make_initializer(validation_dataset)
         self.test_init_op = iterator.make_initializer(test_dataset)
+
+
+        batch0, batch1 = iterator.get_next()
+
+        #self.input_batch0 = self.input_batch1 = batch0
+        #self.output_batch0 = self.output_batch1 = batch1
+        self.input_batch0, self.output_batch0 = batch0
+        self.input_batch1, self.output_batch1 = batch1
 
         # input embedding
 

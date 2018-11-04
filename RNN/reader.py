@@ -53,7 +53,7 @@ def gen_vocab(filename):
     # And to deal with input sentences with variable lengths,
     # we also need padding position as 0.
     word_list = ["_UNK_","_PAD_", "_BOS_", "_EOS_"] + word_list
-    punctuation = ['.', '?', '!']
+    punctuation = ['.', '?', '!', '.']
     for i in punctuation:
         if i not in word_list:
             word_list.append(i)

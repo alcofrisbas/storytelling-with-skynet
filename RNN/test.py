@@ -26,7 +26,7 @@ def sample_from_pmf(probas):
     return int(np.searchsorted(t, np.random.rand(1) * s))
 
 def generate_text(sess, model, word_to_index, index_to_word,
-    seed='.', n_sentences= 1):
+    seed='.', n_sentences= 20):
     sentence_cnt = 0
     input_seeds_id = []
     seed = seed.lower()
@@ -36,34 +36,25 @@ def generate_text(sess, model, word_to_index, index_to_word,
         if word not in ['', ' ']:
             new_seed.append(word)
 
-    for w in seed:
+    for w in new_seed:
         try:
             input_seeds_id.append(word_to_index[w])
         except:   # if word is not in vocabulary, processed as _UNK_
             input_seeds_id.append(word_to_index["_UNK_"])
     state = sess.run(model.initial_state)
 
-
-    # Initiate network with seeds up to the before last word:
-
-    for x in input_seeds_id[:-1]:
-        feed_dict = {model.initial_state: state,
-                    model.input_batch0: [[x]]}
-        state = sess.run([model.final_state], feed_dict)
-
     text = ''
     # Generate a new sample from previous, starting at last word seed
     input_id = [[input_seeds_id[-1]]]
     while sentence_cnt < n_sentences:
-        feed_dict = {model.input_batch0: input_id,
-                    model.initial_state: state}
-        probas, state = sess.run([model.probas, model.final_state],
+        feed_dict = {model.input_batch0: [input_seeds_id], model.input_batch1: input_id}
+        probas= sess.run([model.probas],
                                 feed_dict=feed_dict)
         sampled_word = sample_from_pmf(probas[0])
         punctuation = [word_to_index['.'], word_to_index['?'], word_to_index['!']]
         if sampled_word in punctuation:
             text += '.\n'
-            sentence_cnt += 1
+            sentence_cnt += 20
         else:
             if index_to_word[sampled_word] in ["_UNK_","_PAD_", "_BOS_", "_EOS_"]:
                 text += ''
@@ -73,6 +64,7 @@ def generate_text(sess, model, word_to_index, index_to_word,
                     text += index_to_word[sampled_word].capitalize()
                 else:
                     text += ' ' + index_to_word[sampled_word]
+            sentence_cnt += 1
         input_wordid = [[sampled_word]]
     print(text)
     return text
