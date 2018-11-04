@@ -20,6 +20,11 @@ import time
 import reader
 import math
 
+flags = tf.flags
+flags.DEFINE_string("vocab_file", "data/vocab.txt",
+    "File containing the vocabulary")
+FLAGS = flags.FLAGS
+
 
 
 class RNNModel(object):
@@ -185,12 +190,12 @@ class RNNModel(object):
     def assign_lr(self, lr_value):
         return tf.assign(self.learning_rate, lr_value)
 
-    def batch_train(self, sess, saver, config):
+    def batch_train(self, sess, saver, config, train_file, valid_file):
         """Runs the model on the given data."""
         for i in range(self.max_max_epoch):
             lr_decay = self.lr_decay ** max(i + 1 - self.max_epoch, 0.0)
             self.learning_rate = self.assign_lr(config.learning_rate * lr_decay)
-            sess.run(self.training_init_op, {self.file_name_train: "./data/ptb.train.txt.ids"})
+            sess.run(self.training_init_op, {self.file_name_train: "./data/" + train_file + ".ids"})
             state = sess.run(self.initial_state)
             costs = 0.0
             iters = 0
@@ -208,7 +213,7 @@ class RNNModel(object):
                         iters * self.batch_size / (time.time() - start_time)))
 
             print("Epoch: %d Learning rate: %.3f" % (i + 1, sess.run(self.learning_rate)))
-            sess.run(self.validation_init_op, {self.file_name_validation: "./data/ptb.valid.txt.ids"})
+            sess.run(self.validation_init_op, {self.file_name_validation: "./data/" + valid_file + ".ids"})
             dev_costs = 0.0
             state = sess.run(self.initial_state)
             iters = 0

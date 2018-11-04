@@ -141,7 +141,7 @@ if TRAIN:
     with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
         model = create_model(sess)
         saver = tf.train.Saver()
-        model.batch_train(sess, saver, config)
+        model.batch_train(sess, saver, config, FLAGS.train_file, FLAGS.valid_file)
 
 tf.reset_default_graph()
 gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.35)

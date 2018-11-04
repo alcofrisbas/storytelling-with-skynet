@@ -4,6 +4,8 @@ import RNN
 import re
 import os
 
+
+
 class SmallConfig(object):
     """Small config."""
     init_scale = 0.1
@@ -73,7 +75,7 @@ def generate_text(sess, model, word_to_index, index_to_word,
 
 
 def load_model():
-    with open("../RNN/data/vocab.txt", "r") as vocab_file:
+    with open(RNN.FLAGS.vocab_file, "r") as vocab_file:
         lines = [line.strip() for line in vocab_file.readlines()]
         vocab_size = len(lines)
         word_to_id = dict([(b,a) for (a,b) in enumerate(lines)])
@@ -92,7 +94,7 @@ def load_model():
 
 
 if __name__ == '__main__':
-    with open("data/vocab.txt", "r") as vocab_file:
+    with open(RNN.FLAGS.vocab_file, "r") as vocab_file:
         lines = [line.strip() for line in vocab_file.readlines()]
         vocab_size = len(lines)
         word_to_id = dict([(b,a) for (a,b) in enumerate(lines)])

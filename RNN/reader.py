@@ -24,6 +24,7 @@ import os
 import re
 import sys
 import numpy as np
+import RNN
 
 import tensorflow as tf
 
@@ -58,7 +59,7 @@ def gen_vocab(filename):
         if i not in word_list:
             word_list.append(i)
 
-    with open("data/vocab.txt", "w") as vocab_file:
+    with open(RNN.FLAGS.vocab_file, "w") as vocab_file:
         for word in word_list:
             vocab_file.write(word + '\n')
 
@@ -69,7 +70,7 @@ def word_to_id(word, word_dict):
 
 def gen_id_seqs(filepath=""):
 
-    with open("data/vocab.txt", "r") as vocab_file:
+    with open(RNN.FLAGS.vocab_file, "r") as vocab_file:
         lines = [line.strip() for line in vocab_file.readlines()]
         word_dict = dict([(b,a) for (a,b) in enumerate(lines)])
 
