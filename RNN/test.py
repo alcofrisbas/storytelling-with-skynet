@@ -68,7 +68,7 @@ def generate_text(sess, model, word_to_index, index_to_word,
                     text += index_to_word[sampled_word].capitalize()
                 else:
                     text += ' ' + index_to_word[sampled_word]
-            sentence_cnt += 1
+            #sentence_cnt += 1
         input_wordid = [[sampled_word]]
     print(text)
     return text

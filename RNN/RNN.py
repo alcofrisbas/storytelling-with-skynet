@@ -245,8 +245,8 @@ class RNNModel(object):
 
                 raw_line = raw_line.strip()
 
-                dev_cost, input_line = sess.run(
-                    [self.cost, self.input_batch])
+                dev_cost, input_line0, input_line1 = sess.run(
+                    [self.cost, self.input_batch0, self.input_batch1])
 
 
 
