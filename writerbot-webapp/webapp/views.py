@@ -55,6 +55,9 @@ def write(request):
 def about(request):
     return render(request, 'webapp/about.html')
 
+def team(request):
+    return render(request, 'webapp/team.html')
+
 
 def generatePrompt(curPrompt=""):
     topics = ["a hotheaded penguin", "a wizened chihuahua", "a murderous toucan",
