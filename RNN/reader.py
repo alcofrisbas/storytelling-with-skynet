@@ -37,7 +37,6 @@ def _read_words(filename):
             words = []
             for sent in f.readlines():
                 sent = sent.strip("\n")
-                sent += "."
                 words += re.split(r'([;|, |.|,|:|?|!])', sent)
             for line in words:
                 if line not in ['', ' ']:
