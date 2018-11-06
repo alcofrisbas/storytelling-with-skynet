@@ -1,4 +1,7 @@
 from django.shortcuts import render
+import sys
+import os
+
 from django.http import HttpResponse
 from webapp.models import Story
 from RNN.test import load_model, generate_text
@@ -63,5 +66,8 @@ def generatePrompt(curPrompt=""):
 
 
 def generateSuggestion(newSentence):
-    suggestion = generate_text(sess, model, word_to_id, id_to_word, newSentence)
+    try:
+        suggestion = generate_text(sess, model, word_to_id, id_to_word, newSentence)
+    except:
+        suggestion = ""
     return suggestion
