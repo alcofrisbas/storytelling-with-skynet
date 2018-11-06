@@ -75,7 +75,6 @@ def generate_text(sess, model, word_to_index, index_to_word,
 
 
 def load_model():
-    print(os.getcwd())
     with open(RNN.RNN.FLAGS.vocab_file, "r") as vocab_file:
         lines = [line.strip() for line in vocab_file.readlines()]
         vocab_size = len(lines)
