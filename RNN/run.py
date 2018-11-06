@@ -151,5 +151,5 @@ with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
     saver.restore(sess, "model/best_model.ckpt")
     predict_id_file = os.path.join("data/" + FLAGS.test_file + ".ids")
     if not os.path.isfile(predict_id_file):
-        gen_id_seqs(test_file)
+        reader.gen_id_seqs(test_file)
     model.predict(sess,predict_id_file, predict_id_file, verbose=VERBOSE)
