@@ -78,7 +78,15 @@ def gen_id_seqs(filepath=""):
     with open(filepath, 'r') as raw_file:
         with open("data/" + filepath.split("/")[-1]+".ids", "w") as current_file:
             for line in raw_file.readlines():
-                line = [word_to_id(word, word_dict) for word in line.strip().replace("<unk>","_UNK_").split()]
+                sent = []
+                temp_sent = []
+                line = line.strip()
+                temp_sent =  re.split(r'([;|, |.|,|:|?|!])', line)
+                for char in temp_sent:
+                    if char not in ['', ' ']:
+                        sent.append(char)
+
+                line = [word_to_id(word, word_dict) for word in sent]
                 # each sentence has the start and the end
                 line_word_ids = [1] + line + [2]
                 current_file.write(" ".join([str(id) for id in line_word_ids]) + "\n")
