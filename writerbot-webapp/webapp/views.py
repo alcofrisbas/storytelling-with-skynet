@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from webapp.models import Story
 from RNN.test import load_model, generate_text
 import random
+from webapp.words import ADJECTIVES, ANIMALS
 
 sess, model, word_to_id, id_to_word = None, None, None, None
 
@@ -62,9 +63,14 @@ def team(request):
 def generatePrompt(curPrompt=""):
     topics = ["a hotheaded penguin", "a wizened chihuahua", "a murderous toucan",
               "an exponentially multiplying swarm of beagles"]
+    adj = ADJECTIVES[random.randrange(0, len(ADJECTIVES))]
+    noun = ANIMALS[random.randrange(0, len(ANIMALS))].lower()
     curTopic = curPrompt
     while curTopic == curPrompt:
-        curTopic = "Write about " + topics[random.randrange(0, len(topics))]
+        if adj[0] in 'aeiou':
+            curTopic = "Write about an {} {}".format(adj, noun)
+        else:
+            curTopic = "Write about a {} {}".format(adj, noun)
     return curTopic
 
 
