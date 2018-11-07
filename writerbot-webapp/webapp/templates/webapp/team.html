@@ -1,7 +1,47 @@
 {%  extends "webapp/header.html" %}
+{% load staticfiles %}
 
 {% block content %}
     <h1 class="mt-5">Meet the Team</h1>
-    <p class="lead">This is a tool developed by Ben Greene, Galen Berger-Fletcher, Malcolm Grossman, and Tenzin Dophen, a team of
-        students at Carleton College.</p>
+    <p class="lead">WriterBot was born as a senior comps project for the Carleton College Department of Computer Science in the 2018-2019 academic year.</p>
+    <div class="card-group">
+      <div class="card">
+{#        <img class="card-img-top" src=".../100px180/" alt="Card image cap">#}
+          <img class="card-img-top" src="{% static "images/ben.jpg" %}" alt="Ben Greene">
+        <div class="card-body">
+          <h5 class="card-title">Ben Greene</h5>
+          <p class="card-text">Water polo ninja & backpackr supreme. Known amongst the group as "Gutenberg" for his work scraping our training data.</p>
+          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+        </div>
+      </div>
+      <div class="card">
+{#        <img class="card-img-top" src=".../100px180/" alt="Card image cap">#}
+          <img class="card-img-top" src="{% static "images/galen.jpg" %}" alt="Galen Berger-Fletcher">
+        <div class="card-body">
+          <h5 class="card-title">Galen Berger-Fletcher</h5>
+          <p class="card-text">The guy who's writing all these stupid placeholder blurbs.</p>
+          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+        </div>
+      </div>
+      <div class="card">
+{#        <img class="card-img-top" src=".../100px180/" alt="Card image cap">#}
+          <img class="card-img-top" src="{% static "images/malcolm.jpg" %}" alt="Malcolm Grossman">
+        <div class="card-body">
+          <h5 class="card-title">Malcolm Grossman</h5>
+          <p class="card-text">The neural network wizard who coached WriterBot from its wee stages of infancy to its current slightly-less-wee stage of infancy.
+              Pinball abilities: unknown.</p>
+          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+        </div>
+      </div>
+        <div class="card">
+{#        <img class="card-img-top" src=".../100px180/" alt="Card image cap">#}
+            <img class="card-img-top" src="{% static "images/tenzin.jpg" %}" alt="Tenzin Dophen">
+        <div class="card-body">
+          <h5 class="card-title">Tenzin Dophen</h5>
+          <p class="card-text">The only member of the group who had a decent picture in the Carleton directory in the first draft of this page.
+              All must bow before his style and professionalism.</p>
+          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+        </div>
+      </div>
+    </div>
 {% endblock %}
