@@ -89,12 +89,12 @@ def load_model():
         num_train_samples=1, num_valid_samples=1)
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver()
-    saver.restore(sess, tf.train.latest_checkpoint('../RNN/model'))
+    saver.restore(sess, tf.train.latest_checkpoint('RNN/model'))
     return sess, model, word_to_id, id_to_word
 
 
 if __name__ == '__main__':
-    with open(RNN.FLAGS.vocab_file, "r") as vocab_file:
+    with open(RNN.RNN.FLAGS.vocab_file, "r") as vocab_file:
         lines = [line.strip() for line in vocab_file.readlines()]
         vocab_size = len(lines)
         word_to_id = dict([(b,a) for (a,b) in enumerate(lines)])
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     eval_config.num_steps = 1
     eval_config.batch_size = 1
     with tf.Session() as sess:
-        model = RNN.RNNModel(vocab_size=vocab_size,config=eval_config,
+        model = RNN.RNN.RNNModel(vocab_size=vocab_size,config=eval_config,
             num_train_samples=1, num_valid_samples=1)
         sess.run(tf.global_variables_initializer())
         saver = tf.train.Saver()
