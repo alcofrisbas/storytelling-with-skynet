@@ -22,10 +22,6 @@ class SmallConfig(object):
     vocab_size = 10000
 
 
-def sample_from_pmf(probas):
-    t = np.cumsum(probas)
-    s = np.sum(probas)
-    return int(np.searchsorted(t, np.random.rand(1) * s))
 
 def generate_text(sess, model, word_to_index, index_to_word,
     seed='.', n_sentences= 20):
@@ -52,8 +48,7 @@ def generate_text(sess, model, word_to_index, index_to_word,
         feed_dict = {model.input_batch0: [input_seeds_id[:-1]], model.input_batch1: input_id}
         probas= sess.run([model.probas],
                                 feed_dict=feed_dict)
-
-        sampled_word = sample_from_pmf(probas[0])
+        sampled_word = np.argmax(probas)
         punctuation = [word_to_index['.'], word_to_index['?'], word_to_index['!']]
         input_id = [[sampled_word]]
         if sampled_word in punctuation:
