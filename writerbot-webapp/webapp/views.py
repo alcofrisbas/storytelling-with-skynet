@@ -1,7 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import logout as auth_logout
 import sys
 import os
-
 from django.http import HttpResponse
 from webapp.models import Story
 from RNN.test import load_model, generate_text
@@ -59,6 +59,12 @@ def about(request):
 
 def team(request):
     return render(request, 'webapp/team.html')
+
+
+def logout(request):
+    """Logs out user"""
+    auth_logout(request)
+    return redirect('/')
 
 
 def generatePrompt(curPrompt=""):

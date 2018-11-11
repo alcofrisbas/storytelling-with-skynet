@@ -10,22 +10,33 @@
 </head>
 <body class="body">
     <div class="container">
-      <header>
-          <nav class="navbar navbar-expand-md fixed-top navbar-dark bg-dark">
-          <a class="navbar-brand" href="/">WriterBot</a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div class="navbar-nav">
-              <a class="nav-item nav-link" href="/">Home</a>
-                <a class="nav-item nav-link" href="/write">Write</a>
-              <a class="nav-item nav-link" href="/about">How it Works</a>
-              <a class="nav-item nav-link" href="/team">The Team</a>
+        <nav class="navbar navbar-expand-md fixed-top navbar-dark bg-dark">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" href="/">WriterBot</a>
+
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="nav-item nav-link" href="/">Home</a>
+                    <a class="nav-item nav-link" href="/write">Write</a>
+                    <a class="nav-item nav-link" href="/about">How it Works</a>
+                    <a class="nav-item nav-link" href="/team">The Team</a>
+                </div>
             </div>
-          </div>
+            {% if user.username %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle show" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {{ user.first_name }} {{ user.last_name }}
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right menu" aria-labelledby="navbarDropdownMenuLink">
+                                <a class="dropdown-item" href="/logout">Logout</a>
+                            </div>
+                        </li>
+                    {% else %}
+                        <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn" role="button">Login with Google</a>
+                    {% endif %}
         </nav>
-      </header>
 
       {% block content %}
       {% endblock %}
