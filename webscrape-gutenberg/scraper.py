@@ -86,7 +86,7 @@ def get_full_text(url,fname, dest_dir):
 
     returns: None
     """
-    fname = fname.replace(" ","_")
+    fname = fname.replace(" ","_")[:100]
     # shoddy bug fix -- may or may not work
     if not os.path.exists(dest_dir):
         os.mkdir(dest_dir)
