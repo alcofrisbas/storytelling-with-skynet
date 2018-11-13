@@ -4,12 +4,13 @@ import os
 os.chdir("../webscrape-gutenberg/")
 work = os.getcwd()
 
+
 with open("train.txt", "wb") as f:
     for file in os.listdir("train"):
         with open(work + '/train/' +  file, "rb") as f1:
             text = f1.read()
-            text = text.strip('\r')
-            text = text.strip('\n')
+            text = text.strip(b'\r')
+            text = text.strip(b'\n')
             print(text)
             for sent in text:
                 f.write(sent + "\n")
