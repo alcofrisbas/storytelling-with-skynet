@@ -10,6 +10,7 @@ with open("train.txt", "w") as f:
             text = f1.read()
             text = text.strip()
             text = re.split('.', text)
+            print(text)
             for sent in text:
                 f.write(sent + "\n")
 
@@ -24,7 +25,7 @@ with open("valid.txt", "w") as f:
 
 with open(work + "test.txt", "w") as f:
     for file in os.listdir("test"):
-        with open(workd + '/test/' + file, "r") as f1:
+        with open(work + '/test/' + file, "r") as f1:
             text = f1.read()
             text = text.strip()
             text = re.split('.', text)
