@@ -23,7 +23,7 @@ with open("valid.txt", "w") as f:
                 sents += re.split(r'([.])', line)
             for sent in sents:
                 f.write(sent + "\n")
-with open(word + "test.txt", "w") as f:
+with open(work + "test.txt", "w") as f:
     for file in os.listdir("test"):
         with open(workd + '/test/' + file, "r") as f1:
             sents = []
