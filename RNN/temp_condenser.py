@@ -9,7 +9,6 @@ with open("train.txt", "w") as f:
         with open(work + '/train/' +  file, "r") as f1:
             text = f1.read()
             text = text.strip()
-            text = re.split('.', text)
             print(text)
             for sent in text:
                 f.write(sent + "\n")
