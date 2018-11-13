@@ -3,7 +3,7 @@ import reader
 import RNN
 import os
 import tensorflow as tf
-
+import re
 
 '''
 The hyperparameters used in the model:
@@ -121,9 +121,18 @@ if not os.path.isfile("data/" + FLAGS.train_file + ".ids"):
     reader.gen_id_seqs(FLAGS.valid_file)
 
 with open("data/" + FLAGS.train_file + ".ids") as fp:
-    num_train_samples = len(fp.readlines())
+    sent = []
+    lines = fp.readlines()
+    for line in lines:
+        sent += re.split(r'([.])', line)
+    num_train_samples = len(sent)
 with open("data/" + FLAGS.valid_file + ".ids") as fp:
-    num_valid_samples = len(fp.readlines())
+    sent = []
+    lines = fp.readlines()
+    for lin in lines:
+        sent += re.split(r'([.])', line)
+
+    num_valid_samples = len(sent)
 
 with open("data/vocab.txt") as vocab:
     vocab_size = len(vocab.readlines())
