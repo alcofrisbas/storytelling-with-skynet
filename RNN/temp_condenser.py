@@ -8,7 +8,7 @@ with open("train.txt", "wb") as f:
     for file in os.listdir("train"):
         with open(work + '/train/' +  file, "rb") as f1:
             text = f1.read()
-            text.replace('^M','')
+            text = text.strip()
             print(text)
             for sent in text:
                 f.write(sent + "\n")
