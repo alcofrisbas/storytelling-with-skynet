@@ -6,7 +6,7 @@ work = os.getcwd()
 
 with open("train.txt", "w") as f:
     for file in os.listdir("train"):
-        with open(work + file, "r") as f1:
+        with open(work + '/' +  file, "r") as f1:
             sents = []
             lines = f1.readlines()
             for line in lines:
@@ -16,7 +16,7 @@ with open("train.txt", "w") as f:
 
 with open("valid.txt", "w") as f:
     for file in os.listdir("valid"):
-        with open(work + file, "r") as f1:
+        with open(work + '/' + file, "r") as f1:
             sents = []
             lines = f1.readlines()
             for line in lines:
@@ -25,7 +25,7 @@ with open("valid.txt", "w") as f:
                 f.write(sent + "\n")
 with open(word + "test.txt", "w") as f:
     for file in os.listdir("test"):
-        with open(workd + file, "r") as f1:
+        with open(workd + '/' + file, "r") as f1:
             sents = []
             lines = f1.readlines()
             for line in lines:
