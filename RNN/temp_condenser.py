@@ -11,7 +11,6 @@ with open("train.txt", "wb") as f:
             text = f1.read()
             text = text.strip(b'\r')
             text = text.strip(b'\n')
-            print(text)
             for sent in text:
                 f.write(sent + "\n")
 
