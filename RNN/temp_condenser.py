@@ -9,7 +9,7 @@ with open("train.txt", "w") as f:
         with open(work + '/train/' +  file, "r") as f1:
             text = f1.read()
             text = text.strip()
-            text = re.split('.', line)
+            text = re.split('.', text)
             for sent in text:
                 f.write(sent + "\n")
 
@@ -18,7 +18,7 @@ with open("valid.txt", "w") as f:
         with open(work + '/valid/' + file, "r") as f1:
             text = f1.read()
             text = text.strip()
-            text = re.split('.', line)
+            text = re.split('.', text)
             for sent in text:
                 f.write(sent + "\n")
 
@@ -27,6 +27,6 @@ with open(work + "test.txt", "w") as f:
         with open(workd + '/test/' + file, "r") as f1:
             text = f1.read()
             text = text.strip()
-            text = re.split('.', line)
+            text = re.split('.', text)
             for sent in text:
                 f.write(sent + "\n")
