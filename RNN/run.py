@@ -34,11 +34,11 @@ flags.DEFINE_string(
 
 flags.DEFINE_string("save_path","./models" ,
                     "Model output directory.")
-flags.DEFINE_string("train_file", "ptb.train.txt",
+flags.DEFINE_string("train_file", "train.txt",
                     "The file containing the training data")
-flags.DEFINE_string("valid_file", "ptb.valid.txt",
+flags.DEFINE_string("valid_file", "valid.txt",
                     "The file containing the validation data")
-flags.DEFINE_string("test_file", "ptb.test.txt",
+flags.DEFINE_string("test_file", "test.txt",
                     "The file containing the testing data")
 FLAGS = flags.FLAGS
 
