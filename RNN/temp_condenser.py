@@ -5,29 +5,30 @@ os.chdir("../webscrape-gutenberg/")
 work = os.getcwd()
 
 
-with open("train.txt", "wb") as f:
+with open("train.txt", "w") as f:
     for file in os.listdir("train"):
-        with open(work + '/train/' +  file, "rb") as f1:
+        with open(work + '/train/' +  file, "r") as f1:
             text = f1.read()
-            text = text.strip(b'\r')
-            text = text.strip(b'\n')
+            text = text.replace("\n", " ")
+            text = text.split('.')
             for sent in text:
                 f.write(sent + "\n")
 
-with open("valid.txt", "wb") as f:
+with open("valid.txt", "w") as f:
     for file in os.listdir("valid"):
-        with open(work + '/valid/' + file, "rb") as f1:
+        with open(work + '/valid/' +  file, "r") as f1:
             text = f1.read()
-            text = text.strip()
-            text = re.split('.', text)
+            text = text.replace("\n", " ")
+            text = text.split('.')
             for sent in text:
                 f.write(sent + "\n")
 
-with open(work + "test.txt", "wb") as f:
+
+with open("test.txt", "w") as f:
     for file in os.listdir("test"):
-        with open(work + '/test/' + file, "rb") as f1:
+        with open(work + '/test/' +  file, "r") as f1:
             text = f1.read()
-            text = text.strip()
-            text = re.split('.', text)
+            text = text.replace("\n", " ")
+            text = text.split('.')
             for sent in text:
                 f.write(sent + "\n")
