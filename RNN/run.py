@@ -112,30 +112,22 @@ def get_config():
 
     return config
 
-
+print("---beginning training process---\n")
 # generate vocabulary and ids for all data
 if not os.path.isfile("data/vocab.tx"):
     reader.gen_vocab(FLAGS.train_file)
 if not os.path.isfile("data/" + FLAGS.train_file + ".ids"):
     reader.gen_id_seqs(FLAGS.train_file)
     reader.gen_id_seqs(FLAGS.valid_file)
-
+print("---making training and validation sampels---\n")
 with open("data/" + FLAGS.train_file + ".ids") as fp:
-    sent = []
-    lines = fp.readlines()
-    for line in lines:
-        sent += re.split(r'([.])', line)
-    num_train_samples = len(sent)
+    num_train_samples = len(fp.readlines())
 with open("data/" + FLAGS.valid_file + ".ids") as fp:
-    sent = []
-    lines = fp.readlines()
-    for lin in lines:
-        sent += re.split(r'([.])', line)
-
-    num_valid_samples = len(sent)
-
+    num_valid_samples = len(fp.readlines())
+print("---Training and validations samples created---\n")
 with open("data/vocab.txt") as vocab:
     vocab_size = len(vocab.readlines())
+print("vocab created")
 
 config = get_config()
 
@@ -149,9 +141,11 @@ if TRAIN:
     gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.35)
     with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
         model = create_model(sess)
+        print("---model set---\n")
         saver = tf.train.Saver()
+        print("---training---\n")
         model.batch_train(sess, saver, config, FLAGS.train_file, FLAGS.valid_file)
-
+print("---finished training---\n")
 tf.reset_default_graph()
 gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.35)
 with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:

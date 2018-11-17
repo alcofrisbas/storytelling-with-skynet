@@ -48,6 +48,7 @@ def _read_words(filename):
 
 
 def gen_vocab(filename):
+    print("reading words\n")
     word_list = _read_words(filename)
     word_list = list(set(word_list))
 
@@ -59,11 +60,11 @@ def gen_vocab(filename):
     for i in punctuation:
         if i not in word_list:
             word_list.append(i)
-
+    print("writing to vocab\n")
     with open(RNN.FLAGS.vocab_file, "w") as vocab_file:
         for word in word_list:
             vocab_file.write(word + '\n')
-
+    print("vocab written\n")
 
 def word_to_id(word, word_dict):
     id = word_dict.get(word)
