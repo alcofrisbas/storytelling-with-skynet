@@ -1,7 +1,3 @@
-_UNK_
-_PAD_
-_BOS_
-_EOS_
 absorb
 ncr
 feel
@@ -8043,7 +8039,6 @@ opposes
 ai
 upon
 liberals
-.
 know
 surprised
 extent
@@ -9928,5 +9923,3 @@ voted
 advent
 classes
 antibody
-?
-!
