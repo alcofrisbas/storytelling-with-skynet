@@ -4,13 +4,6 @@ import nltk
 wordlist = []
 with open("data/vocab.csv", "w") as csvfile:
     writer = csv.writer(csvfile, delimiter=',')
-    """
-    with open("dictionary.csv", "r") as dict:
-        reader = csv.reader(dict, delimiter=",")
-        dictionary = []
-        for row in reader:
-            dictionary.append(row)
-    """
     with open("ptb.train.txt", "r") as vocab:
         lines = vocab.readlines()
         for line in lines:
