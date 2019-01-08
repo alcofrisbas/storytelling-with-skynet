@@ -116,8 +116,11 @@ class RNNModel(object):
 
 
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> b3cd8f373abe13450f914424e297d46827f9a845
         cell = tf.contrib.rnn.MultiRNNCell([make_cell() for _ in range(config.num_layers)], state_is_tuple=True)
         self.initial_state = cell.zero_state(self.batch_size, tf.float32)
         state = self.initial_state
@@ -205,7 +208,7 @@ class RNNModel(object):
                         iters * self.batch_size /(time.time() - start_time)))
 
             print("Epoch: %d Learning rate: %.3f" % (i + 1, sess.run(self.learning_rate)))
-            saver.save(sess, "model/best_model.ckpt")
+            saver.save(sess, "models/best_model.ckpt")
 
     def predict(self, sess, input_file, raw_file, verbose=False):
         # if verbose is trrue, then we print the ppl of every sequence
