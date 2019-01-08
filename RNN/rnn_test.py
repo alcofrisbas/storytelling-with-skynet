@@ -70,7 +70,8 @@ def generate_text(sess, model, word_to_index, index_to_word,
 
 
 def load_model():
-    with open(RNN.RNN.FLAGS.vocab_file, "r") as vocab_file:
+    print(RNN.FLAGS.vocab_file)
+    with open(RNN.FLAGS.vocab_file, "r") as vocab_file:
         lines = [line.strip() for line in vocab_file.readlines()]
         vocab_size = len(lines)
         word_to_id = dict([(b,a) for (a,b) in enumerate(lines)])
@@ -80,11 +81,13 @@ def load_model():
     eval_config.num_steps = 1
     eval_config.batch_size = 1
     sess = tf.Session()
-    model = RNN.RNN.RNNModel(vocab_size=vocab_size,config=eval_config,
+    model = RNN.RNNModel(vocab_size=vocab_size,config=eval_config,
         num_train_samples=1, num_valid_samples=1)
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver()
-    saver.restore(sess, tf.train.latest_checkpoint('RNN/model'))
+    # the .. relative path is a bandaid
+    # TODO: make this mess of caca doodoo better
+    saver.restore(sess, tf.train.latest_checkpoint('../RNN/model'))
     return sess, model, word_to_id, id_to_word
 
 

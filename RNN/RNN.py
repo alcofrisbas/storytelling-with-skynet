@@ -21,7 +21,7 @@ import reader
 import math
 
 flags = tf.flags
-flags.DEFINE_string("vocab_file", "data/vocab.txt",
+flags.DEFINE_string("vocab_file", "../RNN/data/vocab.txt",
     "File containing the vocabulary")
 FLAGS = flags.FLAGS
 
@@ -93,10 +93,10 @@ class RNNModel(object):
         # input embedding
 
         embedding = tf.get_variable(
-            "embedding", [self.vocab_size, size], dtype=tf.float32)
+            "embedding", [self.vocab_size, size], dtype=tf.float32)#, reuse=True)
         inputs = tf.nn.embedding_lookup(embedding, self.input_batch)
 
-        non_zero_weights = tf.sign(self.input_batch0)
+        non_zero_weights = tf.sign(self.input_batch)
         self.valid_words = tf.reduce_sum(non_zero_weights)
 
         # Compute sequence length
@@ -116,9 +116,10 @@ class RNNModel(object):
 
 
 
-        self.initial_state = cell0.zero_state(self.batch_size, tf.float32)
+
 
         cell = tf.contrib.rnn.MultiRNNCell([make_cell() for _ in range(config.num_layers)], state_is_tuple=True)
+        self.initial_state = cell.zero_state(self.batch_size, tf.float32)
         state = self.initial_state
         # output embedding
         self.output_embedding_mat = tf.get_variable("output_embedding_mat",
@@ -141,8 +142,8 @@ class RNNModel(object):
         logits = tf.reshape(logits, [-1, vocab_size])
         self.probas = tf.nn.softmax(logits, name='p')
         loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=
-            tf.reshape(self.output_batch1, [-1]), logits = logits) \
-            * tf.cast(tf.reshape(non_zero_weights1, [-1]), tf.float32)
+            tf.reshape(self.output_batch, [-1]), logits = logits) \
+            * tf.cast(tf.reshape(non_zero_weights, [-1]), tf.float32)
 
 
 
@@ -219,8 +220,8 @@ class RNNModel(object):
 
                 raw_line = raw_line.strip()
 
-                dev_cost, input_line0, input_line1 = sess.run(
-                    [self.cost, self.input_batch0, self.input_batch1])
+                dev_cost, input_line = sess.run(
+                    [self.cost, self.input_batch])
 
 
 
