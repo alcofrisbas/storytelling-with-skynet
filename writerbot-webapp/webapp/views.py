@@ -4,7 +4,10 @@ import sys
 import os
 from django.http import HttpResponse
 from webapp.models import Story
-from RNN.test import load_model, generate_text
+
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'RNN'))
+print(sys.path)
+from rnn_test import load_model, generate_text
 import random
 from webapp.words import ADJECTIVES, ANIMALS
 
