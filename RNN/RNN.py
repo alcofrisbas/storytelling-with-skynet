@@ -21,7 +21,7 @@ import reader
 import math
 
 flags = tf.flags
-flags.DEFINE_string("vocab_file", "../RNN/data/vocab.txt",
+flags.DEFINE_string("vocab_file", "data/vocab.txt",
     "File containing the vocabulary")
 FLAGS = flags.FLAGS
 
@@ -93,7 +93,7 @@ class RNNModel(object):
         # input embedding
 
         embedding = tf.get_variable(
-            "embedding", [self.vocab_size, size], dtype=tf.float32)#, reuse=True)
+            "embedding", [self.vocab_size, size], dtype=tf.float32)
         inputs = tf.nn.embedding_lookup(embedding, self.input_batch)
 
         non_zero_weights = tf.sign(self.input_batch)
@@ -116,8 +116,11 @@ class RNNModel(object):
 
 
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> cbf0dbfca848753c4fbbca9d9fe2e607aa05d71b
         cell = tf.contrib.rnn.MultiRNNCell([make_cell() for _ in range(config.num_layers)], state_is_tuple=True)
         self.initial_state = cell.zero_state(self.batch_size, tf.float32)
         state = self.initial_state

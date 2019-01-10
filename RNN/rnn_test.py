@@ -45,7 +45,7 @@ def generate_text(sess, model, word_to_index, index_to_word,
     # Generate a new sample from previous, starting at last word seed
     input_id = [[input_seeds_id[-1]]]
     while sentence_cnt < n_sentences:
-        feed_dict = {model.input_batch0: [input_seeds_id[:-1]], model.input_batch1: input_id}
+        feed_dict = {model.input_batch: input_id}
         probas= sess.run([model.probas],
                                 feed_dict=feed_dict)
         sampled_word = np.argmax(probas)
@@ -70,7 +70,6 @@ def generate_text(sess, model, word_to_index, index_to_word,
 
 
 def load_model():
-    print(RNN.FLAGS.vocab_file)
     with open(RNN.FLAGS.vocab_file, "r") as vocab_file:
         lines = [line.strip() for line in vocab_file.readlines()]
         vocab_size = len(lines)
@@ -85,14 +84,12 @@ def load_model():
         num_train_samples=1, num_valid_samples=1)
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver()
-    # the .. relative path is a bandaid
-    # TODO: make this mess of caca doodoo better
-    saver.restore(sess, tf.train.latest_checkpoint('../RNN/model'))
+    saver.restore(sess, tf.train.latest_checkpoint('RNN/model'))
     return sess, model, word_to_id, id_to_word
 
 
 if __name__ == '__main__':
-    with open(RNN.RNN.FLAGS.vocab_file, "r") as vocab_file:
+    with open(RNN.FLAGS.vocab_file, "r") as vocab_file:
         lines = [line.strip() for line in vocab_file.readlines()]
         vocab_size = len(lines)
         word_to_id = dict([(b,a) for (a,b) in enumerate(lines)])
@@ -102,11 +99,11 @@ if __name__ == '__main__':
     eval_config.num_steps = 1
     eval_config.batch_size = 1
     with tf.Session() as sess:
-        model = RNN.RNN.RNNModel(vocab_size=vocab_size,config=eval_config,
+        model = RNN.RNNModel(vocab_size=vocab_size,config=eval_config,
             num_train_samples=1, num_valid_samples=1)
         sess.run(tf.global_variables_initializer())
         saver = tf.train.Saver()
-        saver.restore(sess, tf.train.latest_checkpoint('./model'))
+        saver.restore(sess, tf.train.latest_checkpoint('./models'))
 
         while True:
             sentence = input('Write your sentence: ')
