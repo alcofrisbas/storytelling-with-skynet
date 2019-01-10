@@ -207,7 +207,7 @@ class RNNModel(object):
             saver.save(sess, "models/best_model.ckpt")
 
     def predict(self, sess, input_file, raw_file, verbose=False):
-        # if verbose is trrue, then we print the ppl of every sequence
+        # if verbose is true, then we print the ppl of every sequence
 
         sess.run(self.test_init_op, {self.file_name_test: input_file})
 
