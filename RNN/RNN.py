@@ -116,11 +116,7 @@ class RNNModel(object):
 
 
 
-<<<<<<< HEAD
 
-
-=======
->>>>>>> cbf0dbfca848753c4fbbca9d9fe2e607aa05d71b
         cell = tf.contrib.rnn.MultiRNNCell([make_cell() for _ in range(config.num_layers)], state_is_tuple=True)
         self.initial_state = cell.zero_state(self.batch_size, tf.float32)
         state = self.initial_state
