@@ -1,0 +1,879 @@
+
+
+
+
+
+Produced by Dr. Gregory B. Newby
+
+
+
+
+
+
+
+
+
+This is a preliminary edition.  The final first edition should be on
+file around midnight, October 31, 1993.
+
+As usual, the margination in these reports may be rough, and another
+edition should appear, somewhat neater in appearance, as a Gutenberg
+volunteer will probably start work on this shortly.
+
+This file has been edited in such a manner as to delete redundancies
+[some, not all] and extra spaces [some, not all], enough that a file
+from Project Gutenberg should be enough smaller that storarge/search
+requirements should be reduced by 15 to 20%.
+
+To search for information on a specific country from the list below,
+search for country:  Afganistan, for example.  You can also search
+directly for one of the categories of that country as follows:
+
+Afghanistan, Geography
+Afghanistan, People
+Afghanistan, Government
+Afghanistan, Economy
+Afghanistan, Communications
+Afghanistan, Defense Forces
+
+
+The Project Gutenberg Edition of the 1993 CIA World Factbook
+
+
+
+Central Intelligence Agency
+
+The World Factbook 1993
+
+Notes, Definitions, and Abbreviations
+A
+Afghanistan
+Albania
+Algeria
+American Samoa
+Andorra
+Angola
+Anguilla
+Antarctica
+Antigua and Barbuda
+Arctic Ocean
+Argentina
+Armenia
+Aruba
+Ashmore and Cartier Islands
+Atlantic Ocean
+Australia
+Austria
+Azerbaijan
+
+B
+Bahamas, The
+Bahrain
+Baker Island
+Bangladesh
+Barbados
+Bassas da India
+Belarus
+Belgium
+Belize
+Benin
+Bermuda
+Bhutan
+Bolivia
+Bosnia and Herzegovina
+Botswana
+Bouvet Island
+Brazil
+British Indian Ocean Territory
+British Virgin Islands
+Brunei
+Bulgaria
+Burkina
+Burma
+Burundi
+
+C
+Cambodia
+Cameroon
+Canada
+Cape Verde
+Cayman Islands
+Central African Republic
+Chad
+Chile
+China (also see separate Taiwan entry)
+Christmas Island
+Clipperton Island
+Cocos (Keeling) Islands
+Colombia
+Comoros
+Congo
+Cook Islands
+Coral Sea Islands
+Costa Rica
+Cote d'Ivoire
+Croatia
+Cuba
+Cyprus
+Czech Republic
+
+D
+Denmark
+Djibouti
+Dominica
+Dominican Republic
+
+E
+Ecuador
+Egypt
+El Salvador
+Equatorial Guinea
+Eritrea
+Estonia
+Ethiopia
+Europa Island
+
+F
+Falkland Islands (Islas Malvinas)
+Faroe Islands
+Fiji
+Finland
+France
+French Guiana
+French Polynesia
+French Southern and Antarctic Lands
+
+G
+Gabon
+Gambia, The
+Gaza Strip
+Georgia
+Germany
+Ghana
+Gibraltar
+Glorioso Islands
+Greece
+Greenland
+Grenada
+Guadeloupe
+Guam
+Guatemala
+Guernsey
+Guinea
+Guinea-Bissau
+Guyana
+
+H
+Haiti
+Heard Island and McDonald Islands
+Holy See (Vatican City)
+Honduras
+Hong Kong
+Howland Island
+Hungary
+
+I
+Iceland
+India
+Indian Ocean
+Indonesia
+Iran
+Iraq
+Ireland
+Israel (also see separate Gaza Strip and West Bank
+entries)
+Italy
+
+J
+Jamaica
+Jan Mayen
+Japan
+Jarvis Island
+Jersey
+Johnston Atoll
+Jordan (also see separate West Bank entry)
+Juan de Nova Island
+
+K
+Kazakhstan
+Kenya
+Kingman Reef
+Kiribati
+Korea, North
+Korea, South
+Kuwait
+Kyrgyzstan
+
+L
+Laos
+Latvia
+Lebanon
+Lesotho
+Liberia
+Libya
+Liechtenstein
+Lithuania
+Luxembourg
+
+M
+Macau
+Macedonia
+Madagascar
+Malawi
+Malaysia
+Maldives
+Mali
+Malta
+Man, Isle of
+Marshall Islands
+Martinique
+Mauritania
+Mauritius
+Mayotte
+Mexico
+Micronesia, Federated States of
+Midway Islands
+Moldova
+Monaco
+Mongolia
+Montserrat
+Morocco
+Mozambique
+
+N
+Namibia
+Nauru
+Navassa Island
+Nepal
+Netherlands
+Netherlands Antilles
+New Caledonia
+New Zealand
+Nicaragua
+Niger
+Nigeria
+Niue
+Norfolk Island
+Northern Mariana Islands
+Norway
+
+O
+Oman
+
+P
+Pacific Islands (Palau), Trust Territory of the
+Pacific Ocean 2
+Pakistan
+Palmyra Atoll
+Panama
+Papua New Guinea
+Paracel Islands
+Paraguay
+Peru
+Philippines
+Pitcairn Islands
+Poland
+Portugal
+Puerto Rico
+
+Q
+Qatar
+
+R
+Reunion
+Romania
+Russia
+Rwanda
+
+S
+Saint Helena
+Saint Kitts and Nevis
+Saint Lucia
+Saint Pierre and Miquelon
+Saint Vincent and the Grenadines
+San Marino
+Sao Tome and Principe
+Saudi Arabia
+Senegal
+Serbia and Montenegro
+Seychelles
+Sierra Leone
+Singapore
+Slovakia
+Slovenia
+Solomon Islands
+Somalia
+South Africa
+South Georgia and the South Sandwich Islands
+Spain
+Spratly Islands
+Sri Lanka
+Sudan
+Suriname
+Svalbard
+Swaziland
+Sweden
+Switzerland
+Syria
+
+T
+Taiwan entry follows Zimbabwe
+Tajikistan
+Tanzania
+Thailand
+Togo
+Tokelau
+Tonga
+Trinidad and Tobago
+Tromelin Island
+Tunisia
+Turkey
+Turkmenistan
+Turks and Caicos Islands
+Tuvalu
+
+U
+Uganda
+Ukraine
+United Arab Emirates
+United Kingdom
+United States
+Uruguay
+Uzbekistan
+
+V
+Vanuatu
+Venezuela
+Vietnam
+Virgin Islands
+
+W
+Wake Island
+Wallis and Futuna
+West Bank
+Western Sahara
+Western Samoa
+World
+
+Y
+Yemen
+
+Z
+Zaire
+Zambia
+Zimbabwe
+Taiwan
+
+Appendixes
+A: The United Nations System
+B: Abbreviations for International Organizations and Groups
+C: International Organizations and Groups
+D: Weights and Measures
+E: Cross-Reference List of Geographic Names
+
+Reference Maps
+The World
+North America
+Central America and the
+Caribbean
+South America
+Europe
+Ethnic Groups in Eastern
+Europe
+Middle East
+Africa
+Asia
+Commonwealth of Independent States--
+European States
+Commonwealth of Independent States--Central Asian States
+Southeast Asia
+Oceania
+Arctic Region
+Antarctic Region
+Standard Time Zones of the World
+
+There have been some significant changes in this edition. Czechoslovakia has
+been superseded by the Czech Republic and Slovakia. Eritrea gained independence
+from Ethiopia. The name of the Ivory Coast has been changed to Cote d'Ivoire and
+the Vatican City became the Holy See. New entries include Location, Map
+references, Abbreviation (often substituted for the country name), and Digraph
+(two-letter country code). Names is a new entry which includes long and short
+forms of both conventional and local names of countries as well as any former
+names. Most diacritical marks have been omitted. The electronic files used to
+produce the Factbook have been restructured into a database. As a result, the
+formats of some entries in this edition have been changed. Additional changes
+will occur in the 1994 Factbook. Irrigated land is a new entry with the data
+separate from the Land use entry. The Disputes entry is now International
+disputes. The GNP/GDP entry was renamed National Product and the per capita and
+real growth rate data placed in separate entries. Similar changes were made in
+the Population and Diplomatic Representation entries.
+
+Abbreviations: (see Appendix B for international organizations and groups)
+
+avdp.
+avoirdupois
+
+c.i.f.
+cost, insurance, and freight
+
+CY
+calendar year
+
+DWT
+deadweight ton
+
+est.
+estimate
+
+Ex-Im
+Export-Import Bank of the United States
+
+f.o.b.
+free on board
+
+FRG
+Federal Republic of Germany (West Germany); used for information dated before 3
+October 1990 or CY91
+
+FY
+fiscal year
+
+GDP
+gross domestic product
+
+GDR
+German Democratic Republic (East Germany); used for information dated before 3
+October 1990 or CY91
+
+GNP
+gross national product
+
+GRT
+gross register ton
+
+GWP
+gross world product
+
+km
+kilometer
+
+km2
+square kilometer
+
+kW
+kilowatt
+
+kWh
+kilowatt hour
+
+m
+meter
+
+NA
+not available
+
+NEGL
+negligible
+
+nm
+nautical mile
+
+NZ
+New Zealand
+
+ODA
+official development assistance
+
+OOF
+other official flows
+
+PDRY
+People's Democratic Republic of Yemen [Yemen (Aden) or South Yemen]; used for
+information dated before 22 May 1990 or CY91
+
+UAE
+United Arab Emirates
+
+UK
+United Kingdom
+
+US
+United States
+
+USSR
+Union of Soviet Socialist Republics (Soviet Union); used for information dated
+before 25 December 1991
+
+YAR
+Yemen Arab Republic [Yemen (Sanaa) or North Yemen]; used
+for information dated before 22 May 1990 or CY91
+
+Administrative divisions: The numbers, designatory terms, and first-order
+administrative divisions are generally those approved by the US Board on
+Geographic Names (BGN). Changes that have been reported but not yet acted on by
+BGN are noted.
+
+Area: Total area is the sum of all land and water areas delimited by
+international boundaries and/or coastlines. Land area is the aggregate of all
+surfaces delimited by international boundaries and/or coastlines, excluding
+inland water bodies (lakes, reservoirs, rivers). Comparative areas are based on
+total area equivalents. Most entities are compared with the entire US or one of
+the 50 states. The smaller entities are compared with Washington, DC (178 km2,
+69 miles 2) or The Mall in Washington, DC (0.59 km2, 0.23 miles 2,146 acres).
+
+Birth rate: The average annual number of births during a year per 1,000
+population at midyear; also known as crude birth rate.
+
+Dates of information: In general, information available as of 1 January 1993 was
+used in the preparation of this edition. Population figures are estimates for 1
+July 1993, with population growth rates estimated for calendar year 1993. Major
+political events have been updated through June 1993.
+
+Death rate: The average annual number of deaths during a year per l,000
+population at midyear; also known as crude death rate.
+
+Digraphs: The digraph is a two-letter "country code'' that precisely identifies
+every entity without overlap, duplication, or omission. AF, for example, is the
+digraph for Afghanistan. It is a standardized geopolitical data element
+promulgated in the Federal Information Processing Standards Publication (FIPS)
+10-3 by the National Bureau of Standards (US Department of Commerce) and
+maintained by the Office of the Geographer (US Department of State). The digraph
+is used to eliminate confusion and incompatibility in the collection,
+processing, and dissemination of area-specific data and is particularly useful
+for interchanging data between databases.
+
+Diplomatic representation: The US Government has diplomatic relations with 180
+nations. The US has diplomatic relations with 174 of the 182 UN members
+(excluding the Socialist Federal Republic of Yugoslavia whose status in the UN
+is unclear)--the exceptions are Angola, Bhutan, Cuba, Iran, Iraq, Macedonia,
+North Korea, and Vietnam. In addition, the US has diplomatic relations with 7
+nations that are not in the UN-Andorra, Holy See, Kiribati, Nauru, Switzerland,
+Tonga, and Tuvalu.
+
+Economic aid: This entry refers to bilateral commitments of official development
+assistance (ODA), which is defined as government grants that are administered
+with the promotion of economic development and welfare of LDCs as their main
+objective and are concessional in character and contain a grant element of at
+least 25%, and other official flows (OOF) or transactions by the official sector
+whose main objective is other than development motivated or whose grant element
+is below the 25% threshold for ODA. OOF transactions include official export
+credits (such as Ex-Im Bank credits), official equity and portfolio investment,
+and debt reorganization by the official sector that does not meet concessional
+terms. Aid is considered to have been committed when agreements are initialed by
+the parties involved and constitute a formal declaration of intent.
+
+Entities: Some of the nations, dependent areas, areas of special sovereignty,
+and governments included in this publication are not independent, and others are
+not officially recognized by the US Government. "Nation'' refers to a people
+politically organized into a sovereign state with a definite territory.
+"Dependent area" refers to a broad category of political entities that are
+associated in some way with a nation. Names used for page headings are usually
+the short-form names as approved by the US Board on Geographic Names. There are
+266 entities in The World Factbook that may be categorized as follows:
+
+NATIONS
+
+182
+UN members (excluding the Socialist Federal Republic of Yugoslavia whose status
+in the UN is unclear)
+
+8
+nations that are not members of the UN--Andorra, Holy See, Kiribati, Nauru,
+Serbia and Montenegro, Switzerland, Tonga, Tuvalu
+
+OTHER
+
+1
+Taiwan
+
+DEPENDENT AREAS
+
+6
+Australia--Ashmore and Cartier Islands, Christmas Island, Cocos (Keeling)
+Islands, Coral Sea Islands, Heard Island and McDonald Islands, Norfolk Island
+
+2
+Denmark--Faroe Islands, Greenland
+
+16
+France--Bassas da India, Clipperton Island, Europa Island, French Guiana, French
+Polynesia, French Southern and Antarctic Lands, Glorioso Islands, Guadeloupe,
+Juan de Nova Island, Martinique, Mayotte, New Caledonia, Reunion, Saint Pierre
+and Miquelon, Tromelin Island, Wallis and Futuna
+
+2
+Netherlands--Aruba, Netherlands Antilles
+
+3
+New Zealand--Cook Islands, Niue, Tokelau
+
+3
+Norway--Bouvet Island, Jan Mayen, Svalbard
+
+1
+Portugal--Macau
+
+16
+United Kingdom--Anguilla, Bermuda, British Indian Ocean Territory, British
+Virgin Islands, Cayman Islands, Falkland Islands, Gibraltar, Guernsey, Hong
+Kong, Jersey, Isle of Man, Montserrat, Pitcairn Islands, Saint Helena, South
+Georgia and the South Sandwich Islands, Turks and Caicos Islands
+
+15
+United States--American Samoa, Baker Island, Guam, Howland Island, Jarvis
+Island, Johnston Atoll, Kingman Reef, Midway Islands, Navassa Island, Northern
+Mariana Islands, Trust Territory of the Pacific Islands (Palau), Palmyra Atoll,
+Puerto Rico, Virgin Islands, Wake Island
+
+MISCELLANEOUS
+
+6
+Antarctica, Gaza Strip, Paracel Islands, Spratly Islands, West Bank, Western
+Sahara
+
+OTHER ENTITIES
+
+4
+oceans--Arctic Ocean, Atlantic Ocean, Indian Ocean, Pacific Ocean
+
+1
+World
+
+266
+total
+
+note: The US Government does not recognize the four so-called independent
+homelands of Bophuthatswana, Ciskei, Transkei, and Venda in South Africa.
+Exchange rate: The value of a nation's monetary unit at a given date or over a
+given period of time, as expressed in units of local currency per US dollar and
+as determined by international market forces or official fiat.
+
+Gross domestic product (GDP): The value of all goods and services produced
+domestically in a given year.
+
+Gross national product (GNP): The value of all goods and services produced
+domestically in a given year, plus income earned abroad, minus income earned by
+foreigners from domestic production.
+
+Gross world product (GWP): The aggregate value of all goods and services
+produced worldwide in a given year.
+
+GNP/GDP methodology: In the "Economy'' section, GNP/GDP dollar estimates for the
+OECD countries, the former Soviet republics, and the East European countries are
+derived from purchasing power parity (PPP) calculations rather than from
+conversions at official currency exchange rates. The PPP method normally
+involves the use of international dollar price weights, which are applied to the
+quantities of goods and services produced in a given economy. In addition to the
+lack of reliable data from the majority of countries, the statistician faces a
+major difficulty in specifying, identifying, and allowing for the quality of
+goods and services. The division of a PPP GNP/GDP estimate in dollars by the
+corresponding estimate in the local currency gives the PPP conversion rate. One
+thousand dollars will buy the same market basket of goods in the US as one
+thousand dollars--converted to the local currency at the PPP conversion rate--
+will buy in the other country. GNP/GDP estimates for the LDCs, on the other
+hand, are based on the conversion of GNP/GDP estimates in local currencies to
+dollars at the official currency exchange rates. Because currency exchange rates
+depend on a variety of international and domestic financial forces that often
+have little relation to domestic output, use of these rates is less satisfactory
+for calculating GNP/GDP than the PPP method. Furthermore, exchange rates may
+suddenly go up or down by 10% or more because of market forces or official fiat
+whereas real output has remained unchanged. One additional caution: the
+proportion of, say, defense expenditures as a percent of GNP/GDP in local
+currency accounts may differ substantially from the proportion when GNP/GDP
+accounts are expressed in PPP terms, as, for example, when an observer estimates
+the dollar level of Russian or Japanese military expenditures; similar problems
+exist when components are expressed in dollars under currency exchange rate
+procedures. Finally, as academic research moves forward on the PPP method, we
+hope to convert all GNP/GDP estimates to this method in future editions of The
+World Factbook.
+
+Growth rate (population): The annual percent change in the population, resulting
+from a surplus (or deficit) of births over deaths and the balance of migrants
+entering and leaving a country. The rate may be positive or negative.
+
+Illicit drugs: There are five categories of illicit drugs--narcotics,
+stimulants, depressants (sedatives), hallucinogens, and cannabis. These
+categories include many drugs legally produced and prescribed by doctors as well
+as those illegally produced and sold outside medical channels.
+
+Cannabis (Cannabis sativa) is the common hemp plant, which provides
+hallucinogens with some sedative properties, and includes marijuana (pot,
+Acapulco gold, grass, reefer), tetrahydrocannabinol (THC, Marinol), hashish
+(hash), and hashish oil (hash oil).
+
+Coca (Erythroxylon coca) is a bush, and the leaves contain the stimulant
+cocaine. Coca is not to be confused with cocoa, which comes from cacao seeds and
+is used in making chocolate, cocoa, and cocoa butter.
+
+Cocaine is a stimulant derived from the leaves of the coca bush.
+
+Depressants (sedatives) are drugs that reduce tension and anxiety and include
+chloral hydrate, barbiturates (Amytal, Nembutal, Seconal, phenobarbital),
+benzodiazepines (Librium, Valium), methaqualone (Quaalude), glutethimide
+(Doriden), and others (Equanil, Placidyl, Valmid).
+
+Drugs are any chemical substances that effect a physical, mental, emotional, or
+behavioral change in an individual.
+
+Drug abuse is the use of any licit or illicit chemical substance that results in
+physical,
+mental, emotional, or behavioral impairment in an individual.
+
+Hallucinogens are drugs that affect sensation, thinking, self-awareness, and
+emotion. Hallucinogens include LSD (acid, microdot), mescaline and peyote (mexc,
+buttons, cactus), amphetamine variants (PMA, STP, DOB), phencyclidine (PCP,
+angel dust, hog), phencyclidine analogues (PCE, PCPy, TCP), and others
+(psilocybin, psilocyn).
+
+Hashish is the resinous exudate of the cannabis or hemp plant (Cannabis sativa).
+
+Heroin is a semisynthetic derivative of morphine.
+
+Marijuana is the dried leaves of the cannabis or hemp plant (Cannabis sativa).
+
+Narcotics are drugs that relieve pain, often induce sleep, and refer to opium,
+opium derivatives, and synthetic substitutes. Natural narcotics include opium
+(paregoric, parepectolin), morphine (MS-Contin, Roxanol), codeine (Tylenol
+w/codeine, Empirin w/codeine, Robitussan AC), and thebaine. Semisynthetic
+narcotics include heroin (horse, smack), and hydromorphone (Dilaudid). Synthetic
+narcotics include meperidine or Pethidine (Demerol, Mepergan), methadone
+(Dolophine, Methadose), and others (Darvon, Lomotil).
+
+Opium is the milky exudate of the incised, unripe seedpod of the opium poppy.
+
+Opium poppy (Papaver somniferum) is the source for many natural and
+semisynthetic narcotics.
+
+Poppy straw concentrate is the alkaloid derived from the mature dried opium
+poppy.
+
+Qat (kat, khat) is a stimulant from the buds or leaves of Catha edulis that is
+chewed or drunk as tea.
+
+Stimulants are drugs that relieve mild depression, increase energy and activity,
+and include cocaine (coke, snow, crack), amphetamines (Desoxyn, Dexedrine),
+phenmetrazine (Preludin), methylphenidate (Ritalin), and others (Cylert,
+Sanorex, Tenuate).
+
+Infant mortality rate: The number of deaths to infants under one year old in a
+given year per l,000 live births occurring in the same year.
+
+International disputes: This category includes a wide variety of situations that
+range from traditional bilateral boundary disputes to unilateral claims of one
+sort or another. Information regarding disputes over international boundaries
+and maritime boundaries has been reviewed by the Department of State. References
+to other situations may also be included that are border or frontier relevant,
+such as resource disputes, geopolitical questions, or irredentist issues.
+However, inclusion does not necessarily constitute official acceptance or
+recognition by the US Government.
+
+Irrigated land: The figure refers to the number of km 2 that is artifically
+supplied with water.
+
+Land use: Human use of the land surface is categorized as arable land--land
+cultivated for crops that are replanted after each harvest (wheat, maize, rice);
+permanent crops--land cultivated for crops that are not replanted after each
+harvest (citrus, coffee, rubber); meadows and pastures--land permanently used
+for herbaceous forage crops; forest and woodland land--under dense or open
+stands of trees; and other--any land type not specifically mentioned above
+(urban areas, roads, desert).
+
+Leaders: The chief of state is the titular leader of the country who represents
+the state at official and ceremonial funcions but is not involved with the day-
+to-day activities of the government. The head of government is the
+administrative leader who manages the day-to-day activities of the government.
+In the UK, the monarch is the chief of state, and the Prime Minister is the head
+of government. In the US, the President is both the chief of state and the head
+of government.
+
+Life expectancy at birth: The average number of years to be lived by a group of
+people all born in the same year, if mortality at each age remains constant in
+the future.
+
+Literacy: There are no universal definitions and standards of literacy. Unless
+otherwise noted, all rates are based on the most common definition--the ability
+to read and write at a specified age. Detailing the standards that individual
+countries use to assess the ability to read and write is beyond the scope of
+this publication.
+
+Maps: All maps will be available only in the printed version of The World
+Factbook for the foreseeable future.
+
+Maritime claims: The proximity of neighboring states may prevent some national
+claims from being extended the full distance.
+
+Merchant marine: All ships engaged in the carriage of goods. All commercial
+vessels (as opposed to all nonmilitary ships), which excludes tugs, fishing
+vessels, offshore oil rigs, etc.; also, a grouping of merchant ships by
+nationality or register.
+
+Captive register--A register of ships maintained by a territory, possession, or
+colony primarily or exclusively for the use of ships owned in the parent
+country; also referred to as an offshore register, the offshore equivalent of an
+internal register. Ships on a captive register will fly the same flag as the
+parent country, or a local variant of it, but will be subject to the maritime
+laws and taxation rules of the offshore territory. Although the nature of a
+captive register makes it especially desirable for ships owned in the parent
+country, just as in the internal register, the ships may also be owned abroad.
+The captive register then acts as a flag of convenience register, except that it
+is not the register of an independent state.
+
+Flag of convenience register--A national register offering registration to a
+merchant ship not owned in the flag state. The major flags of convenience (FOC)
+attract ships to their register by virtue of low fees, low or nonexistent
+taxation of profits, and liberal manning requirements. True FOC registers are
+characterized by having relatively few of the ships registered actually owned in
+the flag state. Thus, while virtually any flag can be used for ships under a
+given set of circumstances, an FOC register is one where the majority of the
+merchant fleet is owned abroad. It is also referred to as an open register.
+
+Flag state--The nation in which a ship is registered and which holds legal
+jurisdiction over operation of the ship, whether at home or abroad. Differences
+in flag state maritime legislation determine how a ship is manned and taxed and
+whether a foreign-owned ship may be placed on the register.
+
+Internal register--A register of ships maintained as a subset of a national
+register. Ships on the internal register fly the national flag and have that
+nationality but are subject to a separate set of maritime rules from those on
+the main national register. These differences usually include lower taxation of
+profits, manning by foreign nationals, and, usually, ownership outside the flag
+state (when it functions as an FOC register). The Norwegian International Ship
+Register and Danish International Ship Register are the most notable examples of
+an internal register. Both have been instrumental in stemming flight from the
+national flag to flags of convenience and in attracting foreignowned ships to
+the Norwegian and Danish flags.
+
+Merchant ship--A vessel that carries goods against payment of freight; commonly
+used to denote any nonmilitary ship but accurately restricted to commercial
+vessels only.
+
+Register--The record of a ship's ownership and nationality as listed with the
+maritime authorities of a country; also, the compendium of such individual
+ships' registrations. Registration of a ship provides it with a nationality and
+makes it subject to the laws of the country in which registered (the flag state)
+regardless of the nationality of the ship's ultimate owner.
+
+Money figures: All are expressed in contemporaneous US dollars unless otherwise
+indicated.
+
+National product: The total output of goods and services in a country in a given
+year. See Gross domestic product (GDP), Gross national product (GNP), and
+GNP/GDP methodology.
+
+Net migration rate: The balance between the number of persons entering and
+leaving a country during the year per 1,000 persons (based on midyear
+population). An excess of persons entering the country is referred to as net
+immigration (3.56 migrants/1,000 population); an excess of persons leaving the
+country as net emigration (-9.26 migrants/1,000 population).
+
+Population: Figures are estimates from the Bureau of the Census based on
+statistics from population censuses, vital registration systems, or sample
+surveys pertaining to the recent past, and on assumptions about future trends.
+
+Total fertility rate: The average number of children that would be born per
+woman if all women lived to the end of their childbearing years and bore
+children according to a given fertility rate at each age.
+
+Years: All year references are for the calendar year (CY) unless indicated as
+fiscal year (FY).
+

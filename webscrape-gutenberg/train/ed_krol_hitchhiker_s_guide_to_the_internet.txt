@@ -1,0 +1,471 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            The Hitchhikers Guide to the Internet
+                        25 August 1987
+
+
+
+                           Ed Krol
+                    krol@uxc.cso.uiuc.edu
+
+
+
+
+ This document was produced through funding of the National
+ Science Foundation.
+
+ Copyright (C) 1987, by the Board of Trustees of The University
+ of Illinois.  Permission to duplicate this document, in whole
+ or part, is granted provided reference is made to the source
+ and this copyright is included in whole copies.
+
+
+ This document assumes that one is familiar with the workings
+ of a non-connected simple IP network (e.g. a few 4.2 BSD
+ systems on an Ethernet not connected to anywhere else).
+ Appendix A contains remedial information to get one to this
+ point.  Its purpose is to get that person, familiar with a
+ simple net, versed in the "oral tradition" of the Internet
+ to the point that that net can be connected to the Internet
+ with little danger to either.  It is not a tutorial, it
+ consists of pointers to other places, literature, and hints
+ which are not normally documented.  Since the Internet is a
+ dynamic environment, changes to this document will be made
+ regularly.  The author welcomes comments and suggestions.
+ This is especially true of terms for the glossary (definitions
+ are not necessary).
+
+
+
+
+ In the beginning there was the ARPAnet, a wide area
+ experimental network connecting hosts and terminal servers
+ together.  Procedures were set up to regulate the allocation
+ of addresses and to create voluntary standards for the network.
+ As local area networks became more pervasive, many hosts became
+ gateways to local networks.  A network layer to allow the
+ interoperation of these networks was developed and called IP
+ (Internet Protocol).  Over time other groups created long haul
+ IP based networks (NASA, NSF, states...).  These nets, too,
+ interoperate because of IP.  The collection of all of these
+ interoperating networks is the Internet.
+
+ Two groups do much of the research and information work of
+ the Internet (ISI and SRI).  ISI (the Informational Sciences
+ Institute) does much of the research, standardization, and
+ allocation work of the Internet.  SRI International provides
+ information services for the Internet.  In fact, after you
+ are connected to the Internet most of the information in
+ this document can be retrieved from the Network Information
+ Center (NIC) run by SRI.
+
+
+
+ Operating the Internet
+
+ Each network, be it the ARPAnet, NSFnet or a regional network,
+ has its own operations center.  The ARPAnet is run by
+ BBN, Inc. under contract from DARPA.  Their facility is
+ called the Network Operations Center or NOC.  Cornell
+ University temporarily operates NSFnet (called the Network
+ Information Service Center, NISC).  It goes on to the
+
+                             -2-
+
+ regionals having similar facilities to monitor and keep
+ watch over the goings on of their portion of the Internet.
+ In addition, they all should have some knowledge of what is
+ happening to the Internet in total. If a problem comes up,
+ it is suggested that a campus network liaison should contact
+ the network operator to which he is directly connected. That
+ is, if you are connected to a regional network (which is
+ gatewayed to the NSFnet, which is connected to the
+ ARPAnet...)  and have a problem, you should contact your
+ regional network operations center.
+
+
+ RFCs
+
+ The internal workings of the Internet are defined by a set
+ of documents called RFCs (Request for Comments).  The general
+ process for creating an RFC is for someone wanting something
+ formalized to write a document describing the issue and mailing
+ it to Jon Postel (postel@isi.edu).  He acts as a referee for
+ the proposal.  It is then commented upon by all those wishing
+ to take part in the discussion (electronically of course).
+ It may go through multiple revisions.  Should it be generally
+ accepted as a good idea, it will be assigned a number and
+ filed with the RFCs.
+
+ The RFCs can be divided into five groups: required, suggested,
+ directional, informational and obsolete.  Required RFC's (e.g.
+ RFC-791, The Internet Protocol) must be implemented on any host
+ connected to the Internet.  Suggested RFCs are generally
+ implemented by network hosts.  Lack of them does not preclude
+ access to the Internet, but may impact its usability.  RFC-793
+ (Transmission Control Protocol) is a suggested RFC.  Directional
+ RFCs were discussed and agreed to, but their application has never
+ come into wide use.  This may be due to the lack of wide need for
+ the specific application (RFC-937 The Post Office Protocol) or
+ that, although technically superior, ran against other pervasive
+ approaches (RFC-891 Hello).  It is suggested that should the
+ facility be required by a particular site, animplementation
+ be done in accordance with the RFC.  This insures that, should
+ the idea be one whose time has come, the implementation will be
+ in accordance with some standard and will be generally usable.
+ Informational RFCs contain factual information about the
+ Internet and its operation (RFC-990, Assigned Numbers).
+ Finally, as the Internet and technology have grown, some
+ RFCs have become unnecessary.  These obsolete RFCs cannot
+ be ignored, however.  Frequently when a change is made to
+ some RFC that causes a new one to be issued obsoleting others,
+ the new RFC only contains explanations and motivations for the
+ change.  Understanding the model on which the whole facility
+ is based may involve reading the original and subsequent RFCs
+ on the topic.
+
+                             -3-
+
+ (Appendix B contains a list of what are considered to be the
+ major RFCs necessary for understanding the Internet).
+
+
+
+ The Network Information Center
+
+ The NIC is a facility available to all Internet users which
+ provides information to the community.  There are three
+ means of NIC contact: network, telephone, and mail.  The
+ network accesses are the most prevalent.  Interactive access
+ is frequently used to do queries of NIC service overviews,
+ look up user and host names, and scan lists of NIC documents.
+ It is available by using
+
+      %telnet sri-nic.arpa
+
+ on a BSD system and following the directions provided by a
+ user friendly prompter.  From poking around in the databases
+ provided one might decide that a document named NETINFO:NUG.DOC
+ (The Users Guide to the ARPAnet) would be worth having.  It could
+ be retrieved via an anonymous FTP.  An anonymous FTP would proceed
+ something like the following.  (The dialogue may vary slightly
+ depending on the implementation of FTP you are using).
+
+      %ftp sri-nic.arpa
+      Connected to sri-nic.arpa.
+      220 SRI_NIC.ARPA FTP Server Process 5Z(47)-6 at Wed
+17-Jun-87 12:00 PDT
+      Name (sri-nic.arpa:myname): anonymous
+      331 ANONYMOUS user ok, send real ident as password.
+      Password: myname
+      230 User ANONYMOUS logged in at Wed 17-Jun-87 12:01 PDT,
+job 15.
+      ftp> get netinfo:nug.doc
+      200 Port 18.144 at host 128.174.5.50 accepted.
+      150 ASCII retrieve of <NETINFO>NUG.DOC.11 started.
+      226 Transfer Completed 157675 (8) bytes transferred
+      local: netinfo:nug.doc  remote:netinfo:nug.doc
+      157675 bytes in 4.5e+02 seconds (0.34 Kbytes/s)
+      ftp> quit
+      221 QUIT command received. Goodbye.
+
+ (Another good initial document to fetch is
+ NETINFO:WHAT-THE-NIC-DOES.TXT)!
+
+ Questions of the NIC or problems with services can be asked
+ of or reported to using electronic mail.  The following
+ addresses can be used:
+
+      NIC@SRI-NIC.ARPA         General user assistance, document requests
+      REGISTRAR@SRI-NIC.ARPA   User registration and WHOIS updates
+      HOSTMASTER@SRI-NIC.ARPA  Hostname and domain changes and updates
+      ACTION@SRI-NIC.ARPA      SRI-NIC computer operations
+      SUGGESTIONS@SRI-NIC.ARPA Comments on NIC publications and services
+
+                             -4-
+
+ For people without network access, or if the number of documents
+ is large, many of the NIC documents are available in printed
+ form for a small charge.  One frequently ordered document for
+ starting sites is a compendium of major RFCs.  Telephone access is
+ used primarily for questions or problems with network access.
+ (See appendix B for mail/telephone contact numbers).
+
+
+
+ The NSFnet Network Service Center
+
+ The NSFnet Network Service Center (NNSC) is funded by NSF to
+ provide a first level of aid to users of NSFnet should they
+ have questions or encounter problems traversing the network.
+ It is run by BBN Inc.  Karen Roubicek
+ (roubicek@nnsc.nsf.net) is the NNSC user liaison.
+
+ The NNSC, which currently has information and documents
+ online and in printed form, plans to distribute news through
+ network mailing lists, bulletins, newsletters, and online
+ reports.  The NNSC also maintains a database of contact
+ points and sources of additional information about NSFnet
+ component networks and supercomputer centers.
+
+ Prospective or current users who do not know whom to call
+ concerning questions about NSFnet use, should contact the
+ NNSC.  The NNSC will answer general questions, and, for
+ detailed information relating to specific components of the
+ Internet, will help users find the appropriate contact for
+ further assistance.  (Appendix B)
+
+
+
+ Mail Reflectors
+
+ The way most people keep up to date on network news is
+ through subscription to a number of mail reflectors.  Mail
+ reflectors are special electronic mailboxes which, when they
+ receive a message, resend it to a list of other mailboxes.
+ This in effect creates a discussion group on a particular
+ topic.  Each subscriber sees all the mail forwarded by the
+ reflector, and if one wants to put his "two cents" in sends
+ a message with the comments to the reflector....
+
+ The general format to subscribe to a mail list is to find
+ the address reflector and append the string -REQUEST to the
+ mailbox name (not the host name).  For example, if you
+ wanted to take part in the mailing list for NSFnet reflected
+ by NSFNET@NNSC.NSF.NET, one sends a request to
+
+                             -5-
+
+ NSFNET-REQUEST@NNSC.NSF.NET.  This may be a wonderful scheme,
+ but the problem is that you must know the list exists in the
+ first place.  It is suggested that, if you are interested,
+ you read the mail from one list (like NSFNET) and you will
+ probably become familiar with the existence of others.
+ A registration service for mail reflectors is provided by
+ the NIC in the files NETINFO:INTEREST-GROUPS-1.TXT,
+ NETINFO:INTEREST-GROUPS-2.TXT, and NETINFO:INTEREST-GROUPS-
+ 3.TXT.
+
+ The NSFNET mail reflector is targeted at those people who
+ have a day to day interest in the news of the NSFnet (the
+ backbone, regional network, and Internet inter-connection
+ site workers).  The messages are reflected by a central
+ location and are sent as separate messages to each subscriber.
+ This creates hundreds of messages on the wide area networks
+ where bandwidth is the scarcest.
+
+ There are two ways in which a campus could spread the news
+ and not cause these messages to inundate the wide area
+ networks.  One is to re-reflect the message on the campus.
+ That is, set up a reflector on a local machine which forwards
+ the message to a campus distribution list.  The other is
+ to create an alias on a campus machine which places the
+ messages into a notesfile on the topic.  Campus users who
+ want the information could access the notesfile and see the
+ messages that have been sent since their last access.  One
+ might also elect to have the campus wide area network
+ liaison screen the messages in either case and only forward
+ those which are considered of merit.  Either of these
+ schemes allows one message to be sent to the campus, while
+ allowing wide distribution within.
+
+
+ Address Allocation
+
+ Before a local network can be connected to the Internet it
+ must be allocated a unique IP address.  These addresses are
+ allocated by ISI.  The allocation process consists of getting
+ an application form received from ISI.  (Send a message
+ to hostmaster@sri-nic.arpa and ask for the template for a
+ connected address).  This template is filled out and mailed
+ back to hostmaster.  An address is allocated and e-mailed back
+ to you.  This can also be done by postal mail (Appendix B).
+
+ IP addresses are 32 bits long.  It is usually written as
+ four decimal numbers separated by periods (e.g., 192.17.5.100).
+ Each number is the value of an octet of the 32 bits.  It was
+ seen from the beginning that some networks might choose to
+ organize themselves as very flat (one net with a lot of nodes)
+ and some might organize hierarchically
+
+                             -6-
+
+ (many interconnected nets with fewer nodes each and a backbone).
+ To provide for these cases, addresses were differentiated into
+ class A, B, and C networks.  This classification had to with the
+ interpretation of the octets.  Class A networks have the first
+ octet as a network address and the remaining three as a host
+ address on that network.  Class C addresses have three octets of
+ network address and one of host.  Class B is split two and two.
+ Therefore, there is an address space for a few large nets, a
+ reasonable number of medium nets and a large number of small nets.
+ The top two bits in the first octet are coded to tell the address
+ format.  All of the class A nets have been allocated.  So one
+ has to choose between Class B and Class C when placing an order.
+ (There are also class D (Multicast) and E (Experimental) formats.
+ Multicast addresses will likely come into greater use in the near
+ future, but are not frequently used now).
+
+ In the past sites requiring multiple network addresses
+ requested multiple discrete addresses (usually Class C).
+ This was done because much of the software available
+ (not ably 4.2BSD) could not deal with subnetted addresses.
+ Information on how to reach a particular network (routing
+ information) must be stored in Internet gateways and packet
+ switches.  Some of these nodes have a limited capability to
+ store and exchange routing information (limited to about 300
+ networks).  Therefore, it is suggested that any campus
+ announce (make known to the Internet) no more than two
+ discrete network numbers.
+
+ If a campus expects to be constrained by this, it should
+ consider subnetting.  Subnetting (RFC-932) allows one to
+ announce one address to the Internet and use a  set of
+ addresses on the campus.  Basically, one defines a mask
+ which allows the network to differentiate between the
+ network portion and host portion of the address.  By using a
+ different mask on the Internet and the campus, the address
+ can be interpreted in multiple ways.  For example, if a
+ campus requires two networks internally and has the 32,000
+ addresses beginning 128.174.X.X (a Class B address) allocated
+ to it,  the campus could allocate 128.174.5.X to one part
+ of campus and 128.174.10.X to another.  By advertising
+ 128.174 to the Internet with a subnet mask of FF.FF.00.00,
+ the Internet would treat these two addresses as one. Within
+ the campus a mask of FF.FF.FF.00 would be used, allowing the
+ campus to treat the addresses as separate entities. (In reality
+ you don't pass the subnet mask of FF.FF.00.00 to the Internet,
+ the octet meaning is implicit in its being a class B address).
+ A word of warning is necessary.  Not all systems know how to
+ do subnetting.  Some 4.2BSD systems require additional
+ software.  4.3BSD systems subnet as released.  Other devices
+
+                             -7-
+
+ and operating systems vary in the problems they have dealing
+ with subnets.  Frequently these machines can be used as a
+ leaf on a network but not as a gateway within the subnetted
+ portion of the network.  As time passes and more systems
+ become 4.3BSD based, these problems should disappear.
+
+ There has been some confusion in the past over the format of
+ an IP broadcast address.  Some machines used an address of
+ all zeros to mean broadcast and some all ones.  This was
+ confusing when machines of both type were connected to the
+ same network. The broadcast address of all ones has been
+ adopted to end the grief.  Some systems (e.g. 4.2 BSD) allow
+ one to choose the format of the broadcast address.  If a
+ system does allow this choice, care should be taken that the
+ all ones format is chosen.  (This is explained in RFC-1009
+ and RFC-1010).
+
+
+ Internet Problems
+
+ There are a number of problems with the Internet.  Solutions
+ to the problems range from software changes to long term
+ research projects. Some of the major ones are detailed
+ below:
+
+ Number of Networks
+
+      When the Internet was designed it was to have about 50
+      connected networks.  With the explosion of networking,
+      the number is now approaching 300.  The software in a
+      group of critical gateways (called the core gateways of
+      the ARPAnet) are not able to pass or store much more
+      than that number.  In the short term, core reallocation
+      and recoding has raised the number slightly.  By the
+      summer of '88 the current PDP-11 core gateways will be
+      replaced with BBN Butterfly gateways which will solve
+      the problem.
+
+ Routing Issues
+
+      Along with sheer mass of the data necessary to route
+      packets to a large number of networks, there are many
+      problems with the updating, stability, and optimality
+      of the routing algorithms.  Much research is being done
+      in the area, but the optimal solution to these routing
+      problems is still years away.  In most cases the the
+      routing we have today works, but sub-optimally and
+      sometimes unpredictably.
+
+                             -8-
+
+
+ Trust Issues
+
+      Gateways exchange network routing information.
+      Currently, most gateways accept on faith that the
+      information provided about the state of the network is
+      correct.  In the past this was not a big problem since
+      most of the gateways belonged to a single administrative
+      entity (DARPA).  Now with multiple wide area networks
+      under different administrations, a rogue gateway
+      somewhere in the net could cripple the Internet.
+      There is design work going on to solve both the problem of
+      a gateway doing unreasonable things and providing enough
+      information to reasonably route data between multiply
+      connected networks (multi-homed networks).
+
+ Capacity & Congestion
+
+      Many portions of the ARPAnet are very congested during
+      the busy part of the day.  Additional links are planned
+      to alleviate this congestion, but the implementation
+      will take a few months.
+
+
+ These problems and the future direction of the Internet are
+ determined by the Internet Architect (Dave Clark of MIT)
+ being advised by the Internet Activities Board (IAB).  This
+ board is composed of chairmen of a number of committees with
+ responsibility for various specialized areas of the Internet.
+ The committees composing the IAB and their chairmen are:
+
+         Committee                            Chair
+      Autonomous Networks                  Deborah Estrin
+      End-to-End Services                  Bob Braden
+      Internet Architecture                Dave Mills
+      Internet Engineering                 Phil Gross
+           EGP2                            Mike Petry
+           Name Domain Planning            Doug Kingston
+           Gateway Monitoring              Craig Partridge
+           Internic                        Jake Feinler
+           Performance & Congestion ControlRobert Stine
+           NSF Routing                     Chuck Hedrick
+           Misc. MilSup Issues             Mike St. Johns
+      Privacy                              Steve Kent
+      IRINET Requirements                  Vint Cerf
+      Robustness & Survivability           Jim Mathis
+      Scientific Requirements              Barry Leiner
+
+ Note that under Internet Engineering, there are a set of
+ task forces and chairs to look at short term concerns.  The
+ chairs of these task forces are not part of the IAB.
+
+                             -9-
+ Routing
+
+
+ Routing is the algorithm by which a network directs a packet
+ from its source to its destination.  To appreciate the problem,
+ watch a small child trying to find a table in a restaurant.
+ From the adult point of view the structure of the dining room
+ is seen and an optimal route easily chosen.  The child, however,
+ is presented with a set of paths between tables where a good path,
+ let alone the optimal one to the goal is not discernible.
