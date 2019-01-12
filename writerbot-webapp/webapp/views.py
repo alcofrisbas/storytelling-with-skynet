@@ -31,7 +31,7 @@ def write(request):
     global sess, model, word_to_id, id_to_word
 
     if not model:
-        sess, model, word_to_id, id_to_word = load_model()
+        sess, model, word_to_id, id_to_word = load_model(save=True)
 
     suggestion = ""
 
