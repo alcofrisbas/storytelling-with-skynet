@@ -87,12 +87,11 @@ def gen_id_seqs(filepath=""):
                 line = line.strip()
                 temp_sent = word_tokenize(line)
                 for char in temp_sent:
-                        sent.append(char)
+                    sent.append(char)
 
                 line = [word_to_id(word, word_dict) for word in sent]
-                # each sentence has the start and the end
-                line_word_ids = [1] + line + [2]
-                current_file.write(" ".join([str(id) for id in line_word_ids]) + "\n")
+
+                current_file.write(" ".join([str(id) for id in line]) + "\n")
 
 
 if __name__ == "__main__":
