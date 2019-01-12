@@ -11,6 +11,8 @@
 
     <form method="post">
         {% csrf_token %}
+        <textarea name="story" class="form-control">
+        <textarea><br>
         <textarea name="text" class="form-control">{{ suggestion }}</textarea><br>
         <button type="submit" class="btn btn-primary btn-lg">Add Sentence</button>
     </form>
