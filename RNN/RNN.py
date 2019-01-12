@@ -62,15 +62,7 @@ class RNNModel(object):
             input_seq = tf.string_to_number(line_split.values[:-1], out_type=tf.int32)
             output_seq = tf.string_to_number(line_split.values[1:], out_type=tf.int32)
             return input_seq, output_seq
-        '''
-        with tf.gfile.GFile("data/ptb.train.txt.ids") as f:
-            lines = f.readlines()
-            print(lines)
-            train_data = []
-            for line in lines:
-                train_data.append((parse(line)))
-        print(1)
-        '''
+
         training_dataset = tf.data.TextLineDataset(self.file_name_train).map(parse).padded_batch(config.batch_size, padded_shapes=([None],[None]))
         # gets next batch so that wen can combine the two datasets into one
 
