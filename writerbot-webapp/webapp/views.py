@@ -36,6 +36,7 @@ def write(request):
     suggestion = ""
 
     sentences = request.session.get("sentences")
+    sentences = ["this is a test sentence"]
     editing = request.session.get("editing")
 
     if request.POST:

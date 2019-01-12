@@ -3,16 +3,20 @@
 {% block content %}
 
     <h5 class="mt-5">Prompt: {{ prompt }}</h5>
-    <p>Start writing here: <br>
+    <p>Start writing here: </p>
+    <div contenteditable="true">
+    <p>
     {% for sentence in sentences %}
         <br>{{ sentence }}
+        {% if not loop.last %}
+            <br> <span style="color:blue">{{ sentence }}</span>
+        {% endif %}
     {% endfor %}
     </p>
+    </div>
 
     <form method="post">
         {% csrf_token %}
-        <textarea name="story" class="form-control">
-        <textarea><br>
         <textarea name="text" class="form-control">{{ suggestion }}</textarea><br>
         <button type="submit" class="btn btn-primary btn-lg">Add Sentence</button>
     </form>

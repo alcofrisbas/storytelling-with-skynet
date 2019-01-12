@@ -21,7 +21,7 @@ import reader
 import math
 
 flags = tf.flags
-flags.DEFINE_string("vocab_file", "data/vocab.csv",
+flags.DEFINE_string("vocab_file", "./RNN/data/vocab.csv",
     "File containing the vocabulary")
 FLAGS = flags.FLAGS
 
