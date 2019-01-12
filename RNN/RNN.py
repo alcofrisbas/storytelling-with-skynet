@@ -21,7 +21,7 @@ import reader
 import math
 
 flags = tf.flags
-flags.DEFINE_string("vocab_file", "data/vocab.txt",
+flags.DEFINE_string("vocab_file", "data/vocab.csv",
     "File containing the vocabulary")
 FLAGS = flags.FLAGS
 
@@ -91,7 +91,6 @@ class RNNModel(object):
 
 
         # input embedding
-
         embedding = tf.get_variable(
             "embedding", [self.vocab_size, size], dtype=tf.float32)
         inputs = tf.nn.embedding_lookup(embedding, self.input_batch)
