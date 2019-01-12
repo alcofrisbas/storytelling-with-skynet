@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from webapp.models import Story
 
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'RNN'))
-print(sys.path)
+#print(sys.path)
 from rnn_test import load_model, generate_text
 import random
 from webapp.words import ADJECTIVES, ANIMALS
