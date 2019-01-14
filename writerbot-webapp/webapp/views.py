@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from webapp.models import Story
 
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'RNN'))
-print(sys.path)
+#print(sys.path)
 from rnn_test import load_model, generate_text
 import random
 from webapp.words import ADJECTIVES, ANIMALS
@@ -31,11 +31,12 @@ def write(request):
     global sess, model, word_to_id, id_to_word
 
     if not model:
-        sess, model, word_to_id, id_to_word = load_model()
+        sess, model, word_to_id, id_to_word = load_model(save=False)
 
     suggestion = ""
 
     sentences = request.session.get("sentences")
+    sentences = ["this is a test sentence"]
     editing = request.session.get("editing")
 
     if request.POST:

@@ -10,7 +10,7 @@ with open("train.txt", "w") as f:
         with open(work + '/train/' +  file, "r") as f1:
             text = f1.read()
             text = text.replace("\n", " ")
-            text = text.split('.')
+            text = re.split("(?<!.Mr|.Ms|Mrs)[.]", text)
             for sent in text:
                 f.write(sent + "\n")
 
@@ -19,7 +19,7 @@ with open("valid.txt", "w") as f:
         with open(work + '/valid/' +  file, "r") as f1:
             text = f1.read()
             text = text.replace("\n", " ")
-            text = text.split('.')
+            text = re.split("(?<!.Mr|.Ms|Mrs)[.]", text)
             for sent in text:
                 f.write(sent + "\n")
 
@@ -29,6 +29,6 @@ with open("test.txt", "w") as f:
         with open(work + '/test/' +  file, "r") as f1:
             text = f1.read()
             text = text.replace("\n", " ")
-            text = text.split('.')
+            text = re.split("(?<!.Mr|.Ms|Mrs)[.]", text)
             for sent in text:
                 f.write(sent + "\n")

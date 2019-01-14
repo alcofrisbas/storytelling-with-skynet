@@ -21,7 +21,7 @@ import reader
 import math
 
 flags = tf.flags
-flags.DEFINE_string("vocab_file", "./RNN/data/vocab.txt",
+flags.DEFINE_string("vocab_file", "./RNN/data/vocab.csv",
     "File containing the vocabulary")
 FLAGS = flags.FLAGS
 
@@ -62,15 +62,7 @@ class RNNModel(object):
             input_seq = tf.string_to_number(line_split.values[:-1], out_type=tf.int32)
             output_seq = tf.string_to_number(line_split.values[1:], out_type=tf.int32)
             return input_seq, output_seq
-        '''
-        with tf.gfile.GFile("data/ptb.train.txt.ids") as f:
-            lines = f.readlines()
-            print(lines)
-            train_data = []
-            for line in lines:
-                train_data.append((parse(line)))
-        print(1)
-        '''
+
         training_dataset = tf.data.TextLineDataset(self.file_name_train).map(parse).padded_batch(config.batch_size, padded_shapes=([None],[None]))
         # gets next batch so that wen can combine the two datasets into one
 
@@ -91,7 +83,6 @@ class RNNModel(object):
 
 
         # input embedding
-
         embedding = tf.get_variable(
             "embedding", [self.vocab_size, size], dtype=tf.float32)
         inputs = tf.nn.embedding_lookup(embedding, self.input_batch)
@@ -112,6 +103,7 @@ class RNNModel(object):
             if config.keep_prob < 1:
                 cell = tf.contrib.rnn.DropoutWrapper( cell, output_keep_prob=config.keep_prob)
             return cell
+
 
 
 
@@ -206,7 +198,7 @@ class RNNModel(object):
             saver.save(sess, "models/best_model.ckpt")
 
     def predict(self, sess, input_file, raw_file, verbose=False):
-        # if verbose is trrue, then we print the ppl of every sequence
+        # if verbose is true, then we print the ppl of every sequence
 
         sess.run(self.test_init_op, {self.file_name_test: input_file})
 

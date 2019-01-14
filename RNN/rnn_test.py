@@ -69,7 +69,7 @@ def generate_text(sess, model, word_to_index, index_to_word,
     return text
 
 
-def load_model():
+def load_model(save=False):
     with open(RNN.FLAGS.vocab_file, "r") as vocab_file:
         lines = [line.strip() for line in vocab_file.readlines()]
         vocab_size = len(lines)
@@ -83,8 +83,9 @@ def load_model():
     model = RNN.RNNModel(vocab_size=vocab_size,config=eval_config,
         num_train_samples=1, num_valid_samples=1)
     sess.run(tf.global_variables_initializer())
-    #saver = tf.train.Saver()
-    #saver.restore(sess, tf.train.latest_checkpoint('RNN/model'))
+    if save:
+        saver = tf.train.Saver()
+        saver.restore(sess, tf.train.latest_checkpoint('RNN/models'))
     return sess, model, word_to_id, id_to_word
 
 
