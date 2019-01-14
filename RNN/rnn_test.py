@@ -83,8 +83,8 @@ def load_model():
     model = RNN.RNNModel(vocab_size=vocab_size,config=eval_config,
         num_train_samples=1, num_valid_samples=1)
     sess.run(tf.global_variables_initializer())
-    saver = tf.train.Saver()
-    saver.restore(sess, tf.train.latest_checkpoint('RNN/model'))
+    #saver = tf.train.Saver()
+    #saver.restore(sess, tf.train.latest_checkpoint('RNN/model'))
     return sess, model, word_to_id, id_to_word
 
 
@@ -102,8 +102,8 @@ if __name__ == '__main__':
         model = RNN.RNNModel(vocab_size=vocab_size,config=eval_config,
             num_train_samples=1, num_valid_samples=1)
         sess.run(tf.global_variables_initializer())
-        saver = tf.train.Saver()
-        saver.restore(sess, tf.train.latest_checkpoint('./models'))
+        #saver = tf.train.Saver()
+        #saver.restore(sess, tf.train.latest_checkpoint('./models'))
 
         while True:
             sentence = input('Write your sentence: ')
