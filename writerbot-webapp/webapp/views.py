@@ -31,11 +31,12 @@ def write(request):
     global sess, model, word_to_id, id_to_word
 
     if not model:
-        sess, model, word_to_id, id_to_word = load_model(save=True)
+        sess, model, word_to_id, id_to_word = load_model(save=False)
 
     suggestion = ""
 
     sentences = request.session.get("sentences")
+    sentences = ["this is a test sentence"]
     editing = request.session.get("editing")
 
     if request.POST:
