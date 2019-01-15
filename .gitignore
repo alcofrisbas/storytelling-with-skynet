@@ -19,3 +19,4 @@
 .*
 !.gitignore
 *.db
+venv*
