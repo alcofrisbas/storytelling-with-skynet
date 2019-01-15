@@ -93,11 +93,11 @@ if __name__ == '__main__':
             try:
                 lines.append(row[0])
             except:
-                print(None)
+                pass
         vocab_size = len(lines)
         word_to_id = dict([(b,a) for (a,b) in enumerate(lines)])
         id_to_word = dict([(a,b) for (a,b) in enumerate(lines)])
-    
+
     eval_config = SmallConfig()
     eval_config.num_steps = 1
     eval_config.batch_size = 1
