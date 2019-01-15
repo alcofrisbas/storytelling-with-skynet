@@ -3,6 +3,7 @@ import numpy as np
 import RNN
 import re
 import os
+import csv
 
 
 
@@ -29,12 +30,7 @@ def generate_text(sess, model, word_to_index, index_to_word,
     input_seeds_id = []
     seed = seed.lower()
     seed = re.split(r'([;|, |.|,|:|?|!])', seed)
-    new_seed = []
-    for word in seed:
-        if word not in ['', ' ']:
-            new_seed.append(word)
-
-    for w in new_seed:
+    for w in seed:
         try:
             input_seeds_id.append(word_to_index[w])
         except:   # if word is not in vocabulary, processed as _UNK_
@@ -91,11 +87,17 @@ def load_model(save=False):
 
 if __name__ == '__main__':
     with open(RNN.FLAGS.vocab_file, "r") as vocab_file:
-        lines = [line.strip() for line in vocab_file.readlines()]
+        reader = csv.reader(vocab_file, delimiter=',')
+        lines = []
+        for row in reader:
+            try:
+                lines.append(row[0])
+            except:
+                print(None)
         vocab_size = len(lines)
         word_to_id = dict([(b,a) for (a,b) in enumerate(lines)])
         id_to_word = dict([(a,b) for (a,b) in enumerate(lines)])
-
+    
     eval_config = SmallConfig()
     eval_config.num_steps = 1
     eval_config.batch_size = 1
