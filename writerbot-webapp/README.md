@@ -16,6 +16,12 @@ GOOGLE_CLIENT_SECRET=<>
 
 For local testing, you can set DJANGO_SECRET_KEY to whatever you like, but the Google entries must be set to valid Google webapp credentials.
 
+If this is your first time running the webapp and you don't have a db.sqlite3 file, run the following command:
+
+```bash
+$ python3 manage.py migrate
+```
+
 Then run the webserver with:
 
 ```bash
