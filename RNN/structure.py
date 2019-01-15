@@ -8,8 +8,9 @@ with open("data/vocab.csv", "r") as csvfile:
             definitions.append(word)
 with open("data/templates.csv", "w") as templates:
     writer = csv.writer(templates, delimiter= ",")
-    with open("ptb.train.txt", "r") as train:
+    with open("train.txt", "r") as train:
         lines = train.readlines()
+        structures = []
         for line in lines:
             structure = []
             line = line.strip()
@@ -19,4 +20,6 @@ with open("data/templates.csv", "w") as templates:
                     if word == definition[0]:
                         structure.append(definition[1])
                         break
+            #if structure not in structures:
+                #structures.append(structure)
             writer.writerow(structure)
