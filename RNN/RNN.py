@@ -81,7 +81,6 @@ class RNNModel(object):
 
         self.input_batch, self.output_batch = iterator.get_next()
 
-
         # input embedding
         embedding = tf.get_variable(
             "embedding", [self.vocab_size, size], dtype=tf.float32)
@@ -164,6 +163,7 @@ class RNNModel(object):
             state = sess.run(self.initial_state)
             costs = 0.0
             iters = 0
+            print(sess.run(self.input_batch), sess.run(self.output_batch))
             for step in range(self.train_epoch):
                 start_time = time.time()
 
