@@ -1,14 +1,14 @@
 import os
 import csv
 definitions = []
-with open("data/vocab.csv", "r") as csvfile:
+with open("RNN/data/vocab.csv", "r") as csvfile:
     reader = csv.reader(csvfile, delimiter=',')
     for word in reader:
         if len(word) > 1:
             definitions.append(word)
-with open("data/templates.csv", "w") as templates:
+with open("RNN/data/templates.csv", "w") as templates:
     writer = csv.writer(templates, delimiter= ",")
-    with open("train.txt", "r") as train:
+    with open("RNN/train.txt", "r") as train:
         lines = train.readlines()
         for line in lines:
             structure = []
