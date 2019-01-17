@@ -13,7 +13,7 @@ def structure_from_sent(sentence):
 
 """
 given our list of structures, returns
-a random sentence structure 
+a random sentence structure
 """
 def pick_structure(max=42068):
     start = time.time()
@@ -26,11 +26,12 @@ def pick_structure(max=42068):
             x = next(r).strip()
     end = time.time() - start
     print("total time: {}".format(str(end)))
-    return x
+    return x.split(',')
 
 
-
+"""
 if __name__ == '__main__':
     s = "This is a delicious sentence"
     print(structure_from_sent(s))
     print(pick_structure())
+"""

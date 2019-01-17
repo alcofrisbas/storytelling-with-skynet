@@ -6,6 +6,7 @@ import os
 import csv
 import random
 import nltk
+import grammarUtils
 
 
 class SmallConfig(object):
@@ -25,10 +26,10 @@ class SmallConfig(object):
 
 
 
-def generate_text(sess, model, word_to_index, index_to_word, templates,
+def generate_text(sess, model, word_to_index, index_to_word,
     seed='.', n_sentences= 20):
     # temporarily choosing templates randomly, in future should be smarter
-    template = random.choice(templates)
+    template = grammarUtils.pick_structure()
     sentence_cnt = 0
     input_seeds_id = []
     seed = seed.lower()
@@ -126,7 +127,7 @@ if __name__ == '__main__':
         while True:
             sentence = input('Write your sentence: ')
             #try:
-            generate_text(sess, model, word_to_id, id_to_word, templates, seed=sentence)
+            generate_text(sess, model, word_to_id, id_to_word, seed=sentence)
             #except:
                 #print("Word not in dictionary.")
             try:
