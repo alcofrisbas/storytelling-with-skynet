@@ -4,7 +4,8 @@ import RNN
 import re
 import os
 import csv
-
+import random
+import nltk
 
 
 class SmallConfig(object):
@@ -24,8 +25,10 @@ class SmallConfig(object):
 
 
 
-def generate_text(sess, model, word_to_index, index_to_word,
+def generate_text(sess, model, word_to_index, index_to_word, templates,
     seed='.', n_sentences= 20):
+    # temporarily choosing templates randomly, in future should be smarter
+    template = random.choice(templates)
     sentence_cnt = 0
     input_seeds_id = []
     seed = seed.lower()
@@ -40,27 +43,34 @@ def generate_text(sess, model, word_to_index, index_to_word,
     text = ''
     # Generate a new sample from previous, starting at last word seed
     input_id = [[input_seeds_id[-1]]]
-    while sentence_cnt < n_sentences:
+    first_word = True
+    print(template)
+    for POS in template:
+        print(POS)
         feed_dict = {model.input_batch: input_id}
         probas= sess.run([model.probas],
                                 feed_dict=feed_dict)
-        sampled_word = np.argmax(probas)
-        punctuation = [word_to_index['.'], word_to_index['?'], word_to_index['!']]
-        input_id = [[sampled_word]]
-        if sampled_word in punctuation:
-            text += '.\n'
-            sentence_cnt += 20
+        # Want to find the highest probability target with type POS
+        test_probas = probas[0][0]
+        test_probas.sort()
+        length = len(test_probas)-1
+        best_choice = None
+        best_choice_idx = None
+        for i in range(len(test_probas)):
+            word = test_probas[length-i]
+            word_idx = np.where(probas==word)[-1][0]
+            word = index_to_word[word_idx]
+            tag = nltk.pos_tag([word])[0][-1]
+            if tag == POS:
+                best_choice = word
+                best_choice_idx = word_idx
+                break
+        if first_word:
+            text += best_choice.capitalize()
+            first_word = False
         else:
-            if index_to_word[sampled_word] in ["_UNK_","_PAD_", "_BOS_", "_EOS_"]:
-                text += ''
-            else:
-                # case if processing the first word
-                if text == '':
-                    text += index_to_word[sampled_word].capitalize()
-                else:
-                    text += ' ' + index_to_word[sampled_word]
-            sentence_cnt += 1
-        input_wordid = [[sampled_word]]
+            text += ' ' + best_choice
+        input_wordid = [[best_choice_idx]]
     print(text)
     return text
 
@@ -86,6 +96,11 @@ def load_model(save=False):
 
 
 if __name__ == '__main__':
+    templates = []
+    with open("data/templates.csv", "r") as csvfile:
+        reader = csv.reader(csvfile, delimiter=',')
+        for line in reader:
+            templates.append(line)
     with open(RNN.FLAGS.vocab_file, "r") as vocab_file:
         reader = csv.reader(vocab_file, delimiter=',')
         lines = []
@@ -111,7 +126,7 @@ if __name__ == '__main__':
         while True:
             sentence = input('Write your sentence: ')
             #try:
-            generate_text(sess, model, word_to_id, id_to_word, seed=sentence)
+            generate_text(sess, model, word_to_id, id_to_word, templates, seed=sentence)
             #except:
                 #print("Word not in dictionary.")
             try:
