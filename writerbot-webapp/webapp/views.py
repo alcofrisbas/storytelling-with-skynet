@@ -52,9 +52,12 @@ def write(request):
         sentences.clear()
         request.session["editing"] = False
         request.session["prompt"] = generatePrompt(request.session.get("prompt"))
-
+    last = ""
+    if sentences:
+        last = sentences[-1]
+        #sentences.pop()
     return render(request, 'webapp/write.html',
-                  context={"prompt": request.session.get("prompt"), "sentences": sentences, "suggestion": suggestion})
+                  context={"prompt": request.session.get("prompt"), "sentences": sentences[:-1], "suggestion": suggestion, "last":last})
 
 
 def about(request):
