@@ -34,9 +34,7 @@ def write(request):
         sess, model, word_to_id, id_to_word = load_model(save=False)
 
     suggestion = ""
-
     sentences = request.session.get("sentences")
-    #sentences = ["this is a test sentence"]
     editing = request.session.get("editing")
 
     if request.POST:
@@ -52,6 +50,10 @@ def write(request):
         sentences.clear()
         request.session["editing"] = False
         request.session["prompt"] = generatePrompt(request.session.get("prompt"))
+
+    elif request.GET.get("save"):
+        # add to model for later use! implement me
+        print(sentences)
     last = ""
     if sentences:
         last = sentences[-1]
@@ -92,5 +94,5 @@ def generateSuggestion(newSentence):
     try:
         suggestion = generate_text(sess, model, word_to_id, id_to_word, newSentence)
     except:
-        suggestion = ""
+        suggestion = "Error: RNN is DOWN"
     return suggestion

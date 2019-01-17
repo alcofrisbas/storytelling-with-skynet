@@ -3,7 +3,7 @@
 {% block content %}
 
     <h5 class="mt-5">Prompt: {{ prompt }}</h5>
-    <p>Start writing here: </p>    
+    <p>Start writing here: </p>
     <p>
     {% for sentence in sentences %}
         {% if not loop.last %}
@@ -21,5 +21,6 @@
     <br>
     <form>
         <button type="submit" class="btn btn-danger btn-sm" name="new" value="true">Start a new story</button>
+        <button type="submit" class="btn btn-danger btn-sm" name="save" value="true">Save this story</button>
     </form>
 {% endblock %}
