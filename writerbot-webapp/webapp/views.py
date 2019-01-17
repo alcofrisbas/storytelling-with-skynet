@@ -34,9 +34,7 @@ def write(request):
         sess, model, word_to_id, id_to_word = load_model(save=False)
 
     suggestion = ""
-
     sentences = request.session.get("sentences")
-    #sentences = ["this is a test sentence"]
     editing = request.session.get("editing")
 
     if request.POST:
@@ -52,6 +50,13 @@ def write(request):
         sentences.clear()
         request.session["editing"] = False
         request.session["prompt"] = generatePrompt(request.session.get("prompt"))
+
+    elif request.GET.get("save"):
+        # add to model for later use! implement me
+        Story.objects.create(sentences = "\n".join(sentences))
+        print(Story.objects.all())
+
+
     last = ""
     if sentences:
         last = sentences[-1]
@@ -67,6 +72,11 @@ def about(request):
 def team(request):
     return render(request, 'webapp/team.html')
 
+def saves(request):
+    # this is not working!!!! make it work  now :)
+    stories = Story.objects.all()
+    stories = Story.objects.all().values_list('sentences', flat=True)
+    return render(request, 'webapp/saves.html',context={'articles': stories})
 
 def logout(request):
     """Logs out user"""

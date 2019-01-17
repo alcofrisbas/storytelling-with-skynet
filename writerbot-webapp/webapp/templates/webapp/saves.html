@@ -1,0 +1,7 @@
+{%  extends "webapp/header.html" %}
+
+{% block content %}
+    {% for story in stories %}
+    <p> {{ story }}</p>
+    {% endfor %}
+{% endblock %}
