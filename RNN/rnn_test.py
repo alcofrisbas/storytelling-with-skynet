@@ -98,7 +98,7 @@ def load_model(save=False):
 
 if __name__ == '__main__':
     templates = []
-    with open("data/templates.csv", "r") as csvfile:
+    with open("./RNN/data/templates.csv", "r") as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
         for line in reader:
             templates.append(line)
@@ -133,5 +133,5 @@ if __name__ == '__main__':
             try:
                 input('press Enter to continue ... \n')
             except KeyboardInterrupt:
-                print('\b\bQuiting now...')
+                print('\b\bQuitting now...')
                 break
