@@ -53,7 +53,10 @@ def write(request):
 
     elif request.GET.get("save"):
         # add to model for later use! implement me
-        print(sentences)
+        Story.objects.create(sentences = "\n".join(sentences))
+        print(Story.objects.all())
+
+
     last = ""
     if sentences:
         last = sentences[-1]
@@ -69,6 +72,11 @@ def about(request):
 def team(request):
     return render(request, 'webapp/team.html')
 
+def saves(request):
+    # this is not working!!!! make it work  now :)
+    stories = Story.objects.all()
+    stories = Story.objects.all().values_list('sentences', flat=True)
+    return render(request, 'webapp/saves.html',context={'articles': stories})
 
 def logout(request):
     """Logs out user"""
