@@ -39,8 +39,8 @@ def generate_text(sess, model, word_to_index, index_to_word,
             input_seeds_id.append(word_to_index[w])
         except:   # if word is not in vocabulary, processed as _UNK_
             input_seeds_id.append(word_to_index["_UNK_"])
+        print(input_seeds_id)
     state = sess.run(model.initial_state)
-
     text = ''
     # Generate a new sample from previous, starting at last word seed
     input_id = [[input_seeds_id[-1]]]
@@ -52,6 +52,7 @@ def generate_text(sess, model, word_to_index, index_to_word,
         probas= sess.run([model.probas],
                                 feed_dict=feed_dict)
         # Want to find the highest probability target with type POS
+        print(probas)
         test_probas = probas[0][0]
         test_probas.sort()
         length = len(test_probas)-1
@@ -78,7 +79,11 @@ def generate_text(sess, model, word_to_index, index_to_word,
 
 def load_model(save=False):
     with open(RNN.FLAGS.vocab_file, "r") as vocab_file:
-        lines = [line.strip() for line in vocab_file.readlines()]
+        reader = csv.reader(vocab_file, delimiter=',')
+        for row in reader:
+            try:
+                lines.append(row[0])
+            except:
         vocab_size = len(lines)
         word_to_id = dict([(b,a) for (a,b) in enumerate(lines)])
         id_to_word = dict([(a,b) for (a,b) in enumerate(lines)])
@@ -97,41 +102,16 @@ def load_model(save=False):
 
 
 if __name__ == '__main__':
-    templates = []
-    with open("./RNN/data/templates.csv", "r") as csvfile:
-        reader = csv.reader(csvfile, delimiter=',')
-        for line in reader:
-            templates.append(line)
-    with open(RNN.FLAGS.vocab_file, "r") as vocab_file:
-        reader = csv.reader(vocab_file, delimiter=',')
-        lines = []
-        for row in reader:
-            try:
-                lines.append(row[0])
-            except:
-                pass
-        vocab_size = len(lines)
-        word_to_id = dict([(b,a) for (a,b) in enumerate(lines)])
-        id_to_word = dict([(a,b) for (a,b) in enumerate(lines)])
+    sess, model, word_to_id, id_to_word = load_model()
 
-    eval_config = SmallConfig()
-    eval_config.num_steps = 1
-    eval_config.batch_size = 1
-    with tf.Session() as sess:
-        model = RNN.RNNModel(vocab_size=vocab_size,config=eval_config,
-            num_train_samples=1, num_valid_samples=1)
-        sess.run(tf.global_variables_initializer())
-        #saver = tf.train.Saver()
-        #saver.restore(sess, tf.train.latest_checkpoint('./models'))
-
-        while True:
-            sentence = input('Write your sentence: ')
-            #try:
-            generate_text(sess, model, word_to_id, id_to_word, seed=sentence)
-            #except:
-                #print("Word not in dictionary.")
-            try:
-                input('press Enter to continue ... \n')
-            except KeyboardInterrupt:
-                print('\b\bQuitting now...')
-                break
+    while True:
+        sentence = input('Write your sentence: ')
+        #try:
+        generate_text(sess, model, word_to_id, id_to_word, seed=sentence)
+        #except:
+            #print("Word not in dictionary.")
+        try:
+            input('press Enter to continue ... \n')
+        except KeyboardInterrupt:
+            print('\b\bQuitting now...')
+            break

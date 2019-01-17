@@ -88,8 +88,8 @@ def generatePrompt(curPrompt=""):
 
 def generateSuggestion(newSentence):
     try:
-        suggestion = generate_text(sess, model, word_to_id, id_to_word, newSentence)
+        suggestion = generate_text(sess, model, word_to_id, id_to_word, seed=newSentence)
     except Exception as e:
-        print(e)
-        suggestion = ""
+        print("ERROR (suggestion generation)")
+        suggestion = e
     return suggestion
