@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="{% static 'css/webapp.css' %}">
     <!--<script src="{% static 'js/bootstrap.min.js' %}"></script>-->
     <script src="{% static 'js/webapp.js' %}"></script>
+
+    <link href="https://fonts.googleapis.com/css?family=Montserrat|Open+Sans|Playfair+Display" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
 <body class="body">
@@ -20,10 +22,11 @@
 
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <ul class="navbar-nav">
-                    <li><a class="nav-item nav-link" id="/" href="/">Home</a>
-                    <li><a class="nav-item nav-link" id ="/write/" href="/write">Write</a>
-                    <li><a class="nav-item nav-link" id="/about/" href="/about">How it Works</a>
-                    <li><a class="nav-item nav-link" id="/team/" href="/team">The Team</a>
+                    <li><a class="nav-item nav-link" id="/" href="/">Home</a></li>
+                    <li><a class="nav-item nav-link" id ="/write/" href="/write">Write</a></li>
+                    <li><a class="nav-item nav-link" id="/about/" href="/about">How it Works</a></li>
+                    <li><a class="nav-item nav-link" id="/team/" href="/team">The Team</a></li>
+                    <li><a class="nav-item nav-link" id="/saves/" href="/saves">Saves--temp</a></li>
                 </ul>
             </div>
             {% if user.username %}

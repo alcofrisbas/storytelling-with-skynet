@@ -8,4 +8,19 @@ function load() {
     console.log(hlt);
     hlt.classList.add("active");
 }
+
+function showSaveInfo() {
+    console.log("save pressed")
+    var lst = document.getElementsByClassName("final");
+
+    var i;
+    for (i = 0; i < lst.length; i++) {
+        if (lst[i].style.display === "none") {
+          lst[i].style.display = "inline";
+        } else {
+          lst[i].style.display = "none";
+        }
+    }
+}
+
 window.onload = load;

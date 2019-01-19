@@ -73,10 +73,11 @@ def team(request):
     return render(request, 'webapp/team.html')
 
 def saves(request):
-    # this is not working!!!! make it work  now :)
+    # need to implement the title and author thing....
+    # author needs users/auth
     stories = Story.objects.all()
-    stories = Story.objects.all().values_list('sentences', flat=True)
-    return render(request, 'webapp/saves.html',context={'articles': stories})
+    #stories = [s.sentences for s in stories]
+    return render(request, 'webapp/saves.html',context={'stories': stories})
 
 def logout(request):
     """Logs out user"""
