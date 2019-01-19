@@ -28,6 +28,9 @@ def write(request):
     if "sentences" not in request.session.keys():
         request.session["sentences"] = []
 
+    if "newStory" not in request.session.keys():
+        request.session["newStory"] = True
+
     global sess, model, word_to_id, id_to_word
 
     if not model:
@@ -37,6 +40,8 @@ def write(request):
     sentences = request.session.get("sentences")
     editing = request.session.get("editing")
     title = request.session.get("title")
+    newStory = request.session.get("newStory")
+
     if request.POST:
         if request.POST.get("text"):
             newSentence = request.POST["text"]
@@ -50,20 +55,27 @@ def write(request):
         if request.POST.get("title"):
             title = request.POST["title"]
             request.session["title"] = title
-            
+
         # STILL WORKING THIS
         if request.POST.get("save"):
             print("saving")
             title = request.POST["title"]
             request.session["title"] = title
-            print(Story.objects.all().filter(title=title))
-            #Story.objects.create(sentences = "\n".join(sentences), title=title)
+            if request.session.get("newStory"):
+                print("making new Story")
+                Story.objects.create(sentences = title, title=sentences)
+                request.session["newStory"] = False
+            else:
+                print(Story.objects.all().filter(title=title))
+                s = Story.objects.all().filter(title=title)
+                print(s)
+
 
     elif request.GET.get("new"):
         sentences.clear()
         request.session["editing"] = False
         request.session["prompt"] = generatePrompt(request.session.get("prompt"))
-        Story.objects.create(sentences = "", title="")
+        request.session["newStory"] = True
 
     # elif request.GET.get("save"):
     #     #title = request.POST["title"]
