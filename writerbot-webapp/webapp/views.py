@@ -48,7 +48,7 @@ def write(request):
             sentences.append(newSentence)
 
             if not editing:
-                suggestion = generateSuggestion(newSentence)
+                suggestion = generateSuggestion(newSentence, develop=True)
 
             request.session["editing"] = not editing
 
@@ -63,16 +63,19 @@ def write(request):
             request.session["title"] = title
             if request.session.get("newStory"):
                 print("making new Story")
-                Story.objects.create(sentences = title, title=sentences)
+                Story.objects.create(sentences = "\n".join(sentences), title=title)
                 request.session["newStory"] = False
             else:
-                print(Story.objects.all().filter(title=title))
-                s = Story.objects.all().filter(title=title)
+                print(title)
+                s = Story.objects.get(title=title)
                 print(s)
+                s.sentences = "\n".join(sentences)
+                s.save()
 
 
     elif request.GET.get("new"):
         sentences.clear()
+        title.clear()
         request.session["editing"] = False
         request.session["prompt"] = generatePrompt(request.session.get("prompt"))
         request.session["newStory"] = True
@@ -90,7 +93,7 @@ def write(request):
         last = sentences[-1]
         #sentences.pop()
     return render(request, 'webapp/write.html',
-                  context={"prompt": request.session.get("prompt"), "sentences": sentences[:-1], "suggestion": suggestion, "last":last})
+                  context={"prompt": request.session.get("prompt"), "sentences": sentences[:-1], "suggestion": suggestion, "last":last, "title":title})
 
 
 def about(request):
@@ -125,7 +128,9 @@ def generatePrompt(curPrompt=""):
     return curTopic
 
 
-def generateSuggestion(newSentence):
+def generateSuggestion(newSentence, develop=False):
+    if develop:
+        return "look! a {} {}".format(random.choice(ADJECTIVES), random.choice(ANIMALS))
     try:
         suggestion = generate_text(sess, model, word_to_id, id_to_word, seed=newSentence)
     except Exception as e:
