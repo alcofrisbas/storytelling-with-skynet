@@ -17,7 +17,7 @@ a random sentence structure
 """
 def pick_structure(max=42068):
     start = time.time()
-    with open("data/templates.csv", "r") as r:
+    with open("./RNN/data/templates.csv", "r") as r:
         for i in range(rrange(0,max)):
             next(r)
         #print(i)

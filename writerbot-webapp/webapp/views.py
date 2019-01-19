@@ -86,8 +86,6 @@ def logout(request):
 
 
 def generatePrompt(curPrompt=""):
-    topics = ["a hotheaded penguin", "a wizened chihuahua", "a murderous toucan",
-              "an exponentially multiplying swarm of beagles"]
     adj = ADJECTIVES[random.randrange(0, len(ADJECTIVES))]
     noun = ANIMALS[random.randrange(0, len(ANIMALS))].lower()
     curTopic = curPrompt
@@ -101,7 +99,8 @@ def generatePrompt(curPrompt=""):
 
 def generateSuggestion(newSentence):
     try:
-        suggestion = generate_text(sess, model, word_to_id, id_to_word, newSentence)
-    except:
-        suggestion = "Error: RNN is DOWN"
+        suggestion = generate_text(sess, model, word_to_id, id_to_word, seed=newSentence)
+    except Exception as e:
+        print("ERROR (suggestion generation)")
+        suggestion = e
     return suggestion
