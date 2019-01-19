@@ -14,7 +14,8 @@ sess, model, word_to_id, id_to_word = None, None, None, None
 
 # Create your views here.
 def home(request):
-    return render(request, 'webapp/home.html')
+    stories = Story.objects.all()
+    return render(request, 'webapp/home.html', context={'stories': stories})
 
 
 def newStory(request):
@@ -23,6 +24,19 @@ def newStory(request):
     request.session["editing"] = False
     request.session["prompt"] = generatePrompt(request.session.get("prompt"))
     request.session["newStory"] = True
+    return redirect('/write')
+
+
+#TODO: either store prompt in stories or don't display prompt in loaded stories
+#TODO: figure out editing interacts with story loading
+#TODO: reconcile storing sentences as str/textField but operating on it as a list
+def loadStory(request, title):
+    request.session["title"] = title
+    s = Story.objects.get(title=title)
+    print (s.sentences)
+    request.session["sentences"] = s.sentences
+    print (request.session["sentences"])
+    request.session["newStory"] = False
     return redirect('/write')
 
 
@@ -111,12 +125,14 @@ def about(request):
 def team(request):
     return render(request, 'webapp/team.html')
 
+
 def saves(request):
     # need to implement the title and author thing....
     # author needs users/auth
     stories = Story.objects.all()
     #stories = [s.sentences for s in stories]
-    return render(request, 'webapp/saves.html',context={'stories': stories})
+    return render(request, 'webapp/saves.html', context={'stories': stories})
+
 
 def logout(request):
     """Logs out user"""

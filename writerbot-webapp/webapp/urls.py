@@ -8,5 +8,6 @@ urlpatterns = [
     path('team/', views.team),
     path('logout/', views.logout),
     path('saves/',views.saves),
-    path('new_story', views.newStory)
+    path('new_story', views.newStory),
+    path('load_story/<str:title>', views.loadStory)
 ]
