@@ -49,7 +49,7 @@ def _read_words(filename):
 def gen_vocab(filename):
     print("reading words\n")
     wordlist = []
-    with open("data/vocab.csv", "w") as csvfile:
+    with open("RNN/data/vocab.csv", "w") as csvfile:
         writer = csv.writer(csvfile, delimiter=',')
         writer.writerow(["_UNK_", "_UNK_"])
         with open(filename, "r") as vocab:
