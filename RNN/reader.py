@@ -81,7 +81,7 @@ def gen_id_seqs(filepath=""):
         word_dict = dict([(b,a) for (a,b) in enumerate(lines)])
 
     with open(filepath, 'r') as raw_file:
-        with open("data/" + filepath.split("/")[-1]+".ids", "w") as current_file:
+        with open("RNN/data/" + filepath.split("/")[-1]+".ids", "w") as current_file:
             for line in raw_file.readlines():
                 sent = []
                 temp_sent = []
