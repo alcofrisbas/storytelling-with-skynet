@@ -166,9 +166,11 @@ class RNNModel(object):
             print(sess.run(self.input_batch), sess.run(self.output_batch))
             for step in range(self.train_epoch):
                 start_time = time.time()
-
-                cost, current_learning_rate, final_state, _ = sess.run(
-                    [self.cost, self.learning_rate, self.final_state, self.updates])
+                try:
+                    cost, current_learning_rate, final_state, _ = sess.run(
+                        [self.cost, self.learning_rate, self.final_state, self.updates])
+                except:
+                    print(self.final_state)
                 costs += cost
 
                 iters += self.num_steps
