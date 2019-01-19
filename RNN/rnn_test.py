@@ -80,6 +80,7 @@ def generate_text(sess, model, word_to_index, index_to_word,
 def load_model(save=False):
     with open(RNN.FLAGS.vocab_file, "r") as vocab_file:
         reader = csv.reader(vocab_file, delimiter=',')
+        lines = []
         for row in reader:
             try:
                 lines.append(row[0])
