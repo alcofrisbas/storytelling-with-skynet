@@ -19,6 +19,7 @@ def home(request):
 
 def newStory(request):
     request.session["sentences"].clear()
+    request.session["title"] = ""
     request.session["editing"] = False
     request.session["prompt"] = generatePrompt(request.session.get("prompt"))
     request.session["newStory"] = True
@@ -37,6 +38,9 @@ def write(request):
 
     if "newStory" not in request.session.keys():
         request.session["newStory"] = True
+    # title of the story in records
+    if "title" not in request.session.keys():
+        request.session["title"] = ""
 
     global sess, model, word_to_id, id_to_word
 
@@ -61,20 +65,24 @@ def write(request):
 
         if request.POST.get("title"):
             title = request.POST["title"]
-            request.session["title"] = title
+            #request.session["title"] = title
 
         # STILL WORKING THIS
         if request.POST.get("save"):
             print("saving")
             title = request.POST["title"]
-            request.session["title"] = title
+            #request.session["current_title"] = title
             if request.session.get("newStory"):
                 print("making new Story")
                 Story.objects.create(sentences = "\n".join(sentences), title=title)
                 request.session["newStory"] = False
+                request.session["title"] = title
             else:
-                s = Story.objects.get(title=title)
+                s = Story.objects.get(title=request.session["title"])
                 s.sentences = "\n".join(sentences)
+                s.title = title
+                # update title in session
+                request.session["title"] = title
                 s.save()
 
 
@@ -93,7 +101,7 @@ def write(request):
         last = sentences[-1]
         #sentences.pop()
     return render(request, 'webapp/write.html',
-                  context={"prompt": request.session.get("prompt"), "sentences": sentences[:-1], "suggestion": suggestion, "last":last, "title":title})
+                  context={"prompt": request.session.get("prompt"), "sentences": sentences[:-1], "suggestion": suggestion, "last":last, "title":request.session["title"]})
 
 
 def about(request):
