@@ -66,9 +66,7 @@ def write(request):
                 Story.objects.create(sentences = "\n".join(sentences), title=title)
                 request.session["newStory"] = False
             else:
-                print(title)
                 s = Story.objects.get(title=title)
-                print(s)
                 s.sentences = "\n".join(sentences)
                 s.save()
 
