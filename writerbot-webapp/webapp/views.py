@@ -21,7 +21,7 @@ def newStory(request):
     request.session["sentences"].clear()
     request.session["editing"] = False
     request.session["prompt"] = generatePrompt(request.session.get("prompt"))
-    Story.objects.create(sentences="", title="")
+    request.session["newStory"] = True
     return redirect('/write')
 
 
@@ -35,6 +35,9 @@ def write(request):
     if "sentences" not in request.session.keys():
         request.session["sentences"] = []
 
+    if "newStory" not in request.session.keys():
+        request.session["newStory"] = True
+
     global sess, model, word_to_id, id_to_word
 
     if not model:
@@ -44,27 +47,38 @@ def write(request):
     sentences = request.session.get("sentences")
     editing = request.session.get("editing")
     title = request.session.get("title")
+    newStory = request.session.get("newStory")
+
     if request.POST:
         if request.POST.get("text"):
             newSentence = request.POST["text"]
             sentences.append(newSentence)
 
             if not editing:
-                suggestion = generateSuggestion(newSentence)
+                suggestion = generateSuggestion(newSentence, develop=True)
 
             request.session["editing"] = not editing
 
         if request.POST.get("title"):
             title = request.POST["title"]
             request.session["title"] = title
-            
+
         # STILL WORKING THIS
         if request.POST.get("save"):
             print("saving")
             title = request.POST["title"]
             request.session["title"] = title
-            print(Story.objects.all().filter(title=title))
-            #Story.objects.create(sentences = "\n".join(sentences), title=title)
+            if request.session.get("newStory"):
+                print("making new Story")
+                Story.objects.create(sentences = "\n".join(sentences), title=title)
+                request.session["newStory"] = False
+            else:
+                print(title)
+                s = Story.objects.get(title=title)
+                print(s)
+                s.sentences = "\n".join(sentences)
+                s.save()
+
 
     elif request.GET.get("new"):
         return redirect('/new_story')
@@ -76,13 +90,12 @@ def write(request):
     #     Story.objects.create(sentences = "\n".join(sentences), title=title)
         #print(Story.objects.all())
 
-
     last = ""
     if sentences:
         last = sentences[-1]
         #sentences.pop()
     return render(request, 'webapp/write.html',
-                  context={"prompt": request.session.get("prompt"), "sentences": sentences[:-1], "suggestion": suggestion, "last":last})
+                  context={"prompt": request.session.get("prompt"), "sentences": sentences[:-1], "suggestion": suggestion, "last":last, "title":title})
 
 
 def about(request):
@@ -117,7 +130,9 @@ def generatePrompt(curPrompt=""):
     return curTopic
 
 
-def generateSuggestion(newSentence):
+def generateSuggestion(newSentence, develop=False):
+    if develop:
+        return "look! a {} {}".format(random.choice(ADJECTIVES), random.choice(ANIMALS))
     try:
         suggestion = generate_text(sess, model, word_to_id, id_to_word, seed=newSentence)
     except Exception as e:

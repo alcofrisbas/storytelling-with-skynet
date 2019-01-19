@@ -151,7 +151,7 @@ gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.35)
 with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
     model = create_model(sess)
     saver = tf.train.Saver()
-    saver.restore(sess, "model/best_model.ckpt")
+    saver.restore(sess, "RNN/models/best_model.ckpt")
     predict_id_file = os.path.join("data/" + FLAGS.test_file + ".ids")
     if not os.path.isfile(predict_id_file):
         reader.gen_id_seqs(test_file)
