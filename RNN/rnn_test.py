@@ -84,6 +84,7 @@ def load_model(save=False):
             try:
                 lines.append(row[0])
             except:
+                pass
         vocab_size = len(lines)
         word_to_id = dict([(b,a) for (a,b) in enumerate(lines)])
         id_to_word = dict([(a,b) for (a,b) in enumerate(lines)])
