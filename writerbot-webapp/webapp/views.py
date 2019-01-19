@@ -45,21 +45,30 @@ def write(request):
                 suggestion = generateSuggestion(newSentence)
 
             request.session["editing"] = not editing
+
         if request.POST.get("title"):
             title = request.POST["title"]
             request.session["title"] = title
-            #print(request.POST["title"])
+            
+        # STILL WORKING THIS
+        if request.POST.get("save"):
+            print("saving")
+            title = request.POST["title"]
+            request.session["title"] = title
+            print(Story.objects.all().filter(title=title))
+            #Story.objects.create(sentences = "\n".join(sentences), title=title)
 
     elif request.GET.get("new"):
         sentences.clear()
         request.session["editing"] = False
         request.session["prompt"] = generatePrompt(request.session.get("prompt"))
+        Story.objects.create(sentences = "", title="")
 
-    elif request.GET.get("save"):
-        #title = request.POST["title"]
-        print(title)
-        print(sentences)
-        Story.objects.create(sentences = "\n".join(sentences), title=title)
+    # elif request.GET.get("save"):
+    #     #title = request.POST["title"]
+    #     print(title)
+    #     print(sentences)
+    #     Story.objects.create(sentences = "\n".join(sentences), title=title)
         #print(Story.objects.all())
 
 
