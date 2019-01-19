@@ -32,13 +32,13 @@ flags.DEFINE_string(
     "model", "small",
     "A type of model. Possible options are: small, medium, large.")
 
-flags.DEFINE_string("save_path","./models" ,
+flags.DEFINE_string("save_path",".RNN/models" ,
                     "Model output directory.")
-flags.DEFINE_string("train_file", "train.txt",
+flags.DEFINE_string("train_file", "RNN/train.txt",
                     "The file containing the training data")
-flags.DEFINE_string("valid_file", "valid.txt",
+flags.DEFINE_string("valid_file", "RNN/valid.txt",
                     "The file containing the validation data")
-flags.DEFINE_string("test_file", "test.txt",
+flags.DEFINE_string("test_file", "RNN/test.txt",
                     "The file containing the testing data")
 FLAGS = flags.FLAGS
 
