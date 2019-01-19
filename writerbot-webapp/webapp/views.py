@@ -6,7 +6,6 @@ from django.http import HttpResponse
 from webapp.models import Story
 
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'RNN'))
-#print(sys.path)
 from rnn_test import load_model, generate_text
 import random
 from webapp.words import ADJECTIVES, ANIMALS
@@ -16,6 +15,14 @@ sess, model, word_to_id, id_to_word = None, None, None, None
 # Create your views here.
 def home(request):
     return render(request, 'webapp/home.html')
+
+
+def newStory(request):
+    request.session["sentences"].clear()
+    request.session["editing"] = False
+    request.session["prompt"] = generatePrompt(request.session.get("prompt"))
+    request.session["newStory"] = True
+    return redirect('/write')
 
 
 def write(request):
@@ -72,11 +79,7 @@ def write(request):
 
 
     elif request.GET.get("new"):
-        sentences.clear()
-        title.clear()
-        request.session["editing"] = False
-        request.session["prompt"] = generatePrompt(request.session.get("prompt"))
-        request.session["newStory"] = True
+        return redirect('/new_story')
 
     # elif request.GET.get("save"):
     #     #title = request.POST["title"]
@@ -84,7 +87,6 @@ def write(request):
     #     print(sentences)
     #     Story.objects.create(sentences = "\n".join(sentences), title=title)
         #print(Story.objects.all())
-
 
     last = ""
     if sentences:
