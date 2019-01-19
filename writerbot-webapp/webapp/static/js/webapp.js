@@ -23,6 +23,13 @@ function showSaveInfo() {
     }
 }
 
-
+function myEdit() {
+    document.getElementById("para").contentEditable = true;
+    document.getElementById("para").style.border = "dotted";
+  }
+function update() {
+    document.getElementById("para").contentEditable = false;
+    document.getElementById("para").style.border = "none";
+  }
 
 window.onload = load;

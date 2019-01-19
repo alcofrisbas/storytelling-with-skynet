@@ -114,18 +114,18 @@ def get_config():
 
 print("---beginning training process---\n")
 # generate vocabulary and ids for all data
-if not os.path.isfile("data/vocab.csv"):
+if not os.path.isfile("RNN/data/vocab.csv"):
     reader.gen_vocab(FLAGS.train_file)
-if not os.path.isfile("data/" + FLAGS.train_file + ".ids"):
+if not os.path.isfile(FLAGS.train_file + ".ids"):
     reader.gen_id_seqs(FLAGS.train_file)
     reader.gen_id_seqs(FLAGS.valid_file)
 print("---making training and validation sampels---\n")
-with open("data/" + FLAGS.train_file + ".ids") as fp:
+with open("RNN/data/train.txt.ids") as fp:
     num_train_samples = len(fp.readlines())
-with open("data/" + FLAGS.valid_file + ".ids") as fp:
+with open("RNN/data/valid.txt.ids") as fp:
     num_valid_samples = len(fp.readlines())
 print("---Training and validations samples created---\n")
-with open("data/vocab.csv") as vocab:
+with open("RNN/data/vocab.csv") as vocab:
     vocab_size = len(vocab.readlines())
 print("vocab created")
 
