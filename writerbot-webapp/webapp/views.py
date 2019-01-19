@@ -17,6 +17,14 @@ def home(request):
     return render(request, 'webapp/home.html')
 
 
+def newStory(request):
+    request.session["sentences"].clear()
+    request.session["editing"] = False
+    request.session["prompt"] = generatePrompt(request.session.get("prompt"))
+    Story.objects.create(sentences="", title="")
+    return redirect('/write')
+
+
 def write(request):
     if "prompt" not in request.session.keys():
         request.session["prompt"] = generatePrompt()
@@ -59,10 +67,7 @@ def write(request):
             #Story.objects.create(sentences = "\n".join(sentences), title=title)
 
     elif request.GET.get("new"):
-        sentences.clear()
-        request.session["editing"] = False
-        request.session["prompt"] = generatePrompt(request.session.get("prompt"))
-        Story.objects.create(sentences = "", title="")
+        return redirect('/new_story')
 
     # elif request.GET.get("save"):
     #     #title = request.POST["title"]
