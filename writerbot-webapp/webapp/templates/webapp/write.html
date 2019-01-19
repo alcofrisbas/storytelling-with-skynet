@@ -12,8 +12,8 @@
     {% endfor %}
     <span style="color:blue">{{ last }}</span>
     </p>
-    <button type="button" class="btn btn-danger btn-sm" onclick="myEdit()">Edit</button>
-    <button type="button" class="btn btn-danger btn-sm" onclick="update()">Update</button>
+    <button type="button" class="btn btn-outline-primary" onclick="myEdit()"> Edit <span class="oi oi-pencil"></span></button>
+    <button type="button" class="btn btn-success" onclick="update()">Update  <span class="oi oi-loop-circular"></span></button>
     <form method="post">
         {% csrf_token %}
         <textarea name="text" class="form-control">{{ suggestion }}</textarea><br>
