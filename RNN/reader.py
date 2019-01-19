@@ -49,7 +49,7 @@ def _read_words(filename):
 def gen_vocab(filename):
     print("reading words\n")
     wordlist = []
-    with open("data/vocab.csv", "w") as csvfile:
+    with open("RNN/data/vocab.csv", "w") as csvfile:
         writer = csv.writer(csvfile, delimiter=',')
         writer.writerow(["_UNK_", "_UNK_"])
         with open(filename, "r") as vocab:
@@ -59,8 +59,8 @@ def gen_vocab(filename):
                 text = word_tokenize(line)
                 text = nltk.pos_tag(text)
                 for word in text:
-                    if word[0] not in wordlist:
-                        wordlist.append(word[0])
+                    if word[0].lower() not in wordlist:
+                        wordlist.append(word[0].lower())
                         writer.writerow(word)
 
 
@@ -81,7 +81,7 @@ def gen_id_seqs(filepath=""):
         word_dict = dict([(b,a) for (a,b) in enumerate(lines)])
 
     with open(filepath, 'r') as raw_file:
-        with open("data/" + filepath.split("/")[-1]+".ids", "w") as current_file:
+        with open("RNN/data/" + filepath.split("/")[-1]+".ids", "w") as current_file:
             for line in raw_file.readlines():
                 sent = []
                 temp_sent = []
