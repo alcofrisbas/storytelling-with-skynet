@@ -15,13 +15,14 @@
 
     <form method="post">
         {% csrf_token %}
+        <input type="text" name="title" placeholder="Add a title" class="form-control final" style="display:none"></input><br>
         <textarea name="text" class="form-control">{{ suggestion }}</textarea><br>
         <button type="submit" class="btn btn-primary btn-lg">Add Sentence</button>
-        <br><br>
+    </form><br>
+    <form method="get">
         <button type="submit" class="btn btn-danger btn-sm" name="new" value="true">Start a new story</button>
         <button type="button" class="btn btn-danger btn-sm" onclick="showSaveInfo()" value="true">Save this story</button>
-        <input type="text" name="title" placeholder="Add a title" class="form-control final" style="display:none"></input><br>
         <button type="button" class="btn btn-danger btn-sm final" onclick="showSaveInfo()"style="display:none">Cancel</button>
-        <button type="submit" class="btn btn-danger btn-sm final" name="save" style="display:none"> Save</button>
+        <button type="submit" class="btn btn-danger btn-sm final" name="save" value="true" style="display:none"> Save</button>
     </form>
 {% endblock %}

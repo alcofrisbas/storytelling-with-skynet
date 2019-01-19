@@ -35,7 +35,7 @@ def write(request):
     suggestion = ""
     sentences = request.session.get("sentences")
     editing = request.session.get("editing")
-
+    title = request.session.get("title")
     if request.POST:
         if request.POST.get("text"):
             newSentence = request.POST["text"]
@@ -45,15 +45,22 @@ def write(request):
                 suggestion = generateSuggestion(newSentence)
 
             request.session["editing"] = not editing
+        if request.POST.get("title"):
+            title = request.POST["title"]
+            request.session["title"] = title
+            #print(request.POST["title"])
+
     elif request.GET.get("new"):
         sentences.clear()
         request.session["editing"] = False
         request.session["prompt"] = generatePrompt(request.session.get("prompt"))
 
     elif request.GET.get("save"):
-        # add to model for later use! implement me
-        Story.objects.create(sentences = "\n".join(sentences))
-        print(Story.objects.all())
+        #title = request.POST["title"]
+        print(title)
+        print(sentences)
+        Story.objects.create(sentences = "\n".join(sentences), title=title)
+        #print(Story.objects.all())
 
 
     last = ""

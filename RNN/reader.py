@@ -59,8 +59,8 @@ def gen_vocab(filename):
                 text = word_tokenize(line)
                 text = nltk.pos_tag(text)
                 for word in text:
-                    if word[0] not in wordlist:
-                        wordlist.append(word[0])
+                    if word[0].lower() not in wordlist:
+                        wordlist.append(word[0].lower())
                         writer.writerow(word)
 
 
