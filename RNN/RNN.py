@@ -63,10 +63,10 @@ class RNNModel(object):
             output_seq = tf.string_to_number(line_split.values[1:], out_type=tf.int32)
             return input_seq, output_seq
 
-        training_dataset = tf.data.TextLineDataset(self.file_name_train).map(parse).padded_batch(config.batch_size, padded_shapes=([None],[None]))
+        training_dataset = tf.data.TextLineDataset(self.file_name_train).map(parse).padded_batch(config.batch_size, padded_shapes=([None],[None]),drop_remainder=True)
         # gets next batch so that wen can combine the two datasets into one
 
-        validation_dataset = tf.data.TextLineDataset(self.file_name_validation).map(parse).padded_batch(config.batch_size, padded_shapes=([None],[None]))
+        validation_dataset = tf.data.TextLineDataset(self.file_name_validation).map(parse).padded_batch(config.batch_size, padded_shapes=([None],[None]),drop_remainder=True)
 
         test_dataset = tf.data.TextLineDataset(self.file_name_test).map(parse).batch(1)
 

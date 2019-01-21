@@ -89,10 +89,10 @@ def gen_id_seqs(filepath=""):
                 temp_sent = word_tokenize(line)
                 for char in temp_sent:
                     sent.append(char)
+                if len(sent) >= 3:
+                    line = [word_to_id(word, word_dict) for word in sent]
 
-                line = [word_to_id(word, word_dict) for word in sent]
-
-                current_file.write(" ".join([str(id) for id in line]) + "\n")
+                    current_file.write(" ".join([str(id) for id in line]) + "\n")
 
 
 if __name__ == "__main__":
