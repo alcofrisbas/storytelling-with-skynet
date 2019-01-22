@@ -67,9 +67,7 @@ def write(request):
     if request.POST:
         if request.POST.get("text"):
             newSentence = request.POST["text"]
-            print(newSentence)
             sentences += (newSentence + "\n")
-            print(sentences)
 
             if not editing:
                 suggestion = generateSuggestion(newSentence, develop=True)
@@ -90,25 +88,16 @@ def write(request):
                 print("making new Story")
                 Story.objects.create(sentences=sentences, title=title)
                 request.session["newStory"] = False
-                request.session["title"] = title
             else:
                 s = Story.objects.get(title=request.session["title"])
                 s.sentences = sentences
                 s.title = title
-                # update title in session
-                request.session["title"] = title
                 s.save()
+            request.session["title"] = title
 
 
     elif request.GET.get("new"):
         return redirect('/new_story')
-
-    # elif request.GET.get("save"):
-    #     #title = request.POST["title"]
-    #     print(title)
-    #     print(sentences)
-    #     Story.objects.create(sentences = "\n".join(sentences), title=title)
-        #print(Story.objects.all())
 
     last = ""
     if sentences != "":

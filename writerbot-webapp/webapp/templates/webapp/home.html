@@ -8,21 +8,23 @@
       <hr class="my-4">
       <p>Start writing your AI-assisted story here.</p>
       <a class="btn btn-primary btn-lg" href="/write" role="button">Get started</a>
-        {% else %}
-        <h1 class="display-4">Welcome back, {{ user.first_name }}!</h1>
-        <p class="lead">Continue your creative journey with WriterBot.</p>
-        <hr class="my-4">
-        <a class="btn btn-primary btn-lg" href="/new_story" role="button">Start a New Story</a>
-        <hr class="my-4">
-        <p>Your current stories:</p>
-        {% for story in stories %}
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">{{ story.title }}</h5>
-                    <a href="/load_story/{{ story.title }}" class="btn btn-primary">Continue this story</a>
-                  </div>
-            </div>
-        {% endfor %}
+      {% else %}
+            <h1 class="display-4">Welcome back, {{ user.first_name }}!</h1>
+            <p class="lead">Continue your creative journey with WriterBot.</p>
+            <hr class="my-4">
+            <a class="btn btn-primary btn-lg" href="/new_story" role="button">Start a New Story</a>
+            <hr class="my-4">
+            {% if stories %}
+                <p>Your current stories:</p>
+                {% for story in stories %}
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ story.title }}</h5>
+                            <a href="/load_story/{{ story.title }}" class="btn btn-primary">Continue this story</a>
+                          </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
         {% endif %}
     </div>
 
