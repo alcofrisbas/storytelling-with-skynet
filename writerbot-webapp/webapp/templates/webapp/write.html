@@ -1,7 +1,7 @@
 {%  extends "webapp/header.html" %}
 
 {% block content %}
-    <div >
+    <div>
     {% if title %}
         <h5 class="mt-5" style="display:inline-block">{{ title }}</h5>
     {% else %}
@@ -9,7 +9,7 @@
     {% endif %}
     <button type="submit" id="edit-button" class="btn btn-outline-primary" onclick="editUpdate()">
          Edit <span class="oi oi-pencil"></span>
-     </button>
+    </button>
     </div>
     {% if not sentences %}
         <p>Start writing here: </p>
@@ -25,7 +25,6 @@
 
     <form method="post">
         {% csrf_token %}
-
         <textarea name="text" class="form-control">{{ suggestion }}</textarea><br>
         <button type="submit" class="btn btn-primary btn-lg">Add Sentence</button>
     </form><br>

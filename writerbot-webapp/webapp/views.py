@@ -27,7 +27,6 @@ def newStory(request):
     return redirect('/write')
 
 
-#TODO: either store prompt in stories or don't display prompt in loaded stories
 #TODO: figure out how editing interacts with story loading
 def loadStory(request, title):
     request.session["title"] = title
@@ -94,7 +93,6 @@ def write(request):
                 s.title = title
                 s.save()
             request.session["title"] = title
-
 
     elif request.GET.get("new"):
         return redirect('/new_story')
