@@ -47,18 +47,4 @@ function editUpdate(){
 
 }
 
-// function myEdit() {
-//     console.log("edit")
-//     document.getElementById("para").contentEditable = true;
-//     document.getElementById("para").style.border = " 1px dotted";
-//     document.getElementById("para").style.padding = "0px";
-//     document.getElementById("update-existing").style.display = "inline";
-//   }
-// function update() {
-//     document.getElementById("para").contentEditable = false;
-//     document.getElementById("para").style.border = "none";
-//     document.getElementById("para").style.padding = "1px";
-//     document.getElementById("update-existing").style.display = "none";
-//   }
-
 window.onload = load;
