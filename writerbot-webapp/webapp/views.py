@@ -19,7 +19,7 @@ def home(request):
 
 
 def newStory(request):
-    request.session["sentences"].clear()
+    request.session["sentences"] = ""
     request.session["title"] = ""
     request.session["editing"] = False
     request.session["prompt"] = generatePrompt(request.session.get("prompt"))
@@ -28,14 +28,11 @@ def newStory(request):
 
 
 #TODO: either store prompt in stories or don't display prompt in loaded stories
-#TODO: figure out editing interacts with story loading
-#TODO: reconcile storing sentences as str/textField but operating on it as a list
+#TODO: figure out how editing interacts with story loading
 def loadStory(request, title):
     request.session["title"] = title
     s = Story.objects.get(title=title)
-    print (s.sentences)
     request.session["sentences"] = s.sentences
-    print (request.session["sentences"])
     request.session["newStory"] = False
     return redirect('/write')
 
@@ -48,7 +45,7 @@ def write(request):
         request.session["editing"] = False
 
     if "sentences" not in request.session.keys():
-        request.session["sentences"] = []
+        request.session["sentences"] = ""
 
     if "newStory" not in request.session.keys():
         request.session["newStory"] = True
@@ -70,12 +67,15 @@ def write(request):
     if request.POST:
         if request.POST.get("text"):
             newSentence = request.POST["text"]
-            sentences.append(newSentence)
+            print(newSentence)
+            sentences += (newSentence + "\n")
+            print(sentences)
 
             if not editing:
                 suggestion = generateSuggestion(newSentence, develop=True)
 
             request.session["editing"] = not editing
+            request.session["sentences"] = sentences
 
         if request.POST.get("title"):
             title = request.POST["title"]
@@ -88,12 +88,12 @@ def write(request):
             #request.session["current_title"] = title
             if request.session.get("newStory"):
                 print("making new Story")
-                Story.objects.create(sentences = "\n".join(sentences), title=title)
+                Story.objects.create(sentences=sentences, title=title)
                 request.session["newStory"] = False
                 request.session["title"] = title
             else:
                 s = Story.objects.get(title=request.session["title"])
-                s.sentences = "\n".join(sentences)
+                s.sentences = sentences
                 s.title = title
                 # update title in session
                 request.session["title"] = title
@@ -111,11 +111,14 @@ def write(request):
         #print(Story.objects.all())
 
     last = ""
-    if sentences:
-        last = sentences[-1]
+    if sentences != "":
+        last = sentences.split("\n")[-1]
         #sentences.pop()
     return render(request, 'webapp/write.html',
-                  context={"prompt": request.session.get("prompt"), "sentences": sentences[:-1], "suggestion": suggestion, "last":last, "title":request.session["title"]})
+                  context={"prompt": request.session.get("prompt"),
+                  "sentences": request.session["sentences"].split("\n")[:-1],
+                  "suggestion": suggestion, "last":last,
+                  "title":request.session["title"]})
 
 
 def about(request):
