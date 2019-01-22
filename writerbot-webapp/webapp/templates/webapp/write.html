@@ -9,7 +9,7 @@
     {% if not sentences %}
         <p>Start writing here: </p>
     {% endif %}
-    <p id = "para" style="padding:1px">
+    <p id = "para" style="padding:1px" contenteditable="false">
     {% for sentence in sentences %}
         {% if not loop.last %}
             <span style="color:black">{{ sentence }}</span><br>
@@ -17,10 +17,11 @@
     {% endfor %}
     <span style="color:blue">{{ last }}</span>
     </p>
-    <button type="button" id="edit-existing" class="btn btn-outline-primary" onclick="myEdit()"> Edit <span class="oi oi-pencil"></span></button>
-    <button type="button" id="update-existing" class="btn btn-success" style="display:none" onclick="update()">Update  <span class="oi oi-loop-circular"></span></button>
+
+    <!-- <button type="button" id="update-existing" class="btn btn-success" style="display:none" onclick="update()">Update  <span class="oi oi-loop-circular"></span></button> -->
     <form method="post">
         {% csrf_token %}
+        <button type="button" id="edit-button" class="btn btn-outline-primary" onclick="editUpdate()"> Edit <span class="oi oi-pencil"></span></button>
         <textarea name="text" class="form-control">{{ suggestion }}</textarea><br>
         <button type="submit" class="btn btn-primary btn-lg">Add Sentence</button>
     </form><br>
