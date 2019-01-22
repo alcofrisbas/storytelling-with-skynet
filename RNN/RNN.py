@@ -193,7 +193,7 @@ class RNNModel(object):
                         iters * self.batch_size /(time.time() - start_time)))
 
             print("Epoch: %d Learning rate: %.3f" % (i + 1, sess.run(self.learning_rate)))
-            saver.save(sess, "models/best_model.ckpt")
+            saver.save(sess, "RNN/models/best_model.ckpt")
 
     def predict(self, sess, input_file, raw_file, verbose=False):
         # if verbose is true, then we print the ppl of every sequence
