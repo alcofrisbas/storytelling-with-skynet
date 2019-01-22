@@ -13,7 +13,6 @@
     <span style="color:blue">{{ last }}</span>
     </p>
 
-    <!-- <button type="button" id="update-existing" class="btn btn-success" style="display:none" onclick="update()">Update  <span class="oi oi-loop-circular"></span></button> -->
     <form method="post">
         {% csrf_token %}
         <button type="button" id="edit-button" class="btn btn-outline-primary" onclick="editUpdate()"> Edit <span class="oi oi-pencil"></span></button>
