@@ -1,9 +1,14 @@
 {%  extends "webapp/header.html" %}
 
 {% block content %}
-
-    <h5 class="mt-5">Prompt: {{ prompt }}</h5>
-    <p>Start writing here: </p>
+    {% if title %}
+        <h5 class="mt-5">{{ title }}</h5>
+    {% else %}
+        <h5 class="mt-5">Prompt: {{ prompt }}</h5>
+    {% endif %}
+    {% if not sentences %}
+        <p>Start writing here: </p>
+    {% endif %}
     <p id = "para" style="padding:1px">
     {% for sentence in sentences %}
         {% if not loop.last %}
