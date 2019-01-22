@@ -1,11 +1,16 @@
 {%  extends "webapp/header.html" %}
 
 {% block content %}
+    <div >
     {% if title %}
-        <h5 class="mt-5">{{ title }}</h5>
+        <h5 class="mt-5" style="display:inline-block">{{ title }}</h5>
     {% else %}
-        <h5 class="mt-5">Prompt: {{ prompt }}</h5>
+        <h5 class="mt-5" style="display:inline-block">Prompt: {{ prompt }}</h5>
     {% endif %}
+    <button type="submit" id="edit-button" class="btn btn-outline-primary" onclick="editUpdate()">
+         Edit <span class="oi oi-pencil"></span>
+     </button>
+    </div>
     {% if not sentences %}
         <p>Start writing here: </p>
     {% endif %}
@@ -20,7 +25,7 @@
 
     <form method="post">
         {% csrf_token %}
-        <button type="button" id="edit-button" class="btn btn-outline-primary" onclick="editUpdate()"> Edit <span class="oi oi-pencil"></span></button>
+
         <textarea name="text" class="form-control">{{ suggestion }}</textarea><br>
         <button type="submit" class="btn btn-primary btn-lg">Add Sentence</button>
     </form><br>
