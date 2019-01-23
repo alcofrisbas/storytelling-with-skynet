@@ -12,6 +12,7 @@
             <h1 class="display-4">Welcome back, {{ user.first_name }}!</h1>
             <p class="lead">Continue your creative journey with WriterBot.</p>
             <hr class="my-4">
+            <a class="btn btn-primary btn-lg" href="/write" role="button">Current Story</a>
             <a class="btn btn-primary btn-lg" href="/new_story" role="button">Start a New Story</a>
             <hr class="my-4">
             {% if stories %}
@@ -21,6 +22,7 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ story.title }}</h5>
                             <a href="/load_story/{{ story.title }}" class="btn btn-primary">Continue this story</a>
+                            <a href="/delete_story/{{ story.title }}" class="btn btn-danger">Delete this story</a>
                           </div>
                     </div>
                 {% endfor %}
