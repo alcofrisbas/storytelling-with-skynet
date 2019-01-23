@@ -31,28 +31,22 @@
     <form method="get">
         <button type="submit" class="btn btn-danger btn-sm" name="new" value="true">Start a new story</button>
         <!-- <button type="button" class="btn btn-danger btn-sm" onclick="showSaveInfo()" value="true">Save this story</button> -->
-        <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#exampleModal" value="true">Save this story</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#saveModal" value="true">Save this story</button>
     </form>
-    <!-- <form method="post">
-        {% csrf_token %}
-        <input type="text" name="title" placeholder="Add a title" class="form-control final" value= "{{ title }}"style="display:none"></input><br>
-        <button type="submit" class="btn btn-danger btn-sm final" name="save" value="true" style="display:none"> Save</button>
-        <button type="button" class="btn btn-danger btn-sm final" onclick="showSaveInfo()"style="display:none">Cancel</button>
-    </form> -->
 
     <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="saveModal" tabindex="-1" role="dialog" aria-labelledby="saveModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Save</h5>
+            <h5 class="modal-title" id="saveModalLabel">Save</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             {% if request.user.username %}
-                Add a title to save your story:
+                Save your story as:
                 <form method="post" style="padding:1px">
                     {% csrf_token %}
                     <input type="text" name="title" placeholder="Add a title" class="form-control final" value= "{{ title }}"></input><br>
@@ -64,8 +58,13 @@
             {% endif %}
           </div>
           <!-- <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
+              <button type="button" class="btn btn-secondary final" data-dismiss="modal">Cancel</button>
+              {% if request.user.username %}
+              <form method="post" style="padding:1px">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-primary final" name="save" value="true">Save</button>
+              </form>
+              {% endif %}
           </div> -->
         </div>
       </div>

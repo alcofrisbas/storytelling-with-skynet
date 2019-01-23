@@ -35,6 +35,14 @@ def loadStory(request, title):
     request.session["newStory"] = False
     return redirect('/write')
 
+#TODO: make this more secure, so I can't just nuke your story if I know the title
+def deleteStory(request, title):
+    s = Story.objects.get(title=title)
+    s.delete()
+    if title == request.session["title"]:
+        newStory(request)
+    return redirect('/')
+
 
 def write(request):
     if "prompt" not in request.session.keys():
@@ -79,6 +87,7 @@ def write(request):
             #request.session["title"] = title
 
         # STILL WORKING THIS
+        # TODO: make Save button read "Saved" after saving, revert after edit
         if request.POST.get("save"):
             print("saving")
             title = request.POST["title"]
