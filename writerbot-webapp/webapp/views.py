@@ -65,12 +65,15 @@ def write(request):
     newStory = request.session.get("newStory")
 
     if request.POST:
+        print(request.POST)
+        if request.POST.get("update"):
+            print("UPDATE WOOOOOOOOOTTTTTT")
         if request.POST.get("text"):
             newSentence = request.POST["text"]
             sentences += (newSentence + "\n")
 
             if not editing:
-                suggestion = generateSuggestion(newSentence, develop=True)
+                suggestion = generateSuggestion(newSentence, develop=False)
 
             request.session["editing"] = not editing
             request.session["sentences"] = sentences
@@ -94,6 +97,8 @@ def write(request):
                 s.title = title
                 s.save()
             request.session["title"] = title
+
+
 
 
     elif request.GET.get("new"):
