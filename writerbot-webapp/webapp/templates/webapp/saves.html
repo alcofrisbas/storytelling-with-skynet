@@ -10,7 +10,7 @@
         <blockquote class="blockquote mb-0">
             <p>{{ story.sentences|linebreaks }}</p>
             <!-- we will eventually be passing author names here vv -->
-            <footer class="blockquote-footer">Anonymous</footer>
+            <footer class="blockquote-footer">{{ story.author.first_name }} {{ story.author.last_name }}</footer>
         </blockquote>
     </div>
     </div>

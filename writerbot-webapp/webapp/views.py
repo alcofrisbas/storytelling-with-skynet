@@ -4,6 +4,7 @@ import sys
 import os
 from django.http import HttpResponse
 from webapp.models import Story
+from webapp.models import User
 
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'RNN'))
 from rnn_test import load_model, generate_text
@@ -14,8 +15,22 @@ sess, model, word_to_id, id_to_word = None, None, None, None
 
 # Create your views here.
 def home(request):
-    stories = Story.objects.all()
+    #stories = Story.objects.all()
+    try:
+        user = getOrCreateUser(request)
+        stories = user.stories.all()
+    except Exception as e:
+        print(e)
+        stories = []
     return render(request, 'webapp/home.html', context={'stories': stories})
+
+
+def getOrCreateUser(request):
+    user, new = User.objects.get_or_create(email=request.user.email)
+    user.first_name = request.user.first_name
+    user.last_name = request.user.last_name
+    user.save()
+    return user
 
 
 def newStory(request):
@@ -38,9 +53,11 @@ def loadStory(request, title):
 #TODO: make this more secure, so I can't just nuke your story if I know the title
 def deleteStory(request, title):
     s = Story.objects.get(title=title)
-    s.delete()
-    if title == request.session["title"]:
-        newStory(request)
+    if s.author.email == request.user.email:
+        s.delete()
+        if title == request.session["title"]:
+            newStory(request)
+    #TODO: make an error page to redirect to in case of permission error
     return redirect('/')
 
 
@@ -84,23 +101,30 @@ def write(request):
 
         if request.POST.get("title"):
             title = request.POST["title"]
-            #request.session["title"] = title
+            request.session["title"] = title
 
         # STILL WORKING THIS
         # TODO: make Save button read "Saved" after saving, revert after edit
         if request.POST.get("save"):
-            print("saving")
+            user = getOrCreateUser(request)
+
             title = request.POST["title"]
-            #request.session["current_title"] = title
             if request.session.get("newStory"):
                 print("making new Story")
-                Story.objects.create(sentences=sentences, title=title)
+                s = Story.objects.create(sentences=sentences, title=title)
+                s.author = user
+                s.save()
+                user.stories.add(s)
+                user.save()
                 request.session["newStory"] = False
             else:
                 s = Story.objects.get(title=request.session["title"])
                 s.sentences = sentences
                 s.title = title
+                s.author = user
                 s.save()
+                user.stories.add(s)
+                user.save()
             request.session["title"] = title
 
     elif request.GET.get("new"):
@@ -109,7 +133,7 @@ def write(request):
     last = ""
     if sentences != "":
         last = sentences.split("\n")[-1]
-        #sentences.pop()
+
     return render(request, 'webapp/write.html',
                   context={"prompt": request.session.get("prompt"),
                   "sentences": request.session["sentences"].split("\n")[:-1],
