@@ -7,9 +7,13 @@
     {% else %}
         <h5 class="mt-5" style="display:inline-block">Prompt: {{ prompt }}</h5>
     {% endif %}
-    <button type="submit" id="edit-button" class="btn btn-outline-primary" onclick="editUpdate()">
+    <form method="post">
+        {% csrf_token %}
+    <button name="update" type="submit" id="edit-button" class="btn btn-outline-primary" value="true" onsubmit="editUpdate()">
          Edit <span class="oi oi-pencil"></span>
-    </button>
+
+     </button>
+    </form>
     </div>
     {% if not sentences %}
         <p>Start writing here: </p>
