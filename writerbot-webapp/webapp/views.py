@@ -50,15 +50,20 @@ def loadStory(request, title):
     request.session["newStory"] = False
     return redirect('/write')
 
-#TODO: make this more secure, so I can't just nuke your story if I know the title
+
 def deleteStory(request, title):
-    s = Story.objects.get(title=title)
-    if s.author.email == request.user.email:
-        s.delete()
-        if title == request.session["title"]:
-            newStory(request)
-    #TODO: make an error page to redirect to in case of permission error
-    return redirect('/')
+    try:
+        s = Story.objects.get(title=title)
+        if s.author.email == request.user.email:
+            s.delete()
+            if title == request.session["title"]:
+                newStory(request)
+            return redirect('/')
+        else:
+            return render(request, 'webapp/error.html',
+                          context={'message': "Sorry, you don't have permission to access that story. Try logging in."})
+    except:
+        return render(request, 'webapp/error.html', context={'message': "Story not found."})
 
 
 def write(request):
@@ -130,12 +135,6 @@ def write(request):
                 user.save()
             request.session["title"] = title
 
-<<<<<<< HEAD
-
-
-
-=======
->>>>>>> 75bb7c657b23967094336effe12f81cf79f7758e
     elif request.GET.get("new"):
         return redirect('/new_story')
 
@@ -156,6 +155,10 @@ def about(request):
 
 def team(request):
     return render(request, 'webapp/team.html')
+
+
+def error(request, message):
+    return render(request, 'webapp/error.html', context={'message': message})
 
 
 def saves(request):
@@ -193,3 +196,4 @@ def generateSuggestion(newSentence, develop=False):
         print("ERROR (suggestion generation)")
         suggestion = e
     return suggestion
+
