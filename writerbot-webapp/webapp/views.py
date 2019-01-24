@@ -27,7 +27,6 @@ def newStory(request):
     return redirect('/write')
 
 
-#TODO: either store prompt in stories or don't display prompt in loaded stories
 #TODO: figure out how editing interacts with story loading
 def loadStory(request, title):
     request.session["title"] = title
@@ -35,6 +34,14 @@ def loadStory(request, title):
     request.session["sentences"] = s.sentences
     request.session["newStory"] = False
     return redirect('/write')
+
+#TODO: make this more secure, so I can't just nuke your story if I know the title
+def deleteStory(request, title):
+    s = Story.objects.get(title=title)
+    s.delete()
+    if title == request.session["title"]:
+        newStory(request)
+    return redirect('/')
 
 
 def write(request):
@@ -83,6 +90,7 @@ def write(request):
             #request.session["title"] = title
 
         # STILL WORKING THIS
+        # TODO: make Save button read "Saved" after saving, revert after edit
         if request.POST.get("save"):
             print("saving")
             title = request.POST["title"]
@@ -98,9 +106,12 @@ def write(request):
                 s.save()
             request.session["title"] = title
 
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> 75bb7c657b23967094336effe12f81cf79f7758e
     elif request.GET.get("new"):
         return redirect('/new_story')
 

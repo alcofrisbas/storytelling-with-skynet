@@ -1,7 +1,7 @@
 {%  extends "webapp/header.html" %}
 
 {% block content %}
-    <div >
+    <div>
     {% if title %}
         <h5 class="mt-5" style="display:inline-block">{{ title }}</h5>
     {% else %}
@@ -11,6 +11,7 @@
         {% csrf_token %}
     <button name="update" type="submit" id="edit-button" class="btn btn-outline-primary" value="true" onsubmit="editUpdate()">
          Edit <span class="oi oi-pencil"></span>
+
      </button>
     </form>
     </div>
@@ -28,18 +29,48 @@
 
     <form method="post">
         {% csrf_token %}
-
         <textarea name="text" class="form-control">{{ suggestion }}</textarea><br>
         <button type="submit" class="btn btn-primary btn-lg">Add Sentence</button>
     </form><br>
     <form method="get">
         <button type="submit" class="btn btn-danger btn-sm" name="new" value="true">Start a new story</button>
-        <button type="button" class="btn btn-danger btn-sm" onclick="showSaveInfo()" value="true">Save this story</button>
+        <!-- <button type="button" class="btn btn-danger btn-sm" onclick="showSaveInfo()" value="true">Save this story</button> -->
+        <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#saveModal" value="true">Save this story</button>
     </form>
-    <form method="post">
-        {% csrf_token %}
-        <input type="text" name="title" placeholder="Add a title" class="form-control final" value= "{{ title }}"style="display:none"></input><br>
-        <button type="submit" class="btn btn-danger btn-sm final" name="save" value="true" style="display:none"> Save</button>
-        <button type="button" class="btn btn-danger btn-sm final" onclick="showSaveInfo()"style="display:none">Cancel</button>
-    </form>
+
+    <!-- Modal -->
+    <div class="modal fade" id="saveModal" tabindex="-1" role="dialog" aria-labelledby="saveModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="saveModalLabel">Save</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            {% if request.user.username %}
+                Save your story as:
+                <form method="post" style="padding:1px">
+                    {% csrf_token %}
+                    <input type="text" name="title" placeholder="Add a title" class="form-control final" value= "{{ title }}"></input><br>
+                    <button type="submit" class="btn btn-danger btn-sm final" name="save" value="true"> Save</button>
+                    <button type="button" class="btn btn-danger btn-sm final" onclick="showSaveInfo()">Cancel</button>
+                </form>
+            {% else %}
+                Please <a href="{% url 'social:begin' 'google-oauth2' %}">login with Google</a> to save your story.
+            {% endif %}
+          </div>
+          <!-- <div class="modal-footer">
+              <button type="button" class="btn btn-secondary final" data-dismiss="modal">Cancel</button>
+              {% if request.user.username %}
+              <form method="post" style="padding:1px">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-primary final" name="save" value="true">Save</button>
+              </form>
+              {% endif %}
+          </div> -->
+        </div>
+      </div>
+    </div>
 {% endblock %}

@@ -9,8 +9,8 @@ Tenzin
 | Day | Time|
 |-----|-----|
 |Tuesday|13:15|
-|Thursday| 14:00|
-|Saturday| 14:00|
+|Thursday| 13:15|
+|Saturday| 14:15|
 
 ### Updates Due:
 | Day | Time |

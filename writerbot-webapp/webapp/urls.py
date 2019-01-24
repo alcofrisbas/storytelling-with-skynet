@@ -9,5 +9,6 @@ urlpatterns = [
     path('logout/', views.logout),
     path('saves/',views.saves),
     path('new_story', views.newStory),
-    path('load_story/<str:title>', views.loadStory)
+    path('load_story/<str:title>', views.loadStory),
+    path('delete_story/<str:title>', views.deleteStory)
 ]
