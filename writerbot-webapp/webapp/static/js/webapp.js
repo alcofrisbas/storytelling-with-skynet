@@ -24,6 +24,9 @@ function showSaveInfo() {
 }
 
 
+
+
+
 function editUpdate(){
     var edit = document.getElementById("para").contentEditable
     console.log(edit)
@@ -47,4 +50,10 @@ function editUpdate(){
 
 }
 
+function init(){
+    console.log("listening?");
+    document.getElementById('form').onsubmit = editUpdate;
+}
+
+window.onload = init;
 window.onload = load;
