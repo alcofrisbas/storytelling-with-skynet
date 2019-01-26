@@ -16,7 +16,7 @@ body > .container {
 
 .sidenav {
   height: 100%;
-  width: 50px;
+  width: 70px;
   position: fixed;
   z-index: 1;
   top: 0;
@@ -46,4 +46,19 @@ body > .container {
 
 nav > navbar {
     background-color: #111;
+}
+
+.side-btn {
+    background-color: #111;
+    color: #818181;
+    display: block;
+    border: none;
+    margin-top: 15px;
+}
+
+.side-btn :hover {
+  color: #f1f1f1;
+}
+i {
+    font-size:x-large;
 }

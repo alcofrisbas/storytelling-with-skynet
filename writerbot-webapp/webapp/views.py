@@ -82,6 +82,8 @@ def write(request):
     # title of the story in records
     if "title" not in request.session.keys():
         request.session["title"] = ""
+    if "developer" not in request.session.keys():
+        request.session["developer"] = False
 
     global sess, model, word_to_id, id_to_word
 
@@ -103,7 +105,7 @@ def write(request):
             sentences += (newSentence + "\n")
 
             if not editing:
-                suggestion = generateSuggestion(newSentence, develop=False)
+                suggestion = generateSuggestion(newSentence, develop=request.session["developer"])
 
             request.session["editing"] = not editing
             request.session["sentences"] = sentences
@@ -135,6 +137,27 @@ def write(request):
                 user.stories.add(s)
                 user.save()
             request.session["title"] = title
+
+        if request.POST.get("side-new"):
+            print("new story Pressed")
+
+        if request.POST.get("side-save"):
+            print("save story Pressed")
+
+        if request.POST.get("side-open"):
+            print("open story Pressed")
+        # need to make this update the story with
+        # the current content
+        if request.POST.get("side-edit"):
+            print("edit story Pressed")
+
+        if request.POST.get("side-settings"):
+            print("settings story Pressed")
+
+        if request.POST.get("side-toggle"):
+            print("toggle story Pressed")
+            request.session["developer"] = not request.session["developer"]
+            print(request.session["developer"])
 
     elif request.GET.get("new"):
         return redirect('/new_story')
@@ -197,4 +220,3 @@ def generateSuggestion(newSentence, develop=False):
         print("ERROR (suggestion generation)")
         suggestion = e
     return suggestion
-
