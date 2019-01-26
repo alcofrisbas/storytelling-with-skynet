@@ -57,3 +57,8 @@ function init(){
 
 window.onload = init;
 window.onload = load;
+
+
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();
+});
