@@ -13,23 +13,24 @@ from webapp.words import ADJECTIVES, ANIMALS
 
 sess, model, word_to_id, id_to_word = None, None, None, None
 
+#TODO: when user logs in, redirect to the page they logged in from
+
 # Create your views here.
 def home(request):
-    #stories = Story.objects.all()
-    try:
+    if request.user.is_authenticated:
         user = getOrCreateUser(request)
         stories = user.stories.all()
-    except Exception as e:
-        print(e)
+    else:
         stories = []
     return render(request, 'webapp/home.html', context={'stories': stories})
 
 
 def getOrCreateUser(request):
     user, new = User.objects.get_or_create(email=request.user.email)
-    user.first_name = request.user.first_name
-    user.last_name = request.user.last_name
-    user.save()
+    if new:
+        user.first_name = request.user.first_name
+        user.last_name = request.user.last_name
+        user.save()
     return user
 
 
