@@ -88,3 +88,21 @@ window.onload = load;
 $(document).ready(function(){
   $('[data-toggle="tooltip"]').tooltip();
 });
+
+$("#side-form").keyup(function(event)
+{
+    if (event.keyCode == 13 && !event.shiftKey)
+    {
+        event.preventDefault();
+        $("#side-form").submit();
+    }
+});
+
+$("#input-form").keyup(function(event)
+{
+    if (event.keyCode == 13)
+    {
+        event.preventDefault();
+        $("#input-form").submit();
+    }
+});

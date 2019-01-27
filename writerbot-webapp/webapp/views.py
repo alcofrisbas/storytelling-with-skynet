@@ -85,6 +85,9 @@ def write(request):
     if "developer" not in request.session.keys():
         request.session["developer"] = False
 
+    if "content-edit" not in request.session.keys():
+        request.session["content-edit"] = False
+
     global sess, model, word_to_id, id_to_word
 
     if not model:
@@ -151,6 +154,7 @@ def write(request):
         # the current content
         if request.POST.get("side-edit"):
             print("edit story Pressed")
+            request.session["content-edit"] = not request.session["content-edit"]
 
         if request.POST.get("side-settings"):
             print("settings story Pressed")
@@ -158,7 +162,7 @@ def write(request):
         if request.POST.get("side-toggle"):
             print("toggle story Pressed")
             request.session["developer"] = not request.session["developer"]
-            print(request.session["developer"])
+            print("dev mode", request.session["developer"])
 
         if request.POST.get("sentence-content"):
             print(request.POST["sentence-content"])
@@ -178,7 +182,8 @@ def write(request):
                   "sentences": request.session["sentences"].split("\n")[:-1],
                   "suggestion": suggestion, "last":last,
                   "title":request.session["title"],
-                  "power":power})
+                  "power":power,
+                  "contentEdit":request.session["content-edit"]})
 
 
 def about(request):

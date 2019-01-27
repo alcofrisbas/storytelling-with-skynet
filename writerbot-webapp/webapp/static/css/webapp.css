@@ -20,23 +20,23 @@ body > .container {
   position: fixed;
   z-index: 1;
   top: 0px;
-  left: -40px;
+  left: 0px;
   background-color: #111;
   overflow-x: hidden;
   padding-top: 50px;
-  transition: 0.3s;
-  transition-delay: 1s;
+  /* transition: 0.3s;
+  transition-delay: 1s; */
 }
 
 .sidenav:hover {
     left: 0px;
-    transition: 0.3s;
+    /* transition: 0.3s; */
 }
 
 .sidenav button {
   position: absolute;
-  left: -20px;
-  transition: 0.3s;
+  /* left: -20px; */
+  /* transition: 0.3s; */
   padding: 6px 8px 6px 16px;
   width: 80px;
   background-color: #111;
@@ -45,14 +45,14 @@ body > .container {
   color: #818181;
   display: block;
   border: none;
-  transition-delay: 0.2s;
+  /* transition-delay: 0.2s; */
 
 }
 
 .sidenav button:hover {
   color: #f1f1f1;
-  left: 0px;
-  transition: 0.3s;
+  /* left: 0px; */
+  /* transition: 0.3s; */
 
 }
 
@@ -100,11 +100,11 @@ i {
   animation: glow 1s ease-in-out infinite alternate;
 }
 
-@-webkit-keyframes glow {
+/* @-webkit-keyframes glow {
   from {
     text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #57f967, 0 0 40px #57f967, 0 0 50px #57f967, 0 0 60px #57f967, 0 0 70px #57f967;
   }
   to {
     text-shadow: 0 0 20px #fff, 0 0 30px #ff4da6, 0 0 40px #ff4da6, 0 0 50px #ff4da6, 0 0 60px #ff4da6, 0 0 70px #ff4da6, 0 0 80px #ff4da6;
   }
-}
+} */
