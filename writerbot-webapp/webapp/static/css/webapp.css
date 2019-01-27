@@ -87,24 +87,11 @@ nav > navbar {
 #side-toggle {
     top:260px;
 }
-/* .side-btn {
-    background-color: #111;
-    color: #818181;
-    display: block;
-    border: none;
-    margin-top: 15px;
-    left: -10px;
 
-}
-
-.side-btn :hover {
-  color: #f1f1f1;
-  left: 0;
-} */
 i {
     font-size:x-large;
 }
-
+/* power button effects */
 .glow {
   color: #fff;
   text-align: center;
@@ -115,7 +102,7 @@ i {
 
 @-webkit-keyframes glow {
   from {
-    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #e60073, 0 0 40px #e60073, 0 0 50px #e60073, 0 0 60px #e60073, 0 0 70px #e60073;
+    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #57f967, 0 0 40px #57f967, 0 0 50px #57f967, 0 0 60px #57f967, 0 0 70px #57f967;
   }
   to {
     text-shadow: 0 0 20px #fff, 0 0 30px #ff4da6, 0 0 40px #ff4da6, 0 0 50px #ff4da6, 0 0 60px #ff4da6, 0 0 70px #ff4da6, 0 0 80px #ff4da6;
