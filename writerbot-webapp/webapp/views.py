@@ -137,9 +137,10 @@ def write(request):
                 user.stories.add(s)
                 user.save()
             request.session["title"] = title
-
+        # same functionality as "Start a new story button"
         if request.POST.get("side-new"):
             print("new story Pressed")
+            return redirect('/new_story')
 
         if request.POST.get("side-save"):
             print("save story Pressed")
@@ -158,6 +159,9 @@ def write(request):
             print("toggle story Pressed")
             request.session["developer"] = not request.session["developer"]
             print(request.session["developer"])
+
+        if request.POST.get("sentence-content"):
+            print(request.POST["sentence-content"])
 
     elif request.GET.get("new"):
         return redirect('/new_story')

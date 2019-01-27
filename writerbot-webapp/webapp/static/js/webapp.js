@@ -28,27 +28,25 @@ function showSaveInfo() {
 
 
 function editUpdate(){
-    var edit = document.getElementById("para").contentEditable
-    console.log(edit)
-    console.log("asdfasdf")
+    var edit = document.getElementById("para").contentEditable;
+    var editButton = document.getElementById("edit-button");
     if (edit == "false"){
-        console.log("not anymore")
         document.getElementById("para").contentEditable = true;
         document.getElementById("para").style.border = "1px dotted";
         document.getElementById("para").style.padding = "0px";
         document.getElementById("edit-button").type = "button";
         document.getElementById("edit-button").innerHTML= '<i class="fas fa-pen"></i>';
     } else {
-        console.log("edity")
         document.getElementById("para").contentEditable = false;
         document.getElementById("para").style.border = " none";
         document.getElementById("para").style.padding = "1px";
         document.getElementById("edit-button").type = "submit";
         document.getElementById("edit-button").innerHTML= '<i class="fas fa-pencil-alt"></i>';
+        // document.getElementById("side-form").submit();
     }
     //document.getElementById("edit-button").classList.toggle('btn-success');
     //document.getElementById("edit-button").classList.toggle('btn-outline-primary');
-
+    console.log(editButton.type)
 }
 
 function init(){

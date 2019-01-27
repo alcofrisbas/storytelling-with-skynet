@@ -19,23 +19,41 @@ body > .container {
   width: 70px;
   position: fixed;
   z-index: 1;
-  top: 0;
-  left: 0;
+  top: 0px;
+  left: -40px;
   background-color: #111;
   overflow-x: hidden;
   padding-top: 50px;
+  transition: 0.3s;
+  transition-delay: 1s;
 }
 
-.sidenav a {
+.sidenav:hover {
+    left: 0px;
+    transition: 0.3s;
+}
+
+.sidenav button {
+  position: absolute;
+  left: -20px;
+  transition: 0.3s;
   padding: 6px 8px 6px 16px;
+  width: 80px;
+  background-color: #111;
   text-decoration: none;
   font-size: 25px;
   color: #818181;
   display: block;
+  border: none;
+  transition-delay: 0.2s;
+
 }
 
-.sidenav a:hover {
+.sidenav button:hover {
   color: #f1f1f1;
+  left: 0px;
+  transition: 0.3s;
+
 }
 
 .main {
@@ -48,17 +66,41 @@ nav > navbar {
     background-color: #111;
 }
 
-.side-btn {
+#side-new {
+    top:60px;
+}
+#side-save {
+    top:100px;
+}
+#side-edit {
+    top:140px;
+    color:#ba3d1d;
+}
+#side-open {
+    top:180px;
+    color:#ba3d1d;
+}
+#side-settings {
+    top:220px;
+    color:#ba3d1d;
+}
+#side-toggle {
+    top:260px;
+}
+/* .side-btn {
     background-color: #111;
     color: #818181;
     display: block;
     border: none;
     margin-top: 15px;
+    left: -10px;
+
 }
 
 .side-btn :hover {
   color: #f1f1f1;
-}
+  left: 0;
+} */
 i {
     font-size:x-large;
 }
