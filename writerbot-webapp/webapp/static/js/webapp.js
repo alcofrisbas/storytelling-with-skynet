@@ -61,6 +61,7 @@ function togglePower(){
     document.getElementById('side-toggle').name="side-toggle";
     document.getElementById('side-toggle').value="true";
     $("#side-form").submit(
+        // this makes it so we can submit extra values for django purposes
   //   function(eventObj) {
   //     $('<input />').attr('type', 'hidden')
   //         .attr('name', "something")
