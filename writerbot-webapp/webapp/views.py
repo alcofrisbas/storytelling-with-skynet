@@ -97,7 +97,7 @@ def write(request):
     newStory = request.session.get("newStory")
 
     if request.POST:
-        print(request.POST)
+        print(request.POST.keys())
         if request.POST.get("update"):
             print("UPDATE WOOOOOOOOOTTTTTT")
         if request.POST.get("text"):
@@ -169,12 +169,16 @@ def write(request):
     last = ""
     if sentences != "":
         last = sentences.split("\n")[-1]
+    power = "glow"
+    if request.session["developer"]:
+        power = ""
 
     return render(request, 'webapp/write.html',
                   context={"prompt": request.session.get("prompt"),
                   "sentences": request.session["sentences"].split("\n")[:-1],
                   "suggestion": suggestion, "last":last,
-                  "title":request.session["title"]})
+                  "title":request.session["title"],
+                  "power":power})
 
 
 def about(request):

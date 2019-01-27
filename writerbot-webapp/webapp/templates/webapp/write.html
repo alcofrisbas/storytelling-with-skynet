@@ -5,24 +5,24 @@
     {% csrf_token %}
 <div class="sidenav">
 <button class="side-btn"type="submit" data-toggle="tooltip" title="New story"
-    value="true", name="side-new" id="side-new">
+    value="true" name="side-new" id="side-new">
     <i class="fas fa-plus"></i></button>
 <button class="side-btn"type="button"
-    value="true", name="side-save"
+    value="true" name="side-save"
     data-toggle="modal" data-target="#saveModal" value="true"id="side-save">
     <i class="far fa-save"></i></button>
 <button class="side-btn" type="button" data-toggle="tooltip" title="Edit story"
-    value="true", name="side-edit" onclick="editUpdate()" id="side-edit">
+    value="true" name="side-edit" onclick="editUpdate()" id="side-edit">
     <i class="fas fa-pencil-alt"></i></button>
 <button class="side-btn"type="submit" data-toggle="tooltip" title="Load"
-    value="true", name="side-open" id="side-open">
+    value="true" name="side-open" id="side-open">
     <i class="far fa-folder-open"></i></button>
 <button class="side-btn"type="submit" data-toggle="tooltip" title="Settings"
-    value="true", name="side-settings" id="side-settings">
+    value="true" name="side-settings" id="side-settings">
     <i class="fas fa-cog"></i></button>
-<button class="side-btn"type="submit" data-toggle="tooltip" title="AI"
-    value="true", name="side-toggle" id="side-toggle">
-    <i class="fas fa-power-off"></i></button>
+<button class="side-btn" type="submit" data-toggle="tooltip" title="AI"
+    value="true" name="side-toggle" id="side-toggle" onclick="togglePower()">
+    <i id="side-toggle-icon" class="fas fa-power-off {{ power }}"></i></button>
 </div>
 </form>
 <div class="main">
@@ -40,6 +40,7 @@
          </button>
         </form>
         </div>
+        <p> {{ power }}</power>
 
         {% if not sentences %}
             <p>Start writing here: </p>

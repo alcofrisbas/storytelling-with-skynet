@@ -54,6 +54,32 @@ function init(){
     document.getElementById('form').onsubmit = editUpdate;
 }
 
+function togglePower(){
+    console.log("power")
+    var powerButton = document.getElementById("side-toggle-icon");
+    powerButton.classList.toggle("glow");
+    document.getElementById('side-toggle').name="side-toggle";
+    document.getElementById('side-toggle').value="true";
+    $("#side-form").submit(
+  //   function(eventObj) {
+  //     $('<input />').attr('type', 'hidden')
+  //         .attr('name', "something")
+  //         .attr('value', "something")
+  //         .appendTo('#side-form');
+  //     return true;
+  // }
+);
+}
+
+// $("#side-form").submit( function(eventObj) {
+//       $('<input />').attr('type', 'hidden')
+//           .attr('name', "something")
+//           .attr('value', "something")
+//           .appendTo('#side-form');
+//       return true;
+//   });
+
+
 window.onload = init;
 window.onload = load;
 
