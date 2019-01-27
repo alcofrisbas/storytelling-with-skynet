@@ -25,7 +25,7 @@
         <i class="fas fa-cog"></i></button>
     <button class="side-btn" type="submit" data-toggle="tooltip" data-placement="right" title="AI"
         value="true" name="side-toggle" id="side-toggle">
-        <i id="side-toggle-icon" class="fas fa-power-off {{ power }}"></i></button>
+        <i id="side-toggle-icon" class="fas fa-power-off"></i></button>
 </div>
 </form>
 <div class="main">
@@ -36,7 +36,6 @@
             <h5 class="mt-5" style="display:inline-block">Prompt: {{ prompt }}</h5>
         {% endif %}
         </div>
-        <p> {{ power }}</power>
 
         {% if not sentences %}
             <p>Start writing here: </p>

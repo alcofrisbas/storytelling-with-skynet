@@ -21,8 +21,8 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">{{ story.title }}</h5>
-                            <a href="/load_story/{{ story.title }}" class="btn btn-primary">Continue this story</a>
-                            <a href="/delete_story/{{ story.title }}" class="btn btn-danger">Delete this story</a>
+                            <a href="/load_story/{{ story.id }}" class="btn btn-primary">Continue this story</a>
+                            <a href="/delete_story/{{ story.id }}" class="btn btn-danger">Delete this story</a>
                           </div>
                     </div>
                 {% endfor %}
