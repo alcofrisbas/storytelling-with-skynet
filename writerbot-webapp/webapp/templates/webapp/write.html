@@ -1,7 +1,7 @@
 {%  extends "webapp/header.html" %}
 
 {% block content %}
-<form method="post" id="side-form">
+<form method="post" id="side-form" xmlns="http://www.w3.org/1999/html">
     {% csrf_token %}
 <div class="sidenav">
     <button class="side-btn" type="submit" data-toggle="tooltip" data-placement="right" title="New story"
@@ -25,10 +25,14 @@
         <i class="fas fa-cog"></i></button>
     <button class="side-btn" type="submit" data-toggle="tooltip" data-placement="right" title="AI"
         value="true" name="side-toggle" id="side-toggle">
-        <i id="side-toggle-icon" class="fas fa-power-off"></i></button>
+        <i id="side-toggle-icon" class="fas fa-power-off {{ power }}"></i></button>
 </div>
 </form>
 <div class="main">
+{#        <form method="post" id="title-form">#}
+{#            {% csrf_token %}#}
+{#            <input type="text" name="title" placeholder="Untitled story" class="mt-5 form-control"></input>#}
+{#        </form>#}
         <div>
         {% if title %}
             <h5 class="mt-5" style="display:inline-block">{{ title }}</h5>

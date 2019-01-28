@@ -14,6 +14,7 @@ from webapp.words import ADJECTIVES, ANIMALS
 sess, model, word_to_id, id_to_word = None, None, None, None
 
 #TODO: when user logs in, redirect to the page they logged in from
+#TODO: figure out how to clear empty stories and expired session data
 
 # Create your views here.
 def home(request):
@@ -35,6 +36,11 @@ def getOrCreateUser(request):
 
 
 def newStory(request):
+    #TODO: prompt user if they're sure they want to discard current story
+    if request.session.get("story_id") and not request.user.is_authenticated:
+        old_story = Story.objects.get(id=request.session.get("story_id"))
+        old_story.delete()
+
     s = Story.objects.create(sentences="", title="")
     if request.user.is_authenticated:
         user = getOrCreateUser(request)
@@ -154,11 +160,15 @@ def write(request):
     if story.sentences != "":
         last = story.sentences.split("\n")[-1]
 
+    power = "glow"
+    if request.session["developer"]:
+        power = ""
+
     return render(request, 'webapp/write.html',
                   context={"prompt": request.session["prompt"],
                   "sentences": story.sentences.split("\n")[:-1],
                   "suggestion": suggestion, "last":last,
-                  "title": story.title,
+                  "title": story.title, "power":power,
                   "contentEdit":request.session["content-edit"]})
 
 

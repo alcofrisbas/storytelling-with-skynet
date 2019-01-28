@@ -106,3 +106,12 @@ $("#input-form").keyup(function(event)
         $("#input-form").submit();
     }
 });
+
+$("#title-form").keyup(function(event)
+{
+    if (event.keyCode == 13)
+    {
+        event.preventDefault();
+        $("#title-form").submit();
+    }
+});
