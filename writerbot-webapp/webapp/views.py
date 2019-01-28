@@ -43,10 +43,7 @@ def newStory(request):
         user.stories.add(s)
         user.save()
     request.session["editing"] = False
-    if "prompt" in request.session.keys():
-        request.session["prompt"] = generatePrompt(request.session.get("prompt"))
-    else:
-        request.session["prompt"] = generatePrompt()
+    request.session["prompt"] = generatePrompt(request.session.get("prompt"))
     request.session["story_id"] = s.id
     return redirect('/write')
 
@@ -66,7 +63,7 @@ def deleteStory(request, id):
         s = Story.objects.get(id=id)
         if s.author.email == request.user.email:
             s.delete()
-            if id == request.session["story_id"]:
+            if id == request.session.get("story_id"):
                 request.session.pop("story_id")
             return redirect('/')
         else:
