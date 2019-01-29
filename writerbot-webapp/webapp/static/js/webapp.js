@@ -24,7 +24,32 @@ function showSaveInfo() {
 }
 
 
+function setEdit(){
+    console.log("editing!");
+    var editor = document.getElementById("para");
+    editor.contentEditable = true;
+    editor.focus();
+}
 
+$("#para").keyup(function(event) {
+    //console.log(event.keyCode);
+});
+
+$("#para").focusout(function(event) {
+    var editor = document.getElementById("para");
+    console.log(editor.textContent);
+    $("#side-form").submit(
+        // this makes it so we can submit extra values for django purposes
+    function(event) {
+        console.log("adding");
+      $('<input />').attr('type', 'hidden')
+          .attr('name', "sentence-content")
+          .attr('value', editor.textContent)
+          .appendTo('#side-form');
+      return true;
+  });
+  $("#side-form").submit();
+});
 
 
 function editUpdate(){
@@ -49,10 +74,10 @@ function editUpdate(){
     console.log(editButton.type)
 }
 
-function init(){
-    console.log("listening?");
-    document.getElementById('form').onsubmit = editUpdate;
-}
+// function init(){
+//     console.log("listening?");
+//     document.getElementById('form').onsubmit = editUpdate;
+// }
 
 function togglePower(){
     console.log("power")
@@ -81,7 +106,7 @@ function togglePower(){
 //   });
 
 
-window.onload = init;
+//window.onload = init;
 window.onload = load;
 
 
@@ -89,25 +114,7 @@ $(document).ready(function(){
   $('[data-toggle="tooltip"]').tooltip();
 });
 
-$("#para").keyup(function(event)
-{
-    console.log("teste alsd;fjk");
-    if (event.keyCode == 13)
-    {
-        console.log(document.getElementById("para").innerHTML);
-        event.preventDefault();
-    //     $("#side-form").submit(
-    //          function(eventObj) {
-    //         $('<input />').attr('type', 'hidden')
-    //                 .attr('name', "something")
-    //                 .attr('value', "something")
-    //                 .appendTo('#side-form');
-    //         return true;
-    //     }
-    // );
-    }
-    return true;
-});
+
 
 $("#input-form").keyup(function(event)
 {

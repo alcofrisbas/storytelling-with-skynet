@@ -14,8 +14,8 @@
             <i class="far fa-save"></i>
         </button>
     </span>
-    <button class="side-btn" type="submit" data-toggle="tooltip" data-placement="right" title="Edit story"
-        value="true" name="side-edit"  id="side-edit">
+    <button class="side-btn" type="button" data-toggle="tooltip" data-placement="right" title="Edit story"
+        value="true" name="side-edit"  id="side-edit" onclick="setEdit()">
         <i class="fas fa-pencil-alt"></i></button>
     <button class="side-btn"type="submit" data-toggle="tooltip" data-placement="right" title="Load"
         value="true" name="side-open" id="side-open">
@@ -48,10 +48,10 @@
         <p id = "para" style="padding:1px" contenteditable="{{ contentEdit }}">
         {% for sentence in sentences %}
             {% if not loop.last %}
-                <span style="color:black">{{ sentence }}</span><br>
+                {{ sentence }}
             {% endif %}
         {% endfor %}
-        <span style="color:blue">{{ last }}</span>
+        {{ last }}<br>
     </p>
 
         <form method="post" id="input-form">

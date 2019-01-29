@@ -10,6 +10,10 @@ body > .container {
   padding: 50px 15px 0;
 }
 
+#para {
+    white-space: pre-wrap;
+}
+
 .dropdown {
     list-style-type: none;
 }
