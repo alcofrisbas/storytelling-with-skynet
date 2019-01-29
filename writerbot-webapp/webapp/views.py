@@ -80,7 +80,8 @@ def deleteStory(request, id):
 
 
 def write(request):
-    if "story_id" not in request.session.keys():
+    if "story_id" not in request.session.keys() or not Story.objects.filter(id = request.session["story_id"]).exists():
+        print("starting new story")
         newStory(request)
 
     if "developer" not in request.session.keys():
