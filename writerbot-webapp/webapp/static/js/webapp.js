@@ -89,20 +89,48 @@ $(document).ready(function(){
   $('[data-toggle="tooltip"]').tooltip();
 });
 
-$("#side-form").keyup(function(event)
+$("#para").keyup(function(event)
 {
-    if (event.keyCode == 13 && !event.shiftKey)
+    console.log("teste alsd;fjk");
+    if (event.keyCode == 13)
     {
+        console.log(document.getElementById("para").innerHTML);
         event.preventDefault();
-        $("#side-form").submit();
+    //     $("#side-form").submit(
+    //          function(eventObj) {
+    //         $('<input />').attr('type', 'hidden')
+    //                 .attr('name', "something")
+    //                 .attr('value', "something")
+    //                 .appendTo('#side-form');
+    //         return true;
+    //     }
+    // );
     }
+    return true;
 });
 
 $("#input-form").keyup(function(event)
 {
+    console.log("asdf");
     if (event.keyCode == 13)
     {
         event.preventDefault();
         $("#input-form").submit();
     }
+    return true;
 });
+
+// document.addEventListener('keyup', function(e) {
+//   if (e.key === 'Enter' && e.target.tagName === 'P') {
+//     console.log('ENTER');
+//     $("#side-form").submit(
+//     //      function(eventObj) {
+//     //     $('<input />').attr('type', 'hidden')
+//     //             .attr('name', "something")
+//     //             .attr('value', "something")
+//     //             .appendTo('this');
+//     //     return true;
+//     // }
+//     );
+//   }
+// });
