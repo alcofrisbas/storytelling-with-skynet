@@ -120,7 +120,7 @@ $("#input-form").keyup(function(event)
     return true;
 });
 
-<<<<<<< HEAD
+
 // document.addEventListener('keyup', function(e) {
 //   if (e.key === 'Enter' && e.target.tagName === 'P') {
 //     console.log('ENTER');
@@ -135,7 +135,7 @@ $("#input-form").keyup(function(event)
 //     );
 //   }
 // });
-=======
+
 $("#title-form").keyup(function(event)
 {
     if (event.keyCode == 13)
@@ -144,4 +144,3 @@ $("#title-form").keyup(function(event)
         $("#title-form").submit();
     }
 });
->>>>>>> 2602f4e1d5129e355aefcd5560c7b0a8ef732ee8

@@ -20,3 +20,5 @@
 !.gitignore
 *.db
 venv*
+
+*.develop
