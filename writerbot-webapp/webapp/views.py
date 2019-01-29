@@ -94,20 +94,21 @@ def write(request):
 
     global sess, model, word_to_id, id_to_word
 
-    if not model:
-        sess, model, word_to_id, id_to_word = load_model(save=False)
+    # if not model:
+    #     sess, model, word_to_id, id_to_word = load_model(save=False)
 
     story = Story.objects.get(id = request.session["story_id"])
     suggestion = ""
     editing = request.session["editing"]
 
     if request.POST:
+        print("======== ===== ===== ====")
         print(request.POST.keys())
         if request.POST.get("update"):
             print("UPDATE WOOOOOOOOOTTTTTT")
         if request.POST.get("text"):
             newSentence = request.POST["text"]
-            story.sentences += (newSentence.strip() + "\n")
+            story.sentences += newSentence.strip()+ "\r"
             story.save()
 
             if not editing:
@@ -154,7 +155,11 @@ def write(request):
             print("dev mode", request.session["developer"])
 
         if request.POST.get("sentence-content"):
+            print("-- -- -- -- --")
             print(request.POST["sentence-content"])
+            print("-- -- -- -- --")
+            story.sentences = request.POST["sentence-content"].strip()
+            story.save()
 
     elif request.GET.get("new"):
         return redirect('/new_story')
@@ -167,9 +172,11 @@ def write(request):
     if request.session["developer"]:
         power = ""
 
+    print([s.strip() for s in story.sentences.split("\n")[:-1]])
+
     return render(request, 'webapp/write.html',
                   context={"prompt": request.session["prompt"],
-                  "sentences": story.sentences.split("\n")[:-1],
+                  "sentences": [s.strip() for s in story.sentences.split("\n")[:-1]],
                   "suggestion": suggestion, "last":last,
                   "title": story.title, "power":power,
                   "contentEdit":request.session["content-edit"]})
