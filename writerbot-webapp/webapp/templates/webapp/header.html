@@ -30,8 +30,8 @@
                     <li><a class="nav-item nav-link" id="/team/" href="/team">The Team</a></li>
                     <li><a class="nav-item nav-link" id="/saves/" href="/saves">Saves--temp</a></li>
                 </ul>
-            </div>
-            {% if user.username %}
+                <ul class="navbar-nav ml-auto">
+                {% if user.username %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle show" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 {{ user.first_name }} {{ user.last_name }}
@@ -43,6 +43,9 @@
                     {% else %}
                         <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn" role="button">Login with Google</a>
                     {% endif %}
+                </ul>
+            </div>
+
         </nav>
 
       {% block content %}

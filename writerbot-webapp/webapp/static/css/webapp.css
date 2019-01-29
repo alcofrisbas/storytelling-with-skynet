@@ -14,9 +14,17 @@ body > .container {
     list-style-type: none;
 }
 
+.tooltip {
+    pointer-events: none;
+}
+
+.tooltip .arrow {
+    display: none;
+}
+
 .sidenav {
   height: 100%;
-  width: 70px;
+  width: 60px;
   position: fixed;
   z-index: 1;
   top: 0px;
@@ -38,7 +46,7 @@ body > .container {
   /* left: -20px; */
   /* transition: 0.3s; */
   padding: 6px 8px 6px 16px;
-  width: 80px;
+  width: 50px;
   background-color: #111;
   text-decoration: none;
   font-size: 25px;
@@ -46,18 +54,17 @@ body > .container {
   display: block;
   border: none;
   /* transition-delay: 0.2s; */
-
 }
 
 .sidenav button:hover {
   color: #f1f1f1;
   /* left: 0px; */
   /* transition: 0.3s; */
-
 }
 
 .main {
-  margin-left: 160px;
+  margin-left: 14%;
+    margin-right: 7%;
   padding: 0px 10px;
 }
 
@@ -90,7 +97,7 @@ nav > navbar {
 i {
     font-size:x-large;
 }
-/* power button effects */
+
 .glow {
   color: #fff;
   text-align: center;
@@ -98,12 +105,3 @@ i {
   -moz-animation: glow 1s ease-in-out infinite alternate;
   animation: glow 1s ease-in-out infinite alternate;
 }
-
-/* @-webkit-keyframes glow {
-  from {
-    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #57f967, 0 0 40px #57f967, 0 0 50px #57f967, 0 0 60px #57f967, 0 0 70px #57f967;
-  }
-  to {
-    text-shadow: 0 0 20px #fff, 0 0 30px #ff4da6, 0 0 40px #ff4da6, 0 0 50px #ff4da6, 0 0 60px #ff4da6, 0 0 70px #ff4da6, 0 0 80px #ff4da6;
-  }
-} */

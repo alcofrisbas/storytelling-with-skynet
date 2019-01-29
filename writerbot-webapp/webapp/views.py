@@ -14,6 +14,7 @@ from webapp.words import ADJECTIVES, ANIMALS
 sess, model, word_to_id, id_to_word = None, None, None, None
 
 #TODO: when user logs in, redirect to the page they logged in from
+#TODO: figure out how to clear empty stories and expired session data
 
 # Create your views here.
 def home(request):
@@ -35,53 +36,53 @@ def getOrCreateUser(request):
 
 
 def newStory(request):
-    request.session["sentences"] = ""
-    request.session["title"] = ""
+    #TODO: prompt user if they're sure they want to discard current story
+    if request.session.get("story_id") and not request.user.is_authenticated:
+        old_story = Story.objects.get(id=request.session.get("story_id"))
+        old_story.delete()
+
+    s = Story.objects.create(sentences="", title="")
+    if request.user.is_authenticated:
+        user = getOrCreateUser(request)
+        s.author = user
+        s.save()
+        user.stories.add(s)
+        user.save()
     request.session["editing"] = False
     request.session["prompt"] = generatePrompt(request.session.get("prompt"))
-    request.session["newStory"] = True
+    request.session["story_id"] = s.id
     return redirect('/write')
 
 
 #TODO: figure out how editing interacts with story loading
-def loadStory(request, title):
-    request.session["title"] = title
-    s = Story.objects.get(title=title)
-    request.session["sentences"] = s.sentences
-    request.session["newStory"] = False
-    return redirect('/write')
+#TODO: error check
+def loadStory(request, id):
+    if Story.objects.filter(id=id).exists():
+        request.session["story_id"] = id
+        return redirect('/write')
+    else:
+        return render(request, 'webapp/error.html', context={'message': "Story not found."})
 
 
-def deleteStory(request, title):
-    try:
-        s = Story.objects.get(title=title)
+def deleteStory(request, id):
+    if Story.objects.filter(id=id).exists():
+        s = Story.objects.get(id=id)
         if s.author.email == request.user.email:
             s.delete()
-            if title == request.session["title"]:
-                newStory(request)
+            if id == request.session.get("story_id"):
+                request.session.pop("story_id")
             return redirect('/')
         else:
             return render(request, 'webapp/error.html',
                           context={'message': "Sorry, you don't have permission to access that story. Try logging in."})
-    except:
+    else:
         return render(request, 'webapp/error.html', context={'message': "Story not found."})
 
 
 def write(request):
-    if "prompt" not in request.session.keys():
-        request.session["prompt"] = generatePrompt()
+    if "story_id" not in request.session.keys():
+        newStory(request)
 
-    if "editing" not in request.session.keys():
-        request.session["editing"] = False
-
-    if "sentences" not in request.session.keys():
-        request.session["sentences"] = ""
-
-    if "newStory" not in request.session.keys():
-        request.session["newStory"] = True
-    # title of the story in records
-    if "title" not in request.session.keys():
-        request.session["title"] = ""
     if "developer" not in request.session.keys():
         request.session["developer"] = False
 
@@ -93,11 +94,9 @@ def write(request):
     if not model:
         sess, model, word_to_id, id_to_word = load_model(save=False)
 
+    story = Story.objects.get(id = request.session["story_id"])
     suggestion = ""
-    sentences = request.session.get("sentences")
-    editing = request.session.get("editing")
-    title = request.session.get("title")
-    newStory = request.session.get("newStory")
+    editing = request.session["editing"]
 
     if request.POST:
         print(request.POST.keys())
@@ -105,41 +104,28 @@ def write(request):
             print("UPDATE WOOOOOOOOOTTTTTT")
         if request.POST.get("text"):
             newSentence = request.POST["text"]
-            sentences += (newSentence + "\n")
+            story.sentences += (newSentence.strip() + "\n")
+            story.save()
 
             if not editing:
                 suggestion = generateSuggestion(newSentence, develop=request.session["developer"])
 
             request.session["editing"] = not editing
-            request.session["sentences"] = sentences
 
         if request.POST.get("title"):
-            title = request.POST["title"]
-            request.session["title"] = title
+            story.title = request.POST["title"]
 
         # STILL WORKING THIS
-        # TODO: make Save button read "Saved" after saving, revert after edit
+        # TODO: make Save button grayed out after saving, revert after edit
         if request.POST.get("save"):
-            user = getOrCreateUser(request)
-
-            title = request.POST["title"]
-            if request.session.get("newStory"):
-                print("making new Story")
-                s = Story.objects.create(sentences=sentences, title=title)
-                s.author = user
-                s.save()
-                user.stories.add(s)
-                user.save()
-                request.session["newStory"] = False
-            else:
-                s = Story.objects.get(title=request.session["title"])
-                s.sentences = sentences
+            if request.user.is_authenticated:
+                user = getOrCreateUser(request)
+                title = request.POST["title"]
+                s = Story.objects.get(id = request.session["story_id"])
                 s.title = title
-                s.author = user
                 s.save()
-                user.stories.add(s)
-                user.save()
-            request.session["title"] = title
+            else:
+                return render(request, 'webapp/error.html', context={'message': "Please log in before trying to save a story."})
         # same functionality as "Start a new story button"
         if request.POST.get("side-new"):
             print("new story Pressed")
@@ -171,18 +157,18 @@ def write(request):
         return redirect('/new_story')
 
     last = ""
-    if sentences != "":
-        last = sentences.split("\n")[-1]
+    if story.sentences != "":
+        last = story.sentences.split("\n")[-1]
+
     power = "glow"
     if request.session["developer"]:
         power = ""
 
     return render(request, 'webapp/write.html',
-                  context={"prompt": request.session.get("prompt"),
-                  "sentences": request.session["sentences"].split("\n")[:-1],
+                  context={"prompt": request.session["prompt"],
+                  "sentences": story.sentences.split("\n")[:-1],
                   "suggestion": suggestion, "last":last,
-                  "title":request.session["title"],
-                  "power":power,
+                  "title": story.title, "power":power,
                   "contentEdit":request.session["content-edit"]})
 
 
