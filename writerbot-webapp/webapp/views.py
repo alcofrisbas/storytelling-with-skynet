@@ -54,11 +54,13 @@ def newStory(request):
     return redirect('/write')
 
 
-#TODO: figure out how editing interacts with story loading
+#TODO: figure out how editing/prompt interact with story loading
 #TODO: error check
 def loadStory(request, id):
     if Story.objects.filter(id=id).exists():
         request.session["story_id"] = id
+        request.session["editing"] = False
+        request.session["prompt"] = ""
         return redirect('/write')
     else:
         return render(request, 'webapp/error.html', context={'message': "Story not found."})
