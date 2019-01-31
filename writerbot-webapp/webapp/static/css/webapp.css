@@ -46,7 +46,6 @@ body > .container {
 }
 
 .sidenav button {
-  position: absolute;
   /* left: -20px; */
   /* transition: 0.3s; */
   padding: 6px 8px 6px 16px;
@@ -76,27 +75,6 @@ nav > navbar {
     background-color: #111;
 }
 
-#side-new {
-    top:60px;
-}
-#side-save {
-    top:100px;
-}
-#side-edit {
-    top:140px;
-    color:#ba3d1d;
-}
-#side-open {
-    top:180px;
-    color:#ba3d1d;
-}
-#side-settings {
-    top:220px;
-    color:#ba3d1d;
-}
-#side-toggle {
-    top:260px;
-}
 
 i {
     font-size:x-large;
