@@ -169,9 +169,10 @@ class RNNModel(object):
             iters = 0
             for step in range(self.train_epoch):
                 start_time = time.time()
-                cost, current_learning_rate, final_state, _ = sess.run(
+                cost, current_learning_rate, final_state, _, output = sess.run(
                     [self.cost, self.learning_rate, self.final_state, self.updates])
                 costs += cost
+                tf.print(output)
 
                 iters += self.num_steps
                 if step % (self.train_epoch // 10) == 10:
