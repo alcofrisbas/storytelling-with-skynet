@@ -94,6 +94,7 @@ def write(request):
 
     global sess, model, word_to_id, id_to_word
 
+    # I was tired of loading TODO: UNCOMMENT ME
     # if not model:
     #     sess, model, word_to_id, id_to_word = load_model(save=False)
 
