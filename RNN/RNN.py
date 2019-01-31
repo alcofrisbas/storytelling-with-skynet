@@ -130,6 +130,10 @@ class RNNModel(object):
         logits = tf.map_fn(output_embedding, output)
         logits = tf.reshape(logits, [-1, vocab_size])
         self.probas = tf.nn.softmax(logits, name='p')
+        tf.print(self.output)
+        sampled_word = np.argmax(probas)
+        input_id = [[sampled_word]]
+        tf.print(input_id)
         loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=
             tf.reshape(self.output_batch, [-1]), logits = logits) \
             * tf.cast(tf.reshape(non_zero_weights, [-1]), tf.float32)
