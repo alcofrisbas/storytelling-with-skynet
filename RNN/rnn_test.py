@@ -53,6 +53,11 @@ def generate_text(sess, model, word_to_index, index_to_word,
                                 feed_dict=feed_dict)
         # Want to find the highest probability target with type POS
         print(probas)
+        sampled_word = np.argmax(probas)
+        input_id = [[sampled_word]]
+        text += ' ' + index_to_word[sampled_word]
+
+        """
         test_probas = probas[0][0]
         test_probas.sort()
         length = len(test_probas)-1
@@ -73,6 +78,7 @@ def generate_text(sess, model, word_to_index, index_to_word,
         else:
             text += ' ' + best_choice
         input_wordid = [[best_choice_idx]]
+        """
     print(text)
     return text
 
