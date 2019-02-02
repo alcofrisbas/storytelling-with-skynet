@@ -104,9 +104,6 @@ class RNNModel(object):
             return cell
 
 
-
-
-
         cell = tf.contrib.rnn.MultiRNNCell([make_cell() for _ in range(config.num_layers)], state_is_tuple=True)
         self.initial_state = cell.zero_state(self.batch_size, tf.float32)
         state = self.initial_state
@@ -116,32 +113,33 @@ class RNNModel(object):
 
         self.output_embedding_bias = tf.get_variable("output_embedding_bias",
                                                 [vocab_size], dtype=tf.float32)
+        stop = False
+        total_loss = []
+        while (not stop):
+            with tf.variable_scope("RNN"):
+                output, state = tf.nn.dynamic_rnn(cell=cell, inputs=inputs,
+                sequence_length=batch_length, initial_state=state, dtype=tf.float32)
 
-        with tf.variable_scope("RNN"):
-            output, state = tf.nn.dynamic_rnn(cell=cell, inputs=inputs,
-            sequence_length=batch_length, initial_state=state, dtype=tf.float32)
+                def output_embedding(current_output):
+                    return tf.add(tf.matmul(current_output, tf.transpose(self.output_embedding_mat)),
+                                self.output_embedding_bias)
 
-        def output_embedding(current_output):
-            return tf.add(tf.matmul(current_output, tf.transpose(self.output_embedding_mat)),
-                            self.output_embedding_bias)
+                # Compute logits
 
-        # Compute logits
+                logits = tf.map_fn(output_embedding, output)
+                logits = tf.reshape(logits, [-1, vocab_size])
+                self.probas = tf.nn.softmax(logits, name='p')
+                sampled_word = np.argmax(self.probas)
+                self.input_batch.append(sampled_word)
+                loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=
+                    tf.reshape(self.output_batch, [-1]), logits = logits) \
+                    * tf.cast(tf.reshape(non_zero_weights, [-1]), tf.float32)
+                total_loss.append(loss)
+                if sampled_word == 217: # 217 is the ID for "." in vocab.csv
+                    stop = True
 
-        logits = tf.map_fn(output_embedding, output)
-        logits = tf.reshape(logits, [-1, vocab_size])
-        self.probas = tf.nn.softmax(logits, name='p')
-        tf.print(self.output_batch)
-        sampled_word = np.argmax(self.probas)
-        input_id = [[sampled_word]]
-        tf.print(input_id)
-        loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=
-            tf.reshape(self.output_batch, [-1]), logits = logits) \
-            * tf.cast(tf.reshape(non_zero_weights, [-1]), tf.float32)
-
-
-
-        self.loss = loss
-        self.cost = tf.reduce_sum(loss)
+        self.loss = total_loss
+        self.cost = tf.reduce_mean(loss)
         self.final_state = state
 
         # Train
@@ -169,10 +167,17 @@ class RNNModel(object):
             iters = 0
             for step in range(self.train_epoch):
                 start_time = time.time()
-                cost, current_learning_rate, final_state, _, output = sess.run(
-                    [self.cost, self.learning_rate, self.final_state, self.updates])
+                cost, current_learning_rate, final_state, _, output_batch, probas, input_batch = sess.run(
+                    [self.cost, self.learning_rate, self.final_state, self.updates, self.output_batch, self.probas, self.input_batch])
                 costs += cost
-                tf.print(output)
+                print(input_batch)
+                print(output_batch)
+                #print(probas)
+                #print(sess1.run(self.output_batch))
+                sampled_word = np.argmax(probas)
+                input_id = [[sampled_word]]
+                print(input_id)
+
 
                 iters += self.num_steps
                 if step % (self.train_epoch // 10) == 10:
