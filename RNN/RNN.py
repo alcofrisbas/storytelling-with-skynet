@@ -115,7 +115,7 @@ class RNNModel(object):
                                                 [vocab_size], dtype=tf.float32)
         stop = False
         total_loss = []
-        while (not stop):
+        for i in range(10):
             with tf.variable_scope("RNN"):
                 output, state = tf.nn.dynamic_rnn(cell=cell, inputs=inputs,
                 sequence_length=batch_length, initial_state=state, dtype=tf.float32)
@@ -130,10 +130,12 @@ class RNNModel(object):
                 logits = tf.reshape(logits, [-1, vocab_size])
                 self.probas = tf.nn.softmax(logits, name='p')
                 sampled_word = np.argmax(self.probas)
-                self.input_batch.append(sampled_word)
-                loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=
-                    tf.reshape(self.output_batch, [-1]), logits = logits) \
-                    * tf.cast(tf.reshape(non_zero_weights, [-1]), tf.float32)
+                print(sampled_word)
+                self.input_batch = tf.concat([self.input_batch, [[sampled_word]]], 0)
+                try:
+                    loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels= tf.reshape(self.output_batch, [-1])[i], logits = logits) \* tf.cast(tf.reshape(non_zero_weights, [-1]), tf.float32)
+                except:
+                    loss = tf.nn.spare_softmax_cross_entropy_with_logits(labels = tf.reshape(self.output_batch, [-1])[-1], logits = logits) \* tf.cast(tf.reshape(non_zero_weights, [-1]), tf.float32)
                 total_loss.append(loss)
                 if sampled_word == 217: # 217 is the ID for "." in vocab.csv
                     stop = True
@@ -167,12 +169,9 @@ class RNNModel(object):
             iters = 0
             for step in range(self.train_epoch):
                 start_time = time.time()
-                cost, current_learning_rate, final_state, _, output_batch, probas, input_batch = sess.run(
-                    [self.cost, self.learning_rate, self.final_state, self.updates, self.output_batch, self.probas, self.input_batch])
+                cost, current_learning_rate, final_state, _, probas = sess.run(
+                    [self.cost, self.learning_rate, self.final_state, self.updates,self.probas])
                 costs += cost
-                print(input_batch)
-                print(output_batch)
-                #print(probas)
                 #print(sess1.run(self.output_batch))
                 sampled_word = np.argmax(probas)
                 input_id = [[sampled_word]]
