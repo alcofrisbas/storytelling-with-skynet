@@ -132,10 +132,9 @@ class RNNModel(object):
                 sampled_word = np.argmax(self.probas)
                 print(sampled_word)
                 self.input_batch = tf.concat([self.input_batch, [[sampled_word]]], 0)
-                try:
-                    loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels= tf.reshape(self.output_batch, [-1])[i], logits = logits) \* tf.cast(tf.reshape(non_zero_weights, [-1]), tf.float32)
-                except:
-                    loss = tf.nn.spare_softmax_cross_entropy_with_logits(labels = tf.reshape(self.output_batch, [-1])[-1], logits = logits) \* tf.cast(tf.reshape(non_zero_weights, [-1]), tf.float32)
+                loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=
+                tf.reshape(self.output_batch, [-1]), logits = logits) \
+                * tf.cast(tf.reshape(non_zero_weights, [-1]), tf.float32)
                 total_loss.append(loss)
                 if sampled_word == 217: # 217 is the ID for "." in vocab.csv
                     stop = True
