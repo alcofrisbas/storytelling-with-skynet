@@ -78,7 +78,7 @@ class MediumConfig(object):
     keep_prob = 0.5
     lr_decay = 0.8
     batch_size = 1
-    vocab_size = 10000
+    vocab_size = 10011
 
 
 class LargeConfig(object):
