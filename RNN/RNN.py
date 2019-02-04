@@ -80,8 +80,6 @@ class RNNModel(object):
 
 
         self.input_batch, self.output_batch = iterator.get_next()
-        print(self.input_batch)
-        print(self.output_batch)
 
         # input embedding
         embedding = tf.get_variable(
@@ -125,9 +123,9 @@ class RNNModel(object):
                 #if i > 0: tf.get_variable_scope().reuse_variables()
             output, state = tf.nn.dynamic_rnn(cell=cell, inputs=inputs,
             sequence_length=batch_length, initial_state=state, dtype=tf.float32)
-                #outputs.append(output)
+            outputs.append(output)
                 #self.input_batch = tf.concat([self.input_batch, [[sampled_word]]], 0)
-        #output = tf.reshape(tf.concat(outputs, 1), [-1, -1, config.hidden_size])
+        output = tf.reshape(outputs, [-1, config.hidden_size])
         softmax_w = tf.get_variable(
         "softmax_w", [size, vocab_size], dtype=tf.float32)
         softmax_b = tf.get_variable(
@@ -137,8 +135,10 @@ class RNNModel(object):
             return tf.add(tf.matmul(current_output, tf.transpose(self.output_embedding_mat)),
             self.output_embedding_bias)
 
+
         # Compute logits
-        logits = tf.map_fn(output_embedding, output)
+        logits = tf.nn.xw_plus_b(output, softmax_w, softmax_b)
+        #logits = tf.map_fn(output_embedding, output)
         logits = tf.reshape(logits, [-1, vocab_size])
         self.probas = tf.nn.softmax(logits, name='p')
         """
