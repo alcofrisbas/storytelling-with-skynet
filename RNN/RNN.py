@@ -78,29 +78,34 @@ class RNNModel(object):
         self.validation_init_op = iterator.make_initializer(validation_dataset)
         self.test_init_op = iterator.make_initializer(test_dataset)
 
-
+        # self.input_batch & self.output_batch may be tensors of shape [batch_size, sequence_length]
+        # sequence_length refers to length of sentence + padding
         self.input_batch, self.output_batch = iterator.get_next()
 
         # input embedding
+        # embedding creates a feature for every word, this makes it possible to relate similar words
         embedding = tf.get_variable(
             "embedding", [self.vocab_size, size], dtype=tf.float32)
+
+        # inputs = [?, ?, size]
         inputs = tf.nn.embedding_lookup(embedding, self.input_batch)
 
         non_zero_weights = tf.sign(self.input_batch)
+
         self.valid_words = tf.reduce_sum(non_zero_weights)
 
         def make_cell():
-            cell = tf.contrib.rnn.LSTMBlockCell(size, forget_bias=0.0)
+            cell = tf.contrib.rnn.LSTMCell(size, state_is_tuple=True)
             if config.keep_prob < 1:
-                cell = tf.contrib.rnn.DropoutWrapper( cell, output_keep_prob=config.keep_prob)
+                cell = tf.contrib.rnn.DropoutWrapper(cll, output_keep_prob=config.keep_prob)
             return cell
 
 
         cell = tf.contrib.rnn.MultiRNNCell([make_cell() for _ in range(config.num_layers)], state_is_tuple=True)
         self.initial_state = cell.zero_state(self.batch_size, tf.float32)
         state = self.initial_state
-        # output embedding
 
+        # output embedding to decode input embedding
         self.output_embedding_mat = tf.get_variable("output_embedding_mat",
                                                 [vocab_size,size], dtype=tf.float32)
 
@@ -115,32 +120,33 @@ class RNNModel(object):
             real_length = tf.cast(real_length, tf.int32)
             return real_length
 
-
         batch_length = get_length(non_zero_weights)
 
+        # output = [batch_size, max_time_nodes, output_vector_size]
         with tf.variable_scope("RNN"):
             #for i in range(self.num_steps):
                 #if i > 0: tf.get_variable_scope().reuse_variables()
             output, state = tf.nn.dynamic_rnn(cell=cell, inputs=inputs,
-            sequence_length=batch_length, initial_state=state, dtype=tf.float32)
-            outputs.append(output)
-                #self.input_batch = tf.concat([self.input_batch, [[sampled_word]]], 0)
-        output = tf.reshape(outputs, [-1, config.hidden_size])
-        softmax_w = tf.get_variable(
-        "softmax_w", [size, vocab_size], dtype=tf.float32)
-        softmax_b = tf.get_variable(
-        "softmax_b", [vocab_size], dtype=tf.float32)
+            sequence_length=batch_length, dtype=tf.float32)
+                #outputs.append(output)
+                #self.input_batch = tf.concat([self.input_batch, [self.output_batch[1]]], 1)
+                #inputs = tf.nn.embedding_lookup(embedding, self.input_batch)
+
+    #    output = tf.reshape(outputs, [-1, config.hidden_size])
 
         def output_embedding(current_output):
             return tf.add(tf.matmul(current_output, tf.transpose(self.output_embedding_mat)),
             self.output_embedding_bias)
 
-
+        #logits = []
         # Compute logits
-        logits = tf.nn.xw_plus_b(output, softmax_w, softmax_b)
-        #logits = tf.map_fn(output_embedding, output)
+        #for output in outputs:
+        #    logits.append(tf.nn.xw_plus_b(tf.reshape(output, [-1, config.hidden_size]), softmax_w, softmax_b))
+        logits = tf.map_fn(output_embedding, output)
         logits = tf.reshape(logits, [-1, vocab_size])
+        print(logits)
         self.probas = tf.nn.softmax(logits, name='p')
+        #self.output_batch = tf.reshape(self.output_batch, (1, 20))
         """
         loss = tf.contrib.seq2seq.sequence_loss(logits, self.output_batch,
         tf.ones([self.batch_size, self.num_steps], dtype = tf.float32),
@@ -148,12 +154,11 @@ class RNNModel(object):
         average_across_batch= False)
         """
         loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=
-        tf.reshape(self.output_batch, [-1]), logits = logits) \
-        * tf.cast(tf.reshape(non_zero_weights, [-1]), tf.float32)
+        tf.reshape(self.output_batch, [-1]), logits = logits) * tf.cast(tf.reshape(non_zero_weights, [-1]), tf.float32)
 
 
         self.loss = loss
-        self.cost = tf.reduce_mean(loss)
+        self.cost = tf.reduce_sum(loss)
         self.final_state = state
 
         # Train
