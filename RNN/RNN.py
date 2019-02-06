@@ -122,7 +122,7 @@ class RNNModel(object):
             #for i in range(self.num_steps):
                 #if i > 0: tf.get_variable_scope().reuse_variables()
             output, state = tf.nn.dynamic_rnn(cell=cell, inputs=inputs,
-            sequence_length=batch_length, dtype=tf.float32)
+            sequence_length=batch_length, initial_state= state, dtype=tf.float32)
                 #outputs.append(output)
                 #self.input_batch = tf.concat([self.input_batch, [self.output_batch[1]]], 1)
                 #inputs = tf.nn.embedding_lookup(embedding, self.input_batch)
