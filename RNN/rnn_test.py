@@ -29,7 +29,7 @@ class SmallConfig(object):
 def generate_text(sess, model, word_to_index, index_to_word,
     seed='.', n_sentences= 20):
     # temporarily choosing templates randomly, in future should be smarter
-    template = grammarUtils.pick_structure()
+    #template = grammarUtils.pick_structure()
     sentence_cnt = 0
     input_seeds_id = []
     seed = seed.lower()
@@ -45,9 +45,7 @@ def generate_text(sess, model, word_to_index, index_to_word,
     # Generate a new sample from previous, starting at last word seed
     input_id = [[input_seeds_id[-1]]]
     first_word = True
-    print(template)
-    for POS in template:
-        print(POS)
+    for i in range(20):
         feed_dict = {model.input_batch: input_id}
         probas= sess.run([model.probas],
                                 feed_dict=feed_dict)
