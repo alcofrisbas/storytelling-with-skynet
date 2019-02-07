@@ -84,10 +84,11 @@ class RNNModel(object):
 
         # input embedding
         # embedding creates a feature for every word, this makes it possible to relate similar words
-        embedding = tf.Variable(tf.random_normal([self.vocab_size, size], stddev=0.1), dtype=tf.float32)
+        self.input_embedding =  tf.get_variable("input_embedding_mat",
+            [self.vocab_size, size], dtype=tf.float32)
 
         # inputs = [?, ?, size]
-        inputs = tf.nn.embedding_lookup(embedding, self.input_batch)
+        inputs = tf.nn.embedding_lookup(self.input_embedding, self.input_batch)
 
         non_zero_weights = tf.sign(self.input_batch)
 
@@ -129,8 +130,7 @@ class RNNModel(object):
                                                 [vocab_size], dtype=tf.float32)
 
         def output_embedding(current_output):
-            print(tf.matmul(current_output, tf.transpose(self.output_embedding_mat)))
-            return tf.add(tf.matmul(current_output, tf.transpose(self.output_embedding_mat)),
+            return tf.add(tf.matmul(current_output, tf.transpose(self.input_embedding)),
             self.output_embedding_bias)
 
         #logits = []
