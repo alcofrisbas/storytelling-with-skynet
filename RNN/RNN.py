@@ -162,7 +162,7 @@ class RNNModel(object):
         params = tf.trainable_variables()
 
         #optimizer = tf.train.GradientDescentOptimizer(self._lr)
-        opt= tf.train.AdamOptimizer(learning_rate=0.001, beta1=0.9, beta2=0.999, epsilon=10e-4)
+        opt= tf.train.AdamOptimizer(self.learning_rate)
         gradients = tf.gradients(self.cost, params)
         clipped_gradients, _ = tf.clip_by_global_norm(gradients, self.max_gradient_norm)
         self.updates = opt.apply_gradients(zip(clipped_gradients, params),
