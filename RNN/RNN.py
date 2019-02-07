@@ -122,11 +122,9 @@ class RNNModel(object):
             sequence_length=batch_length, initial_state= state, dtype=tf.float32)
 
         # output embedding to decode input embedding
-        self.output_embedding_mat = tf.get_variable("output_embedding_mat",
-                                                [vocab_size,size], dtype=tf.float32)
+        self.output_embedding_mat = tf.Variable(tf.random_normal([vocab_size,size], stddev=0.1))
 
-        self.output_embedding_bias = tf.get_variable("output_embedding_bias",
-                                                [vocab_size], dtype=tf.float32)
+        self.output_embedding_bias = tf.Variable(tf.random_normal([vocab_size], stddev=0.1))
 
         def output_embedding(current_output):
             print(tf.matmul(current_output, tf.transpose(self.output_embedding_mat)))
