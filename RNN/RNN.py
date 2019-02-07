@@ -84,8 +84,7 @@ class RNNModel(object):
 
         # input embedding
         # embedding creates a feature for every word, this makes it possible to relate similar words
-        embedding = tf.get_variable(
-            "embedding", [self.vocab_size, size], dtype=tf.float32)
+        embedding = tf.Variable(tf.random_normal([self.vocab_size, size], stddev=0.1), dtype=tf.float32)
 
         # inputs = [?, ?, size]
         inputs = tf.nn.embedding_lookup(embedding, self.input_batch)
@@ -119,15 +118,8 @@ class RNNModel(object):
 
         # output = [batch_size, max_time_nodes, output_vector_size]
         with tf.variable_scope("RNN"):
-            #for i in range(self.num_steps):
-                #if i > 0: tf.get_variable_scope().reuse_variables()
             output, state = tf.nn.dynamic_rnn(cell=cell, inputs=inputs,
             sequence_length=batch_length, initial_state= state, dtype=tf.float32)
-                #outputs.append(output)
-                #self.input_batch = tf.concat([self.input_batch, [self.output_batch[1]]], 1)
-                #inputs = tf.nn.embedding_lookup(embedding, self.input_batch)
-
-    #    output = tf.reshape(outputs, [-1, config.hidden_size])
 
         # output embedding to decode input embedding
         self.output_embedding_mat = tf.get_variable("output_embedding_mat",
@@ -159,7 +151,7 @@ class RNNModel(object):
         """
         #logits = tf.reshape(logits, [0, self.vocab_size])
         loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=
-        tf.slice(self.output_batch[0], [0], [self.batch_size]), logits = tf.slice(logits, [0, 0], [1, 10011])) * tf.cast(tf.reshape(non_zero_weights, [-1]), tf.float32)
+        tf.reshape(self.output_batch, [-1]), logits = logits) * tf.cast(tf.reshape(non_zero_weights, [-1]), tf.float32)
 
         self.loss = loss
         self.cost = tf.reduce_sum(loss)
