@@ -85,7 +85,7 @@ class RNNModel(object):
         # input embedding
         # embedding creates a feature for every word, this makes it possible to relate similar words
         self.input_embedding =  tf.get_variable("input_embedding_mat",
-            [self.vocab_size, size, dtype=tf.float32)
+                                [self.vocab_size, size, dtype=tf.float32)
 
         # inputs = [?, ?, size]
         inputs = tf.nn.embedding_lookup(self.input_embedding, self.input_batch)
