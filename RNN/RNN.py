@@ -84,11 +84,11 @@ class RNNModel(object):
 
         # input embedding
         # embedding creates a feature for every word, this makes it possible to relate similar words
-        self.input_embedding =  tf.get_variable("input_embedding_mat",
-                                [self.vocab_size, size], dtype=tf.float32)
+        embedding = tf.get_variable(
+            "embedding", [self.vocab_size, size], dtype=tf.float32)
 
         # inputs = [?, ?, size]
-        inputs = tf.nn.embedding_lookup(self.input_embedding, self.input_batch)
+        inputs = tf.nn.embedding_lookup(embedding, self.input_batch)
 
         non_zero_weights = tf.sign(self.input_batch)
 
@@ -97,7 +97,7 @@ class RNNModel(object):
         def make_cell():
             cell = tf.contrib.rnn.LSTMCell(size, state_is_tuple=True)
             if config.keep_prob < 1:
-                cell = tf.contrib.rnn.DropoutWrapper(cell, output_keep_prob=config.keep_prob)
+                cell = tf.contrib.rnn.DropoutWrapper(cll, output_keep_prob=config.keep_prob)
             return cell
 
 
@@ -130,6 +130,7 @@ class RNNModel(object):
                                                 [vocab_size], dtype=tf.float32)
 
         def output_embedding(current_output):
+            print(tf.matmul(current_output, tf.transpose(self.output_embedding_mat)))
             return tf.add(tf.matmul(current_output, tf.transpose(self.output_embedding_mat)),
             self.output_embedding_bias)
 
@@ -162,7 +163,7 @@ class RNNModel(object):
         params = tf.trainable_variables()
 
         #optimizer = tf.train.GradientDescentOptimizer(self._lr)
-        opt= tf.train.AdamOptimizer(self.learning_rate)
+        opt= tf.train.AdamOptimizer(learning_rate=0.001, beta1=0.9, beta2=0.999, epsilon=10e-4)
         gradients = tf.gradients(self.cost, params)
         clipped_gradients, _ = tf.clip_by_global_norm(gradients, self.max_gradient_norm)
         self.updates = opt.apply_gradients(zip(clipped_gradients, params),
