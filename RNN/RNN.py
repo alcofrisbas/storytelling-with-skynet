@@ -97,7 +97,7 @@ class RNNModel(object):
         def make_cell():
             cell = tf.contrib.rnn.LSTMCell(size, state_is_tuple=True)
             if config.keep_prob < 1:
-                cell = tf.contrib.rnn.DropoutWrapper(cll, output_keep_prob=config.keep_prob)
+                cell = tf.contrib.rnn.DropoutWrapper(cell, output_keep_prob=config.keep_prob)
             return cell
 
 
