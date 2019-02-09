@@ -29,7 +29,7 @@ logging = tf.logging
 
 
 flags.DEFINE_string(
-    "model", "small",
+    "model", "medium",
     "A type of model. Possible options are: small, medium, large.")
 
 flags.DEFINE_string("save_path",".RNN/models" ,
