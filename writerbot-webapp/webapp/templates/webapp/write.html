@@ -45,10 +45,11 @@
             <p>Start writing here: </p>
         {% endif %}
 
-        <p id = "para" style="padding:1px" contenteditable="{{ contentEdit }}">
+        <!-- <p id = "para" style="padding:1px" contenteditable="{{ contentEdit }}"> -->
+        <p contenteditable="{{ contentEdit }}">
         {% for sentence in sentences %}
             {% if not loop.last %}
-                {{ sentence }}
+                {{ sentence }}<br>
             {% endif %}
         {% endfor %}
         {{ last }}<br>
@@ -84,17 +85,7 @@
                     Please <a href="{% url 'social:begin' 'google-oauth2' %}">login with Google</a> to save your story.
                 {% endif %}
               </div>
-              <!-- <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary final" data-dismiss="modal">Cancel</button>
-                  {% if request.user.username %}
-                  <form method="post" style="padding:1px">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-primary final" name="save" value="true">Save</button>
-                  </form>
-                  {% endif %}
-              </div> -->
             </div>
           </div>
         </div>
-    </div>
 {% endblock %}

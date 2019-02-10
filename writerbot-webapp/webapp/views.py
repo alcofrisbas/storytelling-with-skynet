@@ -63,7 +63,7 @@ def loadStory(request, id):
         request.session["prompt"] = ""
         return redirect('/write')
     else:
-        return render(request, 'webapp/error.html', context={'message': "Story not found."})
+        return render(request, 'webapp/error.html', context= {'message': "Story not found."})
 
 
 def deleteStory(request, id):
@@ -105,11 +105,9 @@ def write(request):
     if request.POST:
         print("======== ===== ===== ====")
         print(request.POST.keys())
-        if request.POST.get("update"):
-            print("UPDATE WOOOOOOOOOTTTTTT")
         if request.POST.get("text"):
             newSentence = request.POST["text"]
-            story.sentences += newSentence.strip()+ "\r"
+            story.sentences += newSentence.strip()+ "\n"
             story.save()
 
             if not editing:
@@ -133,7 +131,6 @@ def write(request):
                 return render(request, 'webapp/error.html', context={'message': "Please log in before trying to save a story."})
         # same functionality as "Start a new story button"
         if request.POST.get("side-new"):
-            print("new story Pressed")
             return redirect('/new_story')
 
         if request.POST.get("side-save"):
