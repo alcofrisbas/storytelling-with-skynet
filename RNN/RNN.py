@@ -21,7 +21,11 @@ flags.DEFINE_string("vocab_file", "./RNN/data/vocab.csv",
     "File containing the vocabulary")
 FLAGS = flags.FLAGS
 
-
+def pad_up_to(tensor, max_in_dims):
+    s = tf.shape(tensor)
+    paddings = [[0, m-s[i]] for (i,m) in enumerate(max_in_dims)]
+    print(paddings)
+    return tf.pad(tensor, paddings, "CONSTANT")
 
 class RNNModel(object):
     """model"""
@@ -57,13 +61,13 @@ class RNNModel(object):
         def parse(line):
             line_split = tf.string_split([line])
             input_seq = tf.string_to_number(line_split.values[:-1], out_type=tf.int32)
-            output_seq = tf.string_to_number(line_split.values[1:], out_type=tf.int32)
+            output_seq = [tf.string_to_number(line_split.values[-1], out_type=tf.int32)]
             return input_seq, output_seq
 
-        training_dataset = tf.data.TextLineDataset(self.file_name_train).map(parse).padded_batch(config.batch_size, padded_shapes=([None],[None]))
+        training_dataset = tf.data.TextLineDataset(self.file_name_train).map(parse).padded_batch(config.batch_size, padded_shapes=([None], [None]))
         # gets next batch so that wen can combine the two datasets into one
 
-        validation_dataset = tf.data.TextLineDataset(self.file_name_validation).map(parse).padded_batch(config.batch_size, padded_shapes=([None],[None]))
+        validation_dataset = tf.data.TextLineDataset(self.file_name_validation).map(parse).padded_batch(config.batch_size, padded_shapes=([None], [None]))
 
         test_dataset = tf.data.TextLineDataset(self.file_name_test).map(parse).batch(1)
 
@@ -81,11 +85,15 @@ class RNNModel(object):
 
         # input embedding
         # embedding creates a feature for every word, this makes it possible to relate similar words
-        embedding = tf.Variable(
-            tf.random_uniform([self.vocab_size, size], -1.0, 1.0))
+        self.embedding = tf.get_variable("input_embedding_mat",
+                [self.vocab_size, size],
+                dtype=tf.float32)
 
         # inputs = [?, ?, size]
-        self.inputs = tf.nn.embedding_lookup(embedding, self.input_batch)
+        self.inputs = pad_up_to(self.input_batch, [1,20])#tf.nn.embedding_lookup(self.embedding, self.input_batch)
+        self.inputs = tf.reshape(self.inputs, [1, 1, 20])
+        self.inputs = tf.cast(self.inputs, tf.float32)
+        print(self.inputs)
 
         non_zero_weights = tf.sign(self.input_batch)
 
@@ -104,7 +112,6 @@ class RNNModel(object):
 
 
         stop = False
-        outputs = []
 
         # Comput sequence length
         def get_length(non_zero_place):
@@ -118,23 +125,29 @@ class RNNModel(object):
         with tf.variable_scope("RNN"):
             output, state = tf.nn.dynamic_rnn(cell=cell, inputs=self.inputs,
             sequence_length=batch_length, initial_state= state, dtype=tf.float32)
-        output = tf.reshape(output, [-1, size])
+        #output = tf.reshape(output, [-1, size])
         # output embedding to decode input embedding
-        self.output_embedding_mat = tf.Variable(
-            tf.random_uniform([size, self.vocab_size], -1.0, 1.0))
+        print(output)
+        self.output_embedding_mat = tf.get_variable("output_embedding_mat",
+            [self.vocab_size, size],
+            dtype=tf.float32)
 
-        self.output_embedding_bias =tf.Variable(
-            tf.random_uniform([self.vocab_size], -1.0, 1.0))
+        self.output_embedding_bias =tf.get_variable("output_embedding_bias",
+                [self.vocab_size],
+                dtype=tf.float32)
 
         def output_embedding(current_output):
             return tf.add(tf.matmul(current_output, tf.transpose(self.output_embedding_mat)),
             self.output_embedding_bias)
-
+        output = tf.reshape(output,[1, size])
         #logits = []
         # Compute logits
         #for output in outputs:
-        logits = tf.add(tf.matmul(output, self.output_embedding_mat),
-                        self.output_embedding_bias)
+        softmax_w = tf.get_variable(
+            "softmax_w", [size, vocab_size], dtype=tf.float32)
+        softmax_b = tf.get_variable("softmax_b", [vocab_size], dtype=tf.float32)
+        logits = tf.nn.xw_plus_b(output, softmax_w, softmax_b)
+        #logits = tf.map_fn(output_embedding, output)
         self.logits = logits
         logits = tf.reshape(logits, [-1, vocab_size])
         self.probas = tf.nn.softmax(logits, name='p')
@@ -178,14 +191,9 @@ class RNNModel(object):
             iters = 0
             for step in range(self.train_epoch):
                 start_time = time.time()
-                cost, current_learning_rate, final_state, _ , probas, inputs, logits = sess.run(
-                    [self.cost, self.learning_rate, self.final_state, self.updates, self.probas, self.inputs, self.logits])
+                cost, current_learning_rate, final_state, _= sess.run(
+                    [self.cost, self.learning_rate, self.final_state, self.updates])
                 costs += cost
-
-                out = np.argmax(probas)
-                print(out)
-                print(inputs)
-                print(logits)
 
                 iters += self.num_steps
                 if step % (self.train_epoch // 1) == 10:
