@@ -12,9 +12,6 @@
             <h1 class="display-4">Welcome back, {{ user.first_name }}!</h1>
             <p class="lead">Continue your creative journey with WriterBot.</p>
             <hr class="my-4">
-            <a class="btn btn-primary btn-lg" href="/write" role="button">Current Story</a>
-            <a class="btn btn-primary btn-lg" href="/new_story" role="button">Start a New Story</a>
-            <hr class="my-4">
             {% if stories %}
                 <p>Your current stories:</p>
                 {% for story in stories %}
@@ -32,6 +29,8 @@
                     </div>
                 {% endfor %}
             {% endif %}
+            <hr class="my-4">
+            <a class="btn btn-primary btn-lg" href="/new_story" role="button">Start a New Story</a>
         {% endif %}
 
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" caller-id="" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">

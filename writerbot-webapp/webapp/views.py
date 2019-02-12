@@ -178,10 +178,7 @@ def error(request, message):
 
 
 def saves(request):
-    # need to implement the title and author thing....
-    # author needs users/auth
     stories = Story.objects.all()
-    #stories = [s.sentences for s in stories]
     return render(request, 'webapp/saves.html', context={'stories': stories})
 
 
