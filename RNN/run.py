@@ -55,14 +55,14 @@ class SmallConfig(object):
     learning_rate = 1.0
     max_grad_norm = 5
     num_layers = 2
-    num_steps = 20
+    num_steps = 1
     hidden_size = 200
     max_epoch = 4
-    max_max_epoch = 20
+    max_max_epoch = 5
     keep_prob = 1.0
     lr_decay = 0.5
     batch_size = 1
-    vocab_size = 10011
+    vocab_size = 59
 
 
 class MediumConfig(object):
@@ -114,7 +114,7 @@ def get_config():
 
 print("---beginning training process---\n")
 # generate vocabulary and ids for all data
-if not os.path.isfile("RNN/data/vocab.csv"):
+if not os.path.isfile("RNN/data/vocab.txt"):
     reader.gen_vocab(FLAGS.train_file)
 if not os.path.isfile(FLAGS.train_file + ".ids"):
     reader.gen_id_seqs(FLAGS.train_file)

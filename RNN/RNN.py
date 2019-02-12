@@ -2,11 +2,8 @@
 A Recurrent Neural Network (LSTM) implementation example using TensorFlow..
 Next word prediction after n_input words learned from text file.
 A story is automatically generated if the predicted word is fed back as input.
-
 Author: Rowel Atienza
 Project: https://github.com/roatienza/Deep-Learning-Experiments
-
-
 '''
 
 from __future__ import print_function
@@ -84,8 +81,8 @@ class RNNModel(object):
 
         # input embedding
         # embedding creates a feature for every word, this makes it possible to relate similar words
-        embedding = tf.get_variable(
-            "embedding", [self.vocab_size, size], dtype=tf.float32)
+        embedding = tf.Variable(
+            tf.random_uniform([self.vocab_size, size], -1.0, 1.0))
 
         # inputs = [?, ?, size]
         inputs = tf.nn.embedding_lookup(embedding, self.input_batch)
@@ -121,27 +118,22 @@ class RNNModel(object):
         with tf.variable_scope("RNN"):
             output, state = tf.nn.dynamic_rnn(cell=cell, inputs=inputs,
             sequence_length=batch_length, initial_state= state, dtype=tf.float32)
-
+        output = tf.reshape(output, [-1, size])
         # output embedding to decode input embedding
-        self.output_embedding_mat = tf.get_variable("output_embedding_mat",
-                                                [vocab_size,size], dtype=tf.float32)
+        self.output_embedding_mat = tf.Variable(tf.random_normal([size, self.vocab_size]))
 
-        self.output_embedding_bias = tf.get_variable("output_embedding_bias",
-                                                [vocab_size], dtype=tf.float32)
+        self.output_embedding_bias = tf.Variable(tf.random_normal([self.vocab_size]))
 
         def output_embedding(current_output):
-            print(tf.matmul(current_output, tf.transpose(self.output_embedding_mat)))
             return tf.add(tf.matmul(current_output, tf.transpose(self.output_embedding_mat)),
             self.output_embedding_bias)
 
         #logits = []
         # Compute logits
         #for output in outputs:
-        #    logits.append(tf.nn.xw_plus_b(tf.reshape(output, [-1, config.hidden_size]), softmax_w, softmax_b))
-        logits = tf.map_fn(output_embedding, output)
-        print(logits)
+        logits = tf.add(tf.matmul(output, self.output_embedding_mat),
+                        self.output_embedding_bias)
         logits = tf.reshape(logits, [-1, vocab_size])
-        print(logits)
         self.probas = tf.nn.softmax(logits, name='p')
         #self.output_batch = tf.reshape(self.output_batch, (1, 20))
         """

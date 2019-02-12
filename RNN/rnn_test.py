@@ -39,44 +39,50 @@ def generate_text(sess, model, word_to_index, index_to_word,
             input_seeds_id.append(word_to_index[w])
         except:   # if word is not in vocabulary, processed as _UNK_
             input_seeds_id.append(word_to_index["_UNK_"])
-        print(input_seeds_id)
     state = sess.run(model.initial_state)
     text = ''
     # Generate a new sample from previous, starting at last word seed
-    input_id = [[input_seeds_id[-1]]]
+    #input_id = [[input_seeds_id[-1]]]
+    input_id =np.array([[[1, 2, 3, 4, 5, 6]]])
+    for input in input_id[0][0]:
+        text += index_to_word[input] + ' '
+    input_id = np.reshape(input_id, (1,1,6))
+    print(input_id.shape)
     first_word = True
-    for i in range(20):
-        feed_dict = {model.input_batch: input_id}
-        probas= sess.run([model.probas],
-                                feed_dict=feed_dict)
-        # Want to find the highest probability target with type POS
-        print(probas)
-        sampled_word = np.argmax(probas)
-        input_id = [[sampled_word]]
-        text += ' ' + index_to_word[sampled_word]
+    #for i in range(20):
+    feed_dict = {model.inputs: input_id}
+    print(feed_dict)
+    probas= sess.run([model.probas],
+                            feed_dict={model.inputs: input_id})
+    # Want to find the highest probability target with type POS
+    print(probas)
+    sampled_word = np.argmax(probas)
+    input_id = [[sampled_word]]
 
-        """
-        test_probas = probas[0][0]
-        test_probas.sort()
-        length = len(test_probas)-1
-        best_choice = None
-        best_choice_idx = None
-        for i in range(len(test_probas)):
-            word = test_probas[length-i]
-            word_idx = np.where(probas==word)[-1][0]
-            word = index_to_word[word_idx]
-            tag = nltk.pos_tag([word])[0][-1]
-            if tag == POS:
-                best_choice = word
-                best_choice_idx = word_idx
-                break
-        if first_word:
-            text += best_choice.capitalize()
-            first_word = False
-        else:
-            text += ' ' + best_choice
-        input_wordid = [[best_choice_idx]]
-        """
+    text += ' ' + index_to_word[sampled_word]
+
+    """
+    test_probas = probas[0][0]
+    test_probas.sort()
+    length = len(test_probas)-1
+    best_choice = None
+    best_choice_idx = None
+    for i in range(len(test_probas)):
+        word = test_probas[length-i]
+        word_idx = np.where(probas==word)[-1][0]
+        word = index_to_word[word_idx]
+        tag = nltk.pos_tag([word])[0][-1]
+        if tag == POS:
+            best_choice = word
+            best_choice_idx = word_idx
+            break
+    if first_word:
+        text += best_choice.capitalize()
+        first_word = False
+    else:
+        text += ' ' + best_choice
+    input_wordid = [[best_choice_idx]]
+    """
     print(text)
     return text
 
