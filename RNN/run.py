@@ -34,11 +34,11 @@ flags.DEFINE_string(
 
 flags.DEFINE_string("save_path",".RNN/models" ,
                     "Model output directory.")
-flags.DEFINE_string("train_file", "RNN/data/test_train.txt",
+flags.DEFINE_string("train_file", "RNN/data/train.txt",
                     "The file containing the training data")
-flags.DEFINE_string("valid_file", "RNN/data/test_valid.txt",
+flags.DEFINE_string("valid_file", "RNN/data/valid.txt",
                     "The file containing the validation data")
-flags.DEFINE_string("test_file", "RNN/data/test_test.txt",
+flags.DEFINE_string("test_file", "RNN/data/test.txt",
                     "The file containing the testing data")
 FLAGS = flags.FLAGS
 
@@ -62,7 +62,7 @@ class SmallConfig(object):
     keep_prob = 1.0
     lr_decay = 0.5
     batch_size = 1
-    vocab_size = 25
+    vocab_size = 10000
 
 
 class MediumConfig(object):
