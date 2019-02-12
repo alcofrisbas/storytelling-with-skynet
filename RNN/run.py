@@ -34,11 +34,11 @@ flags.DEFINE_string(
 
 flags.DEFINE_string("save_path",".RNN/models" ,
                     "Model output directory.")
-flags.DEFINE_string("train_file", "RNN/train.txt",
+flags.DEFINE_string("train_file", "RNN/data/test_train.txt",
                     "The file containing the training data")
-flags.DEFINE_string("valid_file", "RNN/valid.txt",
+flags.DEFINE_string("valid_file", "RNN/data/test_valid.txt",
                     "The file containing the validation data")
-flags.DEFINE_string("test_file", "RNN/test.txt",
+flags.DEFINE_string("test_file", "RNN/data/test_test.txt",
                     "The file containing the testing data")
 FLAGS = flags.FLAGS
 
@@ -114,15 +114,15 @@ def get_config():
 
 print("---beginning training process---\n")
 # generate vocabulary and ids for all data
-if not os.path.isfile("RNN/data/vocab.txt"):
+if not os.path.isfile("RNN/data/vocab.csv"):
     reader.gen_vocab(FLAGS.train_file)
 if not os.path.isfile(FLAGS.train_file + ".ids"):
     reader.gen_id_seqs(FLAGS.train_file)
     reader.gen_id_seqs(FLAGS.valid_file)
 print("---making training and validation sampels---\n")
-with open("RNN/data/train.txt.ids") as fp:
+with open(FLAGS.train_file + ".ids") as fp:
     num_train_samples = len(fp.readlines())
-with open("RNN/data/valid.txt.ids") as fp:
+with open(FLAGS.valid_file + ".ids") as fp:
     num_valid_samples = len(fp.readlines())
 print("---Training and validations samples created---\n")
 with open("RNN/data/vocab.csv") as vocab:
@@ -152,7 +152,7 @@ with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
     model = create_model(sess)
     saver = tf.train.Saver()
     saver.restore(sess, "RNN/models/best_model.ckpt")
-    predict_id_file = os.path.join("data/" + FLAGS.test_file + ".ids")
+    predict_id_file = os.path.join(FLAGS.test_file + ".ids")
     if not os.path.isfile(predict_id_file):
         reader.gen_id_seqs(test_file)
     model.predict(sess,predict_id_file, predict_id_file, verbose=VERBOSE)

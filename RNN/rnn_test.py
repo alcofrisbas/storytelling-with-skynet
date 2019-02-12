@@ -49,11 +49,10 @@ def generate_text(sess, model, word_to_index, index_to_word,
     input_id = np.reshape(input_id, (1,1,6))
     print(input_id.shape)
     first_word = True
-    #for i in range(20):
-    feed_dict = {model.inputs: input_id}
+    #for i in range(20)
     print(feed_dict)
     probas= sess.run([model.probas],
-                            feed_dict={model.inputs: input_id})
+                            feed_dict={model.input_batch: input_id})
     # Want to find the highest probability target with type POS
     print(probas)
     sampled_word = np.argmax(probas)

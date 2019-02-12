@@ -51,6 +51,7 @@ class RNNModel(object):
         self.file_name_test = tf.placeholder(tf.string)
 
         self.train_epoch = (self.num_train_samples - 1) // self.num_steps
+
         self.valid_epoch = (self.num_valid_samples - 1) // self.num_steps
 
 
@@ -85,7 +86,7 @@ class RNNModel(object):
             tf.random_uniform([self.vocab_size, size], -1.0, 1.0))
 
         # inputs = [?, ?, size]
-        inputs = tf.nn.embedding_lookup(embedding, self.input_batch)
+        self.inputs = tf.nn.embedding_lookup(embedding, self.input_batch)
 
         non_zero_weights = tf.sign(self.input_batch)
 
@@ -116,13 +117,15 @@ class RNNModel(object):
 
         # output = [batch_size, max_time_nodes, output_vector_size]
         with tf.variable_scope("RNN"):
-            output, state = tf.nn.dynamic_rnn(cell=cell, inputs=inputs,
+            output, state = tf.nn.dynamic_rnn(cell=cell, inputs=self.inputs,
             sequence_length=batch_length, initial_state= state, dtype=tf.float32)
         output = tf.reshape(output, [-1, size])
         # output embedding to decode input embedding
-        self.output_embedding_mat = tf.Variable(tf.random_normal([size, self.vocab_size]))
+        self.output_embedding_mat = tf.Variable(
+            tf.random_uniform([size, self.vocab_size], -1.0, 1.0))
 
-        self.output_embedding_bias = tf.Variable(tf.random_normal([self.vocab_size]))
+        self.output_embedding_bias =tf.Variable(
+            tf.random_uniform([self.vocab_size], -1.0, 1.0))
 
         def output_embedding(current_output):
             return tf.add(tf.matmul(current_output, tf.transpose(self.output_embedding_mat)),
@@ -133,6 +136,7 @@ class RNNModel(object):
         #for output in outputs:
         logits = tf.add(tf.matmul(output, self.output_embedding_mat),
                         self.output_embedding_bias)
+        self.logits = logits
         logits = tf.reshape(logits, [-1, vocab_size])
         self.probas = tf.nn.softmax(logits, name='p')
         #self.output_batch = tf.reshape(self.output_batch, (1, 20))
@@ -169,26 +173,29 @@ class RNNModel(object):
         for i in range(self.max_max_epoch):
             lr_decay = self.lr_decay ** max(i + 1 - self.max_epoch, 0.0)
             self.learning_rate = self.assign_lr(config.learning_rate * lr_decay)
-            sess.run(self.training_init_op, {self.file_name_train: "RNN/data/train.txt.ids"})
+            sess.run(self.training_init_op, {self.file_name_train: "RNN/data/test_train.txt.ids"})
             state = sess.run(self.initial_state)
             costs = 0.0
             iters = 0
             for step in range(self.train_epoch):
                 start_time = time.time()
-                cost, current_learning_rate, final_state, _  = sess.run(
-                    [self.cost, self.learning_rate, self.final_state, self.updates])
+                cost, current_learning_rate, final_state, _ , probas, inputs, logits = sess.run(
+                    [self.cost, self.learning_rate, self.final_state, self.updates, self.probas, self.inputs, self.logits])
                 costs += cost
 
-
+                out = np.argmax(probas)
+                print(out)
+                print(inputs)
+                print(logits)
 
                 iters += self.num_steps
-                if step % (self.train_epoch // 10) == 10:
+                if step % (self.train_epoch // 1) == 10:
                     print("%.3f perplexity: %.3f speed: %.0f wps" %
                         (step * 1.0 /self.train_epoch, np.exp(costs/iters),
                         iters * self.batch_size / (time.time() - start_time)))
 
             print("Epoch: %d Learning rate: %.3f" % (i + 1, sess.run(self.learning_rate)))
-            sess.run(self.validation_init_op, {self.file_name_validation: "RNN/data/valid.txt.ids"})
+            sess.run(self.validation_init_op, {self.file_name_validation:"RNN/data/test_valid.txt.ids"})
             dev_costs = 0.0
             state = sess.run(self.initial_state)
             iters = 0
@@ -199,7 +206,7 @@ class RNNModel(object):
 
                 dev_costs += dev_cost
                 iters += self.num_steps
-                if step % (self.valid_epoch // 10) == 10:
+                if step % (self.valid_epoch // 1) == 10:
                     print("%.3f perplexity: %.3f speed: %.0f wps" %
                         (step % 1.0/self.valid_epoch, np.exp(dev_costs/iters),
                         iters * self.batch_size /(time.time() - start_time)))
