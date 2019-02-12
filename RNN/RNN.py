@@ -86,7 +86,6 @@ class RNNModel(object):
         self.inputs = pad_up_to(self.input_batch, [1,20])
         self.inputs = tf.reshape(self.inputs, [1, 1, 20])
         self.inputs = tf.cast(self.inputs, tf.float32)
-        print(self.inputs)
 
         non_zero_weights = tf.sign(self.input_batch)
 
@@ -118,41 +117,31 @@ class RNNModel(object):
         with tf.variable_scope("RNN"):
             output, state = tf.nn.dynamic_rnn(cell=cell, inputs=self.inputs,
             sequence_length=batch_length, initial_state= state, dtype=tf.float32)
-        #output = tf.reshape(output, [-1, size])
-        # output embedding to decode input embedding
-        self.output_embedding_mat = tf.get_variable("output_embedding_mat",
-            [self.vocab_size, size],
-            dtype=tf.float32)
 
-        self.output_embedding_bias =tf.get_variable("output_embedding_bias",
-                [self.vocab_size],
-                dtype=tf.float32)
-
-        def output_embedding(current_output):
-            return tf.add(tf.matmul(current_output, tf.transpose(self.output_embedding_mat)),
-            self.output_embedding_bias)
         output = tf.reshape(output,[1, size])
-        #logits = []
+
         # Compute logits
-        #for output in outputs:
         softmax_w = tf.get_variable(
             "softmax_w", [size, vocab_size], dtype=tf.float32)
+        print(vocab_size)
+        print(self.vocab_size)
+        print(softmax_w)
         softmax_b = tf.get_variable("softmax_b", [vocab_size], dtype=tf.float32)
+
         logits = tf.nn.xw_plus_b(output, softmax_w, softmax_b)
-        #logits = tf.map_fn(output_embedding, output)
-        self.logits = logits
-        logits = tf.reshape(logits, [-1, vocab_size])
+
+        logits = tf.reshape(logits, [self.batch_size, self.num_steps, self.vocab_size])
         self.probas = tf.nn.softmax(logits, name='p')
-        #self.output_batch = tf.reshape(self.output_batch, (1, 20))
+
         """
-        loss = tf.contrib.seq2seq.sequence_loss(logits, self.output_batch,
-        tf.ones([self.batch_size, self.num_steps], dtype = tf.float32),
-        average_across_timesteps=False,
-        average_across_batch= False)
-        """
-        #logits = tf.reshape(logits, [0, self.vocab_size])
         loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=
-        tf.reshape(self.output_batch, [-1]), logits = logits) * tf.cast(tf.reshape(non_zero_weights, [-1]), tf.float32)
+            tf.reshape(self.output_batch, [1]), logits = logits)# * tf.cast(tf.reshape(non_zero_weights, [-1]), tf.float32)
+        """
+        loss = tf.contrib.seq2seq.sequence_loss(logits=logits,
+            targets = self.output_batch,
+            weights = tf.ones([self.batch_size, self.num_steps], dtype=tf.float32),
+            average_across_timesteps=False,
+            average_across_batch=False)
 
         self.loss = loss
         self.cost = tf.reduce_sum(loss)
@@ -183,9 +172,15 @@ class RNNModel(object):
             iters = 0
             for step in range(self.train_epoch):
                 start_time = time.time()
-                cost, current_learning_rate, final_state, _= sess.run(
-                    [self.cost, self.learning_rate, self.final_state, self.updates])
+                cost, current_learning_rate, final_state, _, probas, loss, cost, input= sess.run(
+                    [self.cost, self.learning_rate, self.final_state, self.updates, self.probas, self.loss, self.cost, self.input_batch])
                 costs += cost
+
+                print("NEW BATCH:")
+                print(input)
+                print(np.argmax(probas))
+                print(loss)
+                print(cost)
 
                 iters += self.num_steps
                 if step % (self.train_epoch // 1) == 10:

@@ -58,7 +58,7 @@ class SmallConfig(object):
     num_steps = 1
     hidden_size = 200
     max_epoch = 4
-    max_max_epoch = 5
+    max_max_epoch = 20
     keep_prob = 1.0
     lr_decay = 0.5
     batch_size = 1

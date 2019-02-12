@@ -32,19 +32,6 @@ import tensorflow as tf
 
 Py3 = sys.version_info[0] == 3
 
-def _read_words(filename):
-    with tf.gfile.GFile(filename, "r") as f:
-        full = []
-        words = []
-        for sent in f.readlines():
-            sent = sent.strip("\n")
-            words += re.split(r'([;|, |.|,|:|?|!|\"])', sent)
-        for line in words:
-            if line not in ['', ' ']:
-                full.append(line)
-
-        return full
-
 def gen_vocab(filename):
     print("reading words\n")
     wordlist = []
