@@ -36,7 +36,6 @@ def getOrCreateUser(request):
 
 
 def newStory(request):
-    #TODO: prompt user if they're sure they want to discard current story
     if request.session.get("story_id") and not request.user.is_authenticated:
         old_story = Story.objects.get(id=request.session.get("story_id"))
         old_story.delete()
@@ -89,9 +88,6 @@ def write(request):
     if "developer" not in request.session.keys():
         request.session["developer"] = False
 
-    if "content-edit" not in request.session.keys():
-        request.session["content-edit"] = False
-
     global sess, model, word_to_id, id_to_word
 
     # I was tired of loading TODO: UNCOMMENT ME
@@ -118,7 +114,6 @@ def write(request):
         if request.POST.get("title"):
             story.title = request.POST["title"]
 
-        # STILL WORKING THIS
         # TODO: make Save button grayed out after saving, revert after edit
         if request.POST.get("save"):
             if request.user.is_authenticated:
@@ -129,20 +124,13 @@ def write(request):
                 s.save()
             else:
                 return render(request, 'webapp/error.html', context={'message': "Please log in before trying to save a story."})
-        # same functionality as "Start a new story button"
-        if request.POST.get("side-new"):
-            return redirect('/new_story')
 
-        if request.POST.get("side-save"):
-            print("save story Pressed")
+        # same functionality as "Start a new story button"
+        if request.POST.get("new"):
+            return redirect('/new_story')
 
         if request.POST.get("side-open"):
             print("open story Pressed")
-        # need to make this update the story with
-        # the current content
-        if request.POST.get("side-edit"):
-            print("edit story Pressed")
-            request.session["content-edit"] = not request.session["content-edit"]
 
         if request.POST.get("side-settings"):
             print("settings story Pressed")
@@ -170,14 +158,11 @@ def write(request):
     if request.session["developer"]:
         power = ""
 
-    print([s.strip() for s in story.sentences.split("\n")[:-1]])
-
     return render(request, 'webapp/write.html',
                   context={"prompt": request.session["prompt"],
                   "sentences": [s.strip() for s in story.sentences.split("\n")[:-1]],
                   "suggestion": suggestion, "last":last,
-                  "title": story.title, "power":power,
-                  "contentEdit":request.session["content-edit"]})
+                  "title": story.title, "power":power})
 
 
 def about(request):

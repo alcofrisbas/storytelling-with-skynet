@@ -20,7 +20,11 @@
                 {% for story in stories %}
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">{{ story.title }}</h5>
+                            {% if story.title %}
+                                <h5 class="card-title">{{ story.title }}</h5>
+                            {% else %}
+                                <h5 class="card-title">Untitled</h5>
+                            {% endif %}
                             <a href="/load_story/{{ story.id }}" class="btn btn-primary">Continue this story</a>
                             <a href="/delete_story/{{ story.id }}" class="confirm-delete" title= "Delete" data-toggle="modal" data-target= "#confirmDeleteModal" id= "deleteButton{{story.id}}">
                                 <i class="fa fa-trash fa-2x" style= "float: right; color: red;"></i> </a>
