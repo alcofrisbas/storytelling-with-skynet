@@ -12,7 +12,6 @@ import os
 import numpy as np
 import tensorflow as tf
 import random
-import collections
 import time
 import reader
 import math
