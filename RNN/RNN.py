@@ -24,7 +24,6 @@ FLAGS = flags.FLAGS
 def pad_up_to(tensor, max_in_dims):
     s = tf.shape(tensor)
     paddings = [[0, m-s[i]] for (i,m) in enumerate(max_in_dims)]
-    print(paddings)
     return tf.pad(tensor, paddings, "CONSTANT")
 
 class RNNModel(object):
@@ -83,14 +82,8 @@ class RNNModel(object):
         # sequence_length refers to length of sentence + padding
         self.input_batch, self.output_batch = iterator.get_next()
 
-        # input embedding
-        # embedding creates a feature for every word, this makes it possible to relate similar words
-        self.embedding = tf.get_variable("input_embedding_mat",
-                [self.vocab_size, size],
-                dtype=tf.float32)
-
-        # inputs = [?, ?, size]
-        self.inputs = pad_up_to(self.input_batch, [1,20])#tf.nn.embedding_lookup(self.embedding, self.input_batch)
+        # inputs = [1, 1, 20]
+        self.inputs = pad_up_to(self.input_batch, [1,20])
         self.inputs = tf.reshape(self.inputs, [1, 1, 20])
         self.inputs = tf.cast(self.inputs, tf.float32)
         print(self.inputs)
@@ -127,7 +120,6 @@ class RNNModel(object):
             sequence_length=batch_length, initial_state= state, dtype=tf.float32)
         #output = tf.reshape(output, [-1, size])
         # output embedding to decode input embedding
-        print(output)
         self.output_embedding_mat = tf.get_variable("output_embedding_mat",
             [self.vocab_size, size],
             dtype=tf.float32)

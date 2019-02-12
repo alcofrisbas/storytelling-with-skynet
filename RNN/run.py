@@ -127,7 +127,7 @@ with open(FLAGS.valid_file + ".ids") as fp:
 print("---Training and validations samples created---\n")
 with open("RNN/data/vocab.csv") as vocab:
     vocab_size = len(vocab.readlines())
-print("vocab created")
+print("---vocab created---")
 
 config = get_config()
 
