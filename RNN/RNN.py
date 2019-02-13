@@ -83,8 +83,8 @@ class RNNModel(object):
         self.input_batch, self.output_batch = iterator.get_next()
 
         # inputs = [1, 1, 20]
-        self.inputs = pad_up_to(self.input_batch, [1,20])
-        self.inputs = tf.reshape(self.inputs, [1, 1, 20])
+        self.inputs = pad_up_to(self.input_batch, [1,30])
+        self.inputs = tf.reshape(self.inputs, [1, 1, 30])
         self.inputs = tf.cast(self.inputs, tf.float32)
 
         non_zero_weights = tf.sign(self.input_batch)
