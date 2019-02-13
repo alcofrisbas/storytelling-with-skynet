@@ -83,8 +83,8 @@ class RNNModel(object):
         self.input_batch, self.output_batch = iterator.get_next()
 
         # inputs = [1, 1, 20]
-        self.inputs = pad_up_to(self.input_batch, [1,30])
-        self.inputs = tf.reshape(self.inputs, [1, 1, 30])
+        self.inputs = pad_up_to(self.input_batch, [1,50])
+        self.inputs = tf.reshape(self.inputs, [1, 1, 50])
         self.inputs = tf.cast(self.inputs, tf.float32)
 
         non_zero_weights = tf.sign(self.input_batch)
@@ -172,12 +172,6 @@ class RNNModel(object):
                 cost, current_learning_rate, final_state, _, probas, loss, cost, input= sess.run(
                     [self.cost, self.learning_rate, self.final_state, self.updates, self.probas, self.loss, self.cost, self.input_batch])
                 costs += cost
-
-                print("NEW BATCH:")
-                print(input)
-                print(np.argmax(probas))
-                print(loss)
-                print(cost)
 
                 iters += self.num_steps
                 if step % (self.train_epoch // 10) == 10:
