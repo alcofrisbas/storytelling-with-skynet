@@ -22,7 +22,7 @@ class SmallConfig(object):
     keep_prob = 1.0
     lr_decay = 0.5
     batch_size = 1
-    vocab_size = 10000
+    vocab_size = 19310
 
 
 
