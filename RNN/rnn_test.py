@@ -7,6 +7,7 @@ import csv
 import random
 import nltk
 import grammarUtils
+from nltk.tokenize import word_tokenize
 
 
 class SmallConfig(object):
