@@ -50,8 +50,6 @@ def generate_text(sess, model, word_to_index, index_to_word,
                                 feed_dict={model.input_batch: [input_seeds_id]})
         # Want to find the highest probability target with type POS
         sampled_word = np.argmax(probas)
-        output_id = [[sampled_word]]
-        print(output_id)
         if first_word:
             text += index_to_word[sampled_word].capitalize()
         else:
