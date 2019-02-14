@@ -44,21 +44,19 @@ def generate_text(sess, model, word_to_index, index_to_word,
     text = ''
     # Generate a new sample from previous, starting at last word seed
     #input_id = [[input_seeds_id[-1]]]
-
     first_word = True
-    for input in input_seeds_id:
-        if not first_word:
-            text += " "
-        first_word = False
-        text += index_to_word[input]
-    #for i in range(20)
-    probas= sess.run([model.probas],
-                            feed_dict={model.input_batch: input_id})
-    # Want to find the highest probability target with type POS
-    sampled_word = np.argmax(probas)
-    output_id = [[sampled_word]]
-    print(output_id)
-    text += ' ' + index_to_word[sampled_word]
+    for i in range(20):
+        probas= sess.run([model.probas],
+                                feed_dict={model.input_batch: [input_seeds_id]})
+        # Want to find the highest probability target with type POS
+        sampled_word = np.argmax(probas)
+        output_id = [[sampled_word]]
+        print(output_id)
+        if first_word:
+            text += index_to_word[sampled_word].capitalize()
+        else:
+            text += ' ' + index_to_word[sampled_word]
+        input_seeds_id.append(sampled_word)
     print(text)
     return text
 
