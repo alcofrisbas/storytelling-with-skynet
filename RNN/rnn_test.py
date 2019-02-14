@@ -35,7 +35,6 @@ def generate_text(sess, model, word_to_index, index_to_word,
     input_seeds_id = []
     seed = seed.lower()
     seed = word_tokenize(seed)
-    print(seed)
     for w in seed:
         try:
             input_seeds_id.append(word_to_index[w])
@@ -45,7 +44,7 @@ def generate_text(sess, model, word_to_index, index_to_word,
     text = ''
     # Generate a new sample from previous, starting at last word seed
     #input_id = [[input_seeds_id[-1]]]
-
+    print(input_seeds_id)
     print(input_id)
     first_word = True
     for input in input_id[0]:
