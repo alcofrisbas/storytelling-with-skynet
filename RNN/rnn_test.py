@@ -52,6 +52,7 @@ def generate_text(sess, model, word_to_index, index_to_word,
         sampled_word = np.argmax(probas)
         if first_word:
             text += index_to_word[sampled_word].capitalize()
+            first_word = False
         else:
             text += ' ' + index_to_word[sampled_word]
         input_seeds_id.append(sampled_word)
