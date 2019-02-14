@@ -60,7 +60,7 @@ class RNNModel(object):
         def parse(line):
             line_split = tf.string_split([line])
             input_seq = tf.string_to_number(line_split.values[:-1], out_type=tf.int32)
-            output_seq = [tf.string_to_number(line_split.values[-1], out_type=tf.int32)]
+            output_seq = [tf.string_to_number(line_split.values[2], out_type=tf.int32)]
             return input_seq, output_seq
 
         training_dataset = tf.data.TextLineDataset(self.file_name_train).map(parse).padded_batch(config.batch_size, padded_shapes=([None], [None]))
@@ -83,8 +83,9 @@ class RNNModel(object):
         self.input_batch, self.output_batch = iterator.get_next()
 
         # inputs = [1, 1, 20]
-        self.inputs = pad_up_to(self.input_batch, [1,100])
-        self.inputs = tf.reshape(self.inputs, [1, 1, 100])
+        #self.inputs = pad_up_to(self.input_batch, [1,100])
+        self.inputs = tf.slice(self.input_batch, [0, 1], [1, 1])
+        self.inputs = tf.reshape(self.inputs, [1, 1, 1])
         self.inputs = tf.cast(self.inputs, tf.float32)
 
         non_zero_weights = tf.sign(self.input_batch)
@@ -191,10 +192,12 @@ class RNNModel(object):
 
                 dev_costs += dev_cost
                 iters += self.num_steps
+                """
                 if step % (self.valid_epoch // 10) == 10:
                     print("%.3f perplexity: %.3f speed: %.0f wps" %
                         (step % 1.0/self.valid_epoch, np.exp(dev_costs/iters),
                         iters * self.batch_size /(time.time() - start_time)))
+                """
 
             print("Epoch: %d Learning rate: %.3f" % (i + 1, sess.run(self.learning_rate)))
             saver.save(sess, "RNN/models/best_model.ckpt")
