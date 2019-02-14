@@ -44,10 +44,9 @@ def generate_text(sess, model, word_to_index, index_to_word,
     text = ''
     # Generate a new sample from previous, starting at last word seed
     #input_id = [[input_seeds_id[-1]]]
-    print(input_seeds_id)
-    print(input_id)
+
     first_word = True
-    for input in input_id[0]:
+    for input in input_seeds_id:
         if not first_word:
             text += " "
         first_word = False
