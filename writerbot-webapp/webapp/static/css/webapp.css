@@ -87,3 +87,7 @@ i {
   -moz-animation: glow 1s ease-in-out infinite alternate;
   animation: glow 1s ease-in-out infinite alternate;
 }
+
+#title-header {
+    padding-top: 50px;
+}

@@ -40,7 +40,7 @@ def newStory(request):
         old_story = Story.objects.get(id=request.session.get("story_id"))
         old_story.delete()
 
-    s = Story.objects.create(sentences="", title="")
+    s = Story.objects.create(sentences="", title="Untitled", prompt=generatePrompt())
     if request.user.is_authenticated:
         user = getOrCreateUser(request)
         s.author = user
@@ -48,7 +48,6 @@ def newStory(request):
         user.stories.add(s)
         user.save()
     request.session["editing"] = False
-    request.session["prompt"] = generatePrompt(request.session.get("prompt"))
     request.session["story_id"] = s.id
     return redirect('/write')
 
@@ -159,7 +158,7 @@ def write(request):
         power = ""
 
     return render(request, 'webapp/write.html',
-                  context={"prompt": request.session["prompt"],
+                  context={"prompt": story.prompt,
                   "sentences": [s.strip() for s in story.sentences.split("\n")[:-1]],
                   "suggestion": suggestion, "last":last,
                   "title": story.title, "power":power})
