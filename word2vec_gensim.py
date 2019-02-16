@@ -4,7 +4,7 @@ import tensorflow as tf
 from tensorflow.contrib.tensorboard.plugins import projector
 import logging
 
-training_file = 'RNN/data/test.txt'
+training_file = 'RNN/data/train.txt'
 root_path = "RNN/models/"
 vector_dim = 300
 TENSORBOARD_FILES_PATH = root_path+"/tensorboard"
