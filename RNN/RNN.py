@@ -2,11 +2,8 @@
 A Recurrent Neural Network (LSTM) implementation example using TensorFlow..
 Next word prediction after n_input words learned from text file.
 A story is automatically generated if the predicted word is fed back as input.
-
 Author: Rowel Atienza
 Project: https://github.com/roatienza/Deep-Learning-Experiments
-
-
 '''
 
 from __future__ import print_function
@@ -15,7 +12,6 @@ import os
 import numpy as np
 import tensorflow as tf
 import random
-import collections
 import time
 import reader
 import math
@@ -25,7 +21,10 @@ flags.DEFINE_string("vocab_file", "./RNN/data/vocab.csv",
     "File containing the vocabulary")
 FLAGS = flags.FLAGS
 
-
+def pad_up_to(tensor, max_in_dims):
+    s = tf.shape(tensor)
+    paddings = [[0, m-s[i]] for (i,m) in enumerate(max_in_dims)]
+    return tf.pad(tensor, paddings, "CONSTANT")
 
 class RNNModel(object):
     """model"""
@@ -54,19 +53,20 @@ class RNNModel(object):
         self.file_name_test = tf.placeholder(tf.string)
 
         self.train_epoch = (self.num_train_samples - 1) // self.num_steps
+
         self.valid_epoch = (self.num_valid_samples - 1) // self.num_steps
 
 
         def parse(line):
             line_split = tf.string_split([line])
             input_seq = tf.string_to_number(line_split.values[:-1], out_type=tf.int32)
-            output_seq = tf.string_to_number(line_split.values[1:], out_type=tf.int32)
+            output_seq = [tf.string_to_number(line_split.values[2], out_type=tf.int32)]
             return input_seq, output_seq
 
-        training_dataset = tf.data.TextLineDataset(self.file_name_train).map(parse).padded_batch(config.batch_size, padded_shapes=([None],[None]))
+        training_dataset = tf.data.TextLineDataset(self.file_name_train).map(parse).padded_batch(config.batch_size, padded_shapes=([None], [None]))
         # gets next batch so that wen can combine the two datasets into one
 
-        validation_dataset = tf.data.TextLineDataset(self.file_name_validation).map(parse).padded_batch(config.batch_size, padded_shapes=([None],[None]))
+        validation_dataset = tf.data.TextLineDataset(self.file_name_validation).map(parse).padded_batch(config.batch_size, padded_shapes=([None], [None]))
 
         test_dataset = tf.data.TextLineDataset(self.file_name_test).map(parse).batch(1)
 
@@ -82,13 +82,11 @@ class RNNModel(object):
         # sequence_length refers to length of sentence + padding
         self.input_batch, self.output_batch = iterator.get_next()
 
-        # input embedding
-        # embedding creates a feature for every word, this makes it possible to relate similar words
-        self.input_embedding =  tf.Variable("input_embedding_mat",
-            tf.random_normal([self.vocab_size, size], stddev=0.1), dtype=tf.float32, trainable=True)
-
-        # inputs = [?, ?, size]
-        inputs = tf.nn.embedding_lookup(self.input_embedding, self.input_batch)
+        # inputs = [1, 1, 20]
+        #self.inputs = pad_up_to(self.input_batch, [1,100])
+        self.inputs = tf.slice(self.input_batch, [0, 1], [1, 1])
+        self.inputs = tf.reshape(self.inputs, [1, 1, 1])
+        self.inputs = tf.cast(self.inputs, tf.float32)
 
         non_zero_weights = tf.sign(self.input_batch)
 
@@ -97,7 +95,7 @@ class RNNModel(object):
         def make_cell():
             cell = tf.contrib.rnn.LSTMCell(size, state_is_tuple=True)
             if config.keep_prob < 1:
-                cell = tf.contrib.rnn.DropoutWrapper(cell, output_keep_prob=config.keep_prob)
+                cell = tf.contrib.rnn.DropoutWrapper(cll, output_keep_prob=config.keep_prob)
             return cell
 
 
@@ -107,7 +105,6 @@ class RNNModel(object):
 
 
         stop = False
-        outputs = []
 
         # Comput sequence length
         def get_length(non_zero_place):
@@ -119,39 +116,30 @@ class RNNModel(object):
 
         # output = [batch_size, max_time_nodes, output_vector_size]
         with tf.variable_scope("RNN"):
-            output, state = tf.nn.dynamic_rnn(cell=cell, inputs=inputs,
+            output, state = tf.nn.dynamic_rnn(cell=cell, inputs=self.inputs,
             sequence_length=batch_length, initial_state= state, dtype=tf.float32)
 
-        # output embedding to decode input embedding
-        self.output_embedding_mat = tf.Variable("output_embedding_mat",
-                                                tf.random_normal([vocab_size,size], stddev=0.1), dtype=tf.float32, trainable=True)
+        output = tf.reshape(output,[1, size])
 
-        self.output_embedding_bias = tf.Variable("output_embedding_bias",
-                                                tf.random_normal([vocab_size], stddev=0.1), dtype=tf.float32, trainable=True)
-
-        def output_embedding(current_output):
-            return tf.add(tf.matmul(current_output, tf.transpose(self.output_embedding_mat)),
-            self.output_embedding_bias)
-
-        #logits = []
         # Compute logits
-        #for output in outputs:
-        #    logits.append(tf.nn.xw_plus_b(tf.reshape(output, [-1, config.hidden_size]), softmax_w, softmax_b))
-        logits = tf.map_fn(output_embedding, output)
-        print(logits)
-        logits = tf.reshape(logits, [-1, vocab_size])
-        print(logits)
+        softmax_w = tf.get_variable(
+            "softmax_w", [size, vocab_size], dtype=tf.float32)
+        softmax_b = tf.get_variable("softmax_b", [vocab_size], dtype=tf.float32)
+
+        logits = tf.nn.xw_plus_b(output, softmax_w, softmax_b)
+
+        logits = tf.reshape(logits, [self.batch_size, self.num_steps, self.vocab_size])
         self.probas = tf.nn.softmax(logits, name='p')
-        #self.output_batch = tf.reshape(self.output_batch, (1, 20))
+
         """
-        loss = tf.contrib.seq2seq.sequence_loss(logits, self.output_batch,
-        tf.ones([self.batch_size, self.num_steps], dtype = tf.float32),
-        average_across_timesteps=False,
-        average_across_batch= False)
-        """
-        #logits = tf.reshape(logits, [0, self.vocab_size])
         loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=
-        tf.reshape(self.output_batch, [-1]), logits = logits) * tf.cast(tf.reshape(non_zero_weights, [-1]), tf.float32)
+            tf.reshape(self.output_batch, [1]), logits = logits)# * tf.cast(tf.reshape(non_zero_weights, [-1]), tf.float32)
+        """
+        loss = tf.contrib.seq2seq.sequence_loss(logits=logits,
+            targets = self.output_batch,
+            weights = tf.ones([self.batch_size, self.num_steps], dtype=tf.float32),
+            average_across_timesteps=False,
+            average_across_batch=False)
 
         self.loss = loss
         self.cost = tf.reduce_sum(loss)
@@ -162,7 +150,7 @@ class RNNModel(object):
         params = tf.trainable_variables()
 
         #optimizer = tf.train.GradientDescentOptimizer(self._lr)
-        opt= tf.train.AdamOptimizer(self.learning_rate)
+        opt= tf.train.AdamOptimizer(learning_rate=0.001, beta1=0.9, beta2=0.999, epsilon=10e-4)
         gradients = tf.gradients(self.cost, params)
         clipped_gradients, _ = tf.clip_by_global_norm(gradients, self.max_gradient_norm)
         self.updates = opt.apply_gradients(zip(clipped_gradients, params),
@@ -182,11 +170,9 @@ class RNNModel(object):
             iters = 0
             for step in range(self.train_epoch):
                 start_time = time.time()
-                cost, current_learning_rate, final_state, _  = sess.run(
-                    [self.cost, self.learning_rate, self.final_state, self.updates])
+                cost, current_learning_rate, final_state, _, probas, loss, cost, input= sess.run(
+                    [self.cost, self.learning_rate, self.final_state, self.updates, self.probas, self.loss, self.cost, self.input_batch])
                 costs += cost
-
-
 
                 iters += self.num_steps
                 if step % (self.train_epoch // 10) == 10:
@@ -195,7 +181,7 @@ class RNNModel(object):
                         iters * self.batch_size / (time.time() - start_time)))
 
             print("Epoch: %d Learning rate: %.3f" % (i + 1, sess.run(self.learning_rate)))
-            sess.run(self.validation_init_op, {self.file_name_validation: "RNN/data/valid.txt.ids"})
+            sess.run(self.validation_init_op, {self.file_name_validation:"RNN/data/valid.txt.ids"})
             dev_costs = 0.0
             state = sess.run(self.initial_state)
             iters = 0
@@ -206,10 +192,12 @@ class RNNModel(object):
 
                 dev_costs += dev_cost
                 iters += self.num_steps
+                """
                 if step % (self.valid_epoch // 10) == 10:
                     print("%.3f perplexity: %.3f speed: %.0f wps" %
                         (step % 1.0/self.valid_epoch, np.exp(dev_costs/iters),
                         iters * self.batch_size /(time.time() - start_time)))
+                """
 
             print("Epoch: %d Learning rate: %.3f" % (i + 1, sess.run(self.learning_rate)))
             saver.save(sess, "RNN/models/best_model.ckpt")

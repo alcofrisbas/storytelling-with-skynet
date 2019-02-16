@@ -29,16 +29,16 @@ logging = tf.logging
 
 
 flags.DEFINE_string(
-    "model", "medium",
+    "model", "small",
     "A type of model. Possible options are: small, medium, large.")
 
 flags.DEFINE_string("save_path",".RNN/models" ,
                     "Model output directory.")
-flags.DEFINE_string("train_file", "RNN/train.txt",
+flags.DEFINE_string("train_file", "RNN/data/train.txt",
                     "The file containing the training data")
-flags.DEFINE_string("valid_file", "RNN/valid.txt",
+flags.DEFINE_string("valid_file", "RNN/data/valid.txt",
                     "The file containing the validation data")
-flags.DEFINE_string("test_file", "RNN/test.txt",
+flags.DEFINE_string("test_file", "RNN/data/test.txt",
                     "The file containing the testing data")
 FLAGS = flags.FLAGS
 
@@ -55,14 +55,14 @@ class SmallConfig(object):
     learning_rate = 1.0
     max_grad_norm = 5
     num_layers = 2
-    num_steps = 20
+    num_steps = 1
     hidden_size = 200
     max_epoch = 4
     max_max_epoch = 20
     keep_prob = 1.0
     lr_decay = 0.5
     batch_size = 1
-    vocab_size = 10011
+    vocab_size = 19310
 
 
 class MediumConfig(object):
@@ -120,14 +120,14 @@ if not os.path.isfile(FLAGS.train_file + ".ids"):
     reader.gen_id_seqs(FLAGS.train_file)
     reader.gen_id_seqs(FLAGS.valid_file)
 print("---making training and validation sampels---\n")
-with open("RNN/data/train.txt.ids") as fp:
+with open(FLAGS.train_file + ".ids") as fp:
     num_train_samples = len(fp.readlines())
-with open("RNN/data/valid.txt.ids") as fp:
+with open(FLAGS.valid_file + ".ids") as fp:
     num_valid_samples = len(fp.readlines())
 print("---Training and validations samples created---\n")
 with open("RNN/data/vocab.csv") as vocab:
     vocab_size = len(vocab.readlines())
-print("vocab created")
+print("---vocab created---")
 
 config = get_config()
 
@@ -152,7 +152,7 @@ with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
     model = create_model(sess)
     saver = tf.train.Saver()
     saver.restore(sess, "RNN/models/best_model.ckpt")
-    predict_id_file = os.path.join("data/" + FLAGS.test_file + ".ids")
+    predict_id_file = os.path.join(FLAGS.test_file + ".ids")
     if not os.path.isfile(predict_id_file):
         reader.gen_id_seqs(test_file)
     model.predict(sess,predict_id_file, predict_id_file, verbose=VERBOSE)

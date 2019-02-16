@@ -6,6 +6,7 @@ class Story(models.Model):
     sentences = models.TextField(null=True)
     public = models.BooleanField(default=False)
     author = models.ForeignKey("User", on_delete=models.CASCADE, null=True)
+    prompt = models.CharField(max_length=255)
 
     def __str__(self):
         return self.sentences

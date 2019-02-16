@@ -4,10 +4,19 @@
 <form method="post" id="side-form" xmlns="http://www.w3.org/1999/html">
     {% csrf_token %}
 <div class="sidenav">
-    <button class="side-btn" type="submit" data-toggle="tooltip" data-placement="right" title="New story"
-        value="true" name="side-new" id="side-new">
-        <i class="fas fa-plus"></i>
-    </button>
+    {% if request.user.username %}
+        <button class="side-btn" type="submit" data-toggle="tooltip" data-placement="right" title="New story"
+            value="true" name="new" id="side-new">
+            <i class="fas fa-plus"></i>
+        </button>
+    {% else %}
+        <span data-toggle="modal" data-target="#newStoryModal" data-target="#id">
+            <button class="side-btn" type="button" data-toggle="tooltip" data-placement="right" title="New story"
+                value="true" name="side-new" id="side-new">
+                <i class="fas fa-plus"></i>
+            </button>
+        </span>
+    {% endif %}
     <span data-toggle="modal" data-target="#saveModal" data-target="#id">
         <button class="side-btn" type="button" data-toggle="tooltip" data-placement="right" title="Save story"
             value="true" name="side-save" data-placement="right" id="side-save">
@@ -29,30 +38,28 @@
 </div>
 </form>
 <div class="main">
-{#        <form method="post" id="title-form">#}
+<!-- {#        <form method="post" id="title-form">#}
 {#            {% csrf_token %}#}
 {#            <input type="text" name="title" placeholder="Untitled story" class="mt-5 form-control"></input>#}
-{#        </form>#}
+{#        </form>#} -->
         <div>
-        {% if title %}
-            <h5 class="mt-5" style="display:inline-block">{{ title }}</h5>
-        {% else %}
-            <h5 class="mt-5" style="display:inline-block">Prompt: {{ prompt }}</h5>
-        {% endif %}
+            <h4 id="title-header">{{ title }}</h4>
+            <h5>Prompt: {{ prompt }}</h5>
         </div>
 
         {% if not sentences %}
             <p>Start writing here: </p>
+        {% else %}
+        <!-- <p id = "para" style="padding:1px" contenteditable="{{ contentEdit }}"> -->
+            <p>
+            {% for sentence in sentences %}
+                {% if not loop.last %}
+                    {{ sentence }}<br>
+                {% endif %}
+            {% endfor %}
+            {{ last }}<br>
+            </p>
         {% endif %}
-
-        <p id = "para" style="padding:1px" contenteditable="{{ contentEdit }}">
-        {% for sentence in sentences %}
-            {% if not loop.last %}
-                {{ sentence }}
-            {% endif %}
-        {% endfor %}
-        {{ last }}<br>
-    </p>
 
         <form method="post" id="input-form">
             {% csrf_token %}
@@ -71,30 +78,49 @@
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
-              <div class="modal-body">
-                {% if request.user.username %}
-                    Save your story as:
-                    <form method="post" style="padding:1px">
-                        {% csrf_token %}
-                        <input type="text" name="title" placeholder="Add a title" class="form-control final" value= "{{ title }}"></input><br>
-                        <button type="submit" class="btn btn-danger btn-sm final" name="save" value="true"> Save</button>
-                        <button type="button" class="btn btn-danger btn-sm final" onclick="showSaveInfo()">Cancel</button>
-                    </form>
-                {% else %}
-                    Please <a href="{% url 'social:begin' 'google-oauth2' %}">login with Google</a> to save your story.
-                {% endif %}
-              </div>
-              <!-- <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary final" data-dismiss="modal">Cancel</button>
+              <form method="post">
+                  {% csrf_token %}
+                  <div class="modal-body">
+                    {% if request.user.username %}
+                        Save your story as:
+                            <input type="text" name="title" placeholder="Add a title" class="form-control final" value= "{{ title }}"></input><br>
+                    {% else %}
+                        Please <a href="{% url 'social:begin' 'google-oauth2' %}">login with Google</a> to save your story.
+                    {% endif %}
+                  </div>
                   {% if request.user.username %}
-                  <form method="post" style="padding:1px">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-primary final" name="save" value="true">Save</button>
-                  </form>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-danger final" type="submit"
+                        value="true" name="save">Save</button>
+                  </div>
                   {% endif %}
-              </div> -->
+              </form>
             </div>
           </div>
         </div>
-    </div>
+
+        <div class="modal fade" id="newStoryModal" tabindex="-1" role="dialog" aria-labelledby="newStoryModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="newStoryModalLabel">New Story</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              <div class="modal-body">
+                  Your current story has not been saved. Are you sure you want to discard it and start a new story?
+              </div>
+              <form method="post">
+                  {% csrf_token %}
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-danger final" type="submit" title="New story"
+                        value="true" name="new">Yes</button>
+                  </div>
+              </form>
+            </div>
+          </div>
+        </div>
 {% endblock %}

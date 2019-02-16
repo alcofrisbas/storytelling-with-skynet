@@ -6,12 +6,16 @@ from django.http import HttpResponse
 from webapp.models import Story
 from webapp.models import User
 
-sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'RNN'))
-from rnn_test import load_model, generate_text
+#sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'RNN'))
+#from rnn_test import load_model, generate_text
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'simpleRNN'))
+from rnn_words import generateText
 import random
 from webapp.words import ADJECTIVES, ANIMALS
 
-sess, model, word_to_id, id_to_word = None, None, None, None
+#sess, model, word_to_id, id_to_word = None, None, None, None
+
+sess = None
 
 #TODO: when user logs in, redirect to the page they logged in from
 #TODO: figure out how to clear empty stories and expired session data
@@ -36,12 +40,11 @@ def getOrCreateUser(request):
 
 
 def newStory(request):
-    #TODO: prompt user if they're sure they want to discard current story
     if request.session.get("story_id") and not request.user.is_authenticated:
         old_story = Story.objects.get(id=request.session.get("story_id"))
         old_story.delete()
 
-    s = Story.objects.create(sentences="", title="")
+    s = Story.objects.create(sentences="", title="Untitled", prompt=generatePrompt())
     if request.user.is_authenticated:
         user = getOrCreateUser(request)
         s.author = user
@@ -49,7 +52,6 @@ def newStory(request):
         user.stories.add(s)
         user.save()
     request.session["editing"] = False
-    request.session["prompt"] = generatePrompt(request.session.get("prompt"))
     request.session["story_id"] = s.id
     return redirect('/write')
 
@@ -63,7 +65,7 @@ def loadStory(request, id):
         request.session["prompt"] = ""
         return redirect('/write')
     else:
-        return render(request, 'webapp/error.html', context={'message': "Story not found."})
+        return render(request, 'webapp/error.html', context= {'message': "Story not found."})
 
 
 def deleteStory(request, id):
@@ -89,10 +91,7 @@ def write(request):
     if "developer" not in request.session.keys():
         request.session["developer"] = False
 
-    if "content-edit" not in request.session.keys():
-        request.session["content-edit"] = False
-
-    global sess, model, word_to_id, id_to_word
+    #global sess, model, word_to_id, id_to_word
 
     # I was tired of loading TODO: UNCOMMENT ME
     # if not model:
@@ -105,11 +104,9 @@ def write(request):
     if request.POST:
         print("======== ===== ===== ====")
         print(request.POST.keys())
-        if request.POST.get("update"):
-            print("UPDATE WOOOOOOOOOTTTTTT")
         if request.POST.get("text"):
             newSentence = request.POST["text"]
-            story.sentences += newSentence.strip()+ "\r"
+            story.sentences += newSentence.strip()+ "\n"
             story.save()
 
             if not editing:
@@ -120,7 +117,6 @@ def write(request):
         if request.POST.get("title"):
             story.title = request.POST["title"]
 
-        # STILL WORKING THIS
         # TODO: make Save button grayed out after saving, revert after edit
         if request.POST.get("save"):
             if request.user.is_authenticated:
@@ -131,21 +127,13 @@ def write(request):
                 s.save()
             else:
                 return render(request, 'webapp/error.html', context={'message': "Please log in before trying to save a story."})
-        # same functionality as "Start a new story button"
-        if request.POST.get("side-new"):
-            print("new story Pressed")
-            return redirect('/new_story')
 
-        if request.POST.get("side-save"):
-            print("save story Pressed")
+        # same functionality as "Start a new story button"
+        if request.POST.get("new"):
+            return redirect('/new_story')
 
         if request.POST.get("side-open"):
             print("open story Pressed")
-        # need to make this update the story with
-        # the current content
-        if request.POST.get("side-edit"):
-            print("edit story Pressed")
-            request.session["content-edit"] = not request.session["content-edit"]
 
         if request.POST.get("side-settings"):
             print("settings story Pressed")
@@ -173,14 +161,11 @@ def write(request):
     if request.session["developer"]:
         power = ""
 
-    print([s.strip() for s in story.sentences.split("\n")[:-1]])
-
     return render(request, 'webapp/write.html',
-                  context={"prompt": request.session["prompt"],
+                  context={"prompt": story.prompt,
                   "sentences": [s.strip() for s in story.sentences.split("\n")[:-1]],
                   "suggestion": suggestion, "last":last,
-                  "title": story.title, "power":power,
-                  "contentEdit":request.session["content-edit"]})
+                  "title": story.title, "power":power})
 
 
 def about(request):
@@ -196,10 +181,7 @@ def error(request, message):
 
 
 def saves(request):
-    # need to implement the title and author thing....
-    # author needs users/auth
     stories = Story.objects.all()
-    #stories = [s.sentences for s in stories]
     return render(request, 'webapp/saves.html', context={'stories': stories})
 
 
@@ -225,7 +207,8 @@ def generateSuggestion(newSentence, develop=False):
     if develop:
         return "look! a {} {}".format(random.choice(ADJECTIVES), random.choice(ANIMALS))
     try:
-        suggestion = generate_text(sess, model, word_to_id, id_to_word, seed=newSentence)
+        #suggestion = generate_text(sess, model, word_to_id, id_to_word, seed=newSentence)
+        suggestion = generateText(newSentence)
     except Exception as e:
         print("ERROR (suggestion generation)")
         suggestion = e

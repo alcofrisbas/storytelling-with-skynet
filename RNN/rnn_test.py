@@ -7,6 +7,7 @@ import csv
 import random
 import nltk
 import grammarUtils
+from nltk.tokenize import word_tokenize
 
 
 class SmallConfig(object):
@@ -15,14 +16,14 @@ class SmallConfig(object):
     learning_rate = 1.0
     max_grad_norm = 5
     num_layers = 2
-    num_steps = 20
+    num_steps = 1
     hidden_size = 200
     max_epoch = 4
-    max_max_epoch = 13
+    max_max_epoch = 20
     keep_prob = 1.0
     lr_decay = 0.5
-    batch_size = 20
-    vocab_size = 10000
+    batch_size = 1
+    vocab_size = 19310
 
 
 
@@ -33,55 +34,33 @@ def generate_text(sess, model, word_to_index, index_to_word,
     sentence_cnt = 0
     input_seeds_id = []
     seed = seed.lower()
-    seed = re.split(r'([;|, |.|,|:|?|!])', seed)
+    seed = word_tokenize(seed)
     for w in seed:
         try:
             input_seeds_id.append(word_to_index[w])
         except:   # if word is not in vocabulary, processed as _UNK_
             input_seeds_id.append(word_to_index["_UNK_"])
-        print(input_seeds_id)
     state = sess.run(model.initial_state)
     text = ''
     # Generate a new sample from previous, starting at last word seed
-    input_id = [[input_seeds_id[-1]]]
+    #input_id = [[input_seeds_id[-1]]]
     first_word = True
     for i in range(20):
-        feed_dict = {model.input_batch: input_id}
         probas= sess.run([model.probas],
-                                feed_dict=feed_dict)
+                                feed_dict={model.input_batch: [input_seeds_id]})
         # Want to find the highest probability target with type POS
-        print(probas)
         sampled_word = np.argmax(probas)
-        input_id = [[sampled_word]]
-        text += ' ' + index_to_word[sampled_word]
-
-        """
-        test_probas = probas[0][0]
-        test_probas.sort()
-        length = len(test_probas)-1
-        best_choice = None
-        best_choice_idx = None
-        for i in range(len(test_probas)):
-            word = test_probas[length-i]
-            word_idx = np.where(probas==word)[-1][0]
-            word = index_to_word[word_idx]
-            tag = nltk.pos_tag([word])[0][-1]
-            if tag == POS:
-                best_choice = word
-                best_choice_idx = word_idx
-                break
         if first_word:
-            text += best_choice.capitalize()
+            text += index_to_word[sampled_word].capitalize()
             first_word = False
         else:
-            text += ' ' + best_choice
-        input_wordid = [[best_choice_idx]]
-        """
+            text += ' ' + index_to_word[sampled_word]
+        input_seeds_id.append(sampled_word)
     print(text)
     return text
 
 
-def load_model(save=False):
+def load_model(save=True):
     with open(RNN.FLAGS.vocab_file, "r") as vocab_file:
         reader = csv.reader(vocab_file, delimiter=',')
         lines = []
@@ -98,17 +77,19 @@ def load_model(save=False):
     eval_config.num_steps = 1
     eval_config.batch_size = 1
     sess = tf.Session()
-    model = RNN.RNNModel(vocab_size=vocab_size,config=eval_config,
+    model = RNN.RNNModel(vocab_size=eval_config.vocab_size,config=eval_config,
         num_train_samples=1, num_valid_samples=1)
     sess.run(tf.global_variables_initializer())
     if save:
         saver = tf.train.Saver()
         saver.restore(sess, tf.train.latest_checkpoint('RNN/models'))
+
     return sess, model, word_to_id, id_to_word
 
 
 if __name__ == '__main__':
     sess, model, word_to_id, id_to_word = load_model()
+    print("---model loaded---")
 
     while True:
         sentence = input('Write your sentence: ')
