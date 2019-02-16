@@ -6,12 +6,16 @@ from django.http import HttpResponse
 from webapp.models import Story
 from webapp.models import User
 
-sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'RNN'))
-from rnn_test import load_model, generate_text
+#sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'RNN'))
+#from rnn_test import load_model, generate_text
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'simpleRNN'))
+from rnn_words import generateText
 import random
 from webapp.words import ADJECTIVES, ANIMALS
 
-sess, model, word_to_id, id_to_word = None, None, None, None
+#sess, model, word_to_id, id_to_word = None, None, None, None
+
+sess = None
 
 #TODO: when user logs in, redirect to the page they logged in from
 #TODO: figure out how to clear empty stories and expired session data
@@ -87,7 +91,7 @@ def write(request):
     if "developer" not in request.session.keys():
         request.session["developer"] = False
 
-    global sess, model, word_to_id, id_to_word
+    #global sess, model, word_to_id, id_to_word
 
     # I was tired of loading TODO: UNCOMMENT ME
     # if not model:
@@ -203,7 +207,8 @@ def generateSuggestion(newSentence, develop=False):
     if develop:
         return "look! a {} {}".format(random.choice(ADJECTIVES), random.choice(ANIMALS))
     try:
-        suggestion = generate_text(sess, model, word_to_id, id_to_word, seed=newSentence)
+        #suggestion = generate_text(sess, model, word_to_id, id_to_word, seed=newSentence)
+        suggestion = generateText(newSentence)
     except Exception as e:
         print("ERROR (suggestion generation)")
         suggestion = e
