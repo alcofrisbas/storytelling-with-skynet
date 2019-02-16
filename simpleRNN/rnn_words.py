@@ -14,6 +14,7 @@ from tensorflow.contrib import rnn
 import random
 import collections
 import time
+import gensim
 import sys
 
 start_time = time.time()
@@ -27,11 +28,11 @@ def elapsed(sec):
 
 
 # Target log path
-logs_path = '/tmp/tensorflow/rnn_words'
+logs_path = '/tmp/tensorflow/rnn_word'
 writer = tf.summary.FileWriter(logs_path)
 
 # Text file containing words for training
-training_file = 'simpleRNN/belling_the_cat.txt'
+training_file = "RNN/data/train.txt"#'simpleRNN/belling_the_cat.txt'
 
 def read_data(fname):
     with open(fname) as f:
@@ -53,30 +54,29 @@ def build_dataset(words):
     return dictionary, reverse_dictionary
 
 dictionary, reverse_dictionary = build_dataset(training_data)
-vocab_size = len(dictionary)
+#vocab_size = len(dictionary)
 
 # Parameters
 learning_rate = 0.001
-training_iters = 15000
+training_iters = 50000
 display_step = 1000
 n_input = 4
 
 # number of units in RNN cell
-n_hidden = 512
+n_hidden = 300
+path_to_model = "RNN/models/"
 
+embedding_model = gensim.models.Word2Vec.load(path_to_model + "my_embedding_model")
+vocab_size = len(embedding_model.wv.vocab)
+print(vocab_size)
+weights = {'out': embedding_model.syn1neg}
 # tf Graph input
-x = tf.placeholder("float", [None, n_input, 1])
+x = tf.placeholder("float", [None, n_input, n_hidden])
 y = tf.placeholder("float", [None, vocab_size])
 
-# RNN output node weights and biases
-weights = {
-    'out': tf.Variable(tf.random_normal([n_hidden, vocab_size]))
-}
-biases = {
-    'out': tf.Variable(tf.random_normal([vocab_size]))
-}
 
-def RNN(x, weights, biases):
+
+def RNN(x, weights):
 
     # reshape to [1, n_input]
     x = tf.reshape(x, [-1, n_input])
@@ -99,10 +99,10 @@ def RNN(x, weights, biases):
 
     # there are n_input outputs but
     # we only want the last output
-    return tf.matmul(outputs[-1], weights['out']) + biases['out']
+    return tf.matmul(outputs[-1], tf.transpose(weights['out']))
 
-pred = RNN(x, weights, biases)
-
+pred = RNN(x, weights)
+pred = tf.reshape(pred, [-1, vocab_size])
 # Loss and optimizer
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=pred, labels=y))
 optimizer = tf.train.RMSPropOptimizer(learning_rate=learning_rate).minimize(cost)
@@ -125,6 +125,7 @@ def generateText(input):
         if len(words) == n_input:
             try:
                 symbols_in_keys = [dictionary[str(words[i])] for i in range(len(words))]
+                print(symbols_in_keys)
                 for i in range(32):
                     keys = np.reshape(np.array(symbols_in_keys), [-1, n_input, 1])
                     onehot_pred = session.run(pred, feed_dict={x: keys})
@@ -138,6 +139,7 @@ def generateText(input):
 
 
 if __name__ == '__main__':
+
     if len(sys.argv) > 1 and sys.argv[1] == "train":
         training = True
     # Launch the graph
@@ -156,16 +158,22 @@ if __name__ == '__main__':
                 # Generate a minibatch. Add some randomness on selection process.
                 if offset > (len(training_data)-end_offset):
                     offset = random.randint(0, n_input+1)
+                symbols = [str(training_data[i]) for i in range(offset, offset+n_input)]
+                embedded_symbols = []
+                for word in symbols:
+                    try:
+                        embedding = embedding_model.wv[word]
+                    except KeyError:
+                        print(word + " not in vocabulary")
+                        embedding = np.zeros((300,), dtype=np.float)
+                    embedded_symbols.append(embedding)
+                embedded_symbols = [embedded_symbols]
 
-                symbols_in_keys = [ [dictionary[ str(training_data[i])]] for i in range(offset, offset+n_input) ]
-                symbols_in_keys = np.reshape(np.array(symbols_in_keys), [-1, n_input, 1])
-
-                symbols_out_onehot = np.zeros([vocab_size], dtype=float)
-                symbols_out_onehot[dictionary[str(training_data[offset+n_input])]] = 1.0
-                symbols_out_onehot = np.reshape(symbols_out_onehot,[1,-1])
+                symbols_out_onehot = np.zeros([1, vocab_size], dtype=float)
 
                 _, acc, loss, onehot_pred = session.run([optimizer, accuracy, cost, pred], \
-                                                        feed_dict={x: symbols_in_keys, y: symbols_out_onehot})
+                                                        feed_dict={x: embedded_symbols, y: symbols_out_onehot})
+
                 loss_total += loss
                 acc_total += acc
                 if (step+1) % display_step == 0:

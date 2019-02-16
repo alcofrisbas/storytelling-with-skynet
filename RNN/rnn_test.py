@@ -23,7 +23,7 @@ class SmallConfig(object):
     keep_prob = 1.0
     lr_decay = 0.5
     batch_size = 1
-    vocab_size = 19310
+    vocab_size = 48
 
 
 
@@ -35,6 +35,7 @@ def generate_text(sess, model, word_to_index, index_to_word,
     input_seeds_id = []
     seed = seed.lower()
     seed = word_tokenize(seed)
+    print(seed)
     for w in seed:
         try:
             input_seeds_id.append(word_to_index[w])
@@ -45,17 +46,17 @@ def generate_text(sess, model, word_to_index, index_to_word,
     # Generate a new sample from previous, starting at last word seed
     #input_id = [[input_seeds_id[-1]]]
     first_word = True
-    for i in range(20):
-        probas= sess.run([model.probas],
-                                feed_dict={model.input_batch: [input_seeds_id]})
+    #for i in range(20):
+    probas= sess.run([model.probas],
+                            feed_dict={model.input_batch: [input_seeds_id]})
         # Want to find the highest probability target with type POS
-        sampled_word = np.argmax(probas)
-        if first_word:
-            text += index_to_word[sampled_word].capitalize()
-            first_word = False
-        else:
-            text += ' ' + index_to_word[sampled_word]
-        input_seeds_id.append(sampled_word)
+    sampled_word = np.argmax(probas)
+    if first_word:
+        text += index_to_word[sampled_word].capitalize()
+        first_word = False
+    else:
+        text += ' ' + index_to_word[sampled_word]
+    input_seeds_id.append(sampled_word)
     print(text)
     return text
 

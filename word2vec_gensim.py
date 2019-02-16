@@ -4,13 +4,13 @@ import tensorflow as tf
 from tensorflow.contrib.tensorboard.plugins import projector
 import logging
 
-training_file = 'test.txt'
-root_path = "/Users/tenzindophen/Desktop/StoryBot/"
+training_file = 'RNN/data/test.txt'
+root_path = "RNN/models/"
 vector_dim = 300
 TENSORBOARD_FILES_PATH = root_path+"/tensorboard"
 
 #accepts a filename and returns a string of contents
-def read(fname): 
+def read(fname):
     with open(fname) as f:
         fileList = f.readlines()
     file_content = " ".join(str(x) for x in fileList)
@@ -28,7 +28,7 @@ for sentence in raw_sentences:
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
 # model gets trained in gensim
-model = gensim.models.Word2Vec(sentences, iter=100, min_count=10, size=300, workers=10)
+model = gensim.models.Word2Vec(sentences, iter=100, min_count=1, size=300, workers=10)
 
 #returns the list of indexes of each owrd in the word vector vocab
 def convert_data_to_index(string_data, wv):
@@ -54,9 +54,9 @@ else:
     print(unk)
     print(unk.shape)
 
-#saves the model to be reused 
-model.save(root_path + "mymodel")
-model = gensim.models.Word2Vec.load(root_path + "mymodel")
+#saves the model to be reused
+model.save(root_path + "my_embedding_model")
+model = gensim.models.Word2Vec.load(root_path + "my_embedding_model")
 
 # print(model.wv.syn0) #prints input embedding
 # print(model.syn1neg) #prints output embedding
@@ -73,7 +73,7 @@ for i in range(vocab_size):
 # embedding layer weights are frozen to avoid updating embeddings while training
 saved_embeddings = tf.constant(embedding_matrix)
 embedding = tf.Variable(initial_value=saved_embeddings, trainable=False)
-
+"""
 tsv_file_path = root_path +"tensorboard/metadata.tsv"
 with open(tsv_file_path,'w+', encoding='utf-8') as file_metadata:
     for i,word in enumerate(model.wv.index2word[:vocab_size]):
@@ -111,7 +111,5 @@ saver.save(sess, TENSORBOARD_FILES_PATH+'/model.ckpt', global_step = vocab_size)
 
 #close the session
 sess.close()
-
+"""
 #use command: python -m tensorboard.main --logdir=/Users/tenzindophen/Desktop/StoryBot/tensorboard to get the projector
-
-
