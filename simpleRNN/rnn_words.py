@@ -68,7 +68,6 @@ path_to_model = "RNN/models/"
 
 embedding_model = gensim.models.Word2Vec.load(path_to_model + "my_embedding_model")
 vocab_size = len(embedding_model.wv.vocab)
-print(vocab_size)
 weights = {'out': embedding_model.syn1neg}
 # tf Graph input
 x = tf.placeholder("float", [None, n_input, n_hidden])
@@ -77,14 +76,14 @@ y = tf.placeholder("float", [None, vocab_size])
 
 
 def RNN(x, weights):
-
+    """
     # reshape to [1, n_input]
     x = tf.reshape(x, [-1, n_input])
 
     # Generate a n_input-element sequence of inputs
     # (eg. [had] [a] [general] -> [20] [6] [33])
     x = tf.split(x,n_input,1)
-
+    """
     # 2-layer LSTM, each layer has n_hidden units.
     # Average Accuracy= 95.20% at 50k iter
     rnn_cell = rnn.MultiRNNCell([rnn.BasicLSTMCell(n_hidden),rnn.BasicLSTMCell(n_hidden)])
@@ -95,14 +94,16 @@ def RNN(x, weights):
     # rnn_cell = rnn.BasicLSTMCell(n_hidden)
 
     # generate prediction
-    outputs, states = rnn.static_rnn(rnn_cell, x, dtype=tf.float32)
+    # the shape of outputs is [batch_size, n_input, n_hidden]
+    outputs, states = tf.nn.dynamic_rnn(cell=rnn_cell, inputs = x, dtype = tf.float32)
+    #outputs, states = rnn.static_rnn(rnn_cell, x, dtype=tf.float32)
 
     # there are n_input outputs but
     # we only want the last output
-    return tf.matmul(outputs[-1], tf.transpose(weights['out']))
+    return tf.matmul(tf.reshape(outputs, [n_input, n_hidden]), tf.transpose(weights['out']))
 
 pred = RNN(x, weights)
-pred = tf.reshape(pred, [-1, vocab_size])
+probas = tf.nn.softmax(pred, name='p')
 # Loss and optimizer
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=pred, labels=y))
 optimizer = tf.train.RMSPropOptimizer(learning_rate=learning_rate).minimize(cost)
@@ -125,7 +126,6 @@ def generateText(input):
         if len(words) == n_input:
             try:
                 symbols_in_keys = [dictionary[str(words[i])] for i in range(len(words))]
-                print(symbols_in_keys)
                 for i in range(32):
                     keys = np.reshape(np.array(symbols_in_keys), [-1, n_input, 1])
                     onehot_pred = session.run(pred, feed_dict={x: keys})
@@ -167,13 +167,16 @@ if __name__ == '__main__':
                         print(word + " not in vocabulary")
                         embedding = np.zeros((300,), dtype=np.float)
                     embedded_symbols.append(embedding)
+                # embeded_symbols shape [1, n_input, n_hidden]
                 embedded_symbols = [embedded_symbols]
 
                 symbols_out_onehot = np.zeros([1, vocab_size], dtype=float)
 
-                _, acc, loss, onehot_pred = session.run([optimizer, accuracy, cost, pred], \
+                _, acc, loss, onehot_pred = session.run([optimizer, accuracy, cost, probas], \
                                                         feed_dict={x: embedded_symbols, y: symbols_out_onehot})
 
+                onehot_pred = np.argmax(onehot_pred[3])
+                onehot_pred = embedding_model.wv.index2word[onehot_pred]
                 loss_total += loss
                 acc_total += acc
                 if (step+1) % display_step == 0:
@@ -184,9 +187,8 @@ if __name__ == '__main__':
                     loss_total = 0
                     symbols_in = [training_data[i] for i in range(offset, offset + n_input)]
                     symbols_out = training_data[offset + n_input]
-                    print(onehot_pred)
-                    symbols_out_pred = reverse_dictionary[int(tf.argmax(onehot_pred, 1).eval())]
-                    print("%s - [%s] vs [%s]" % (symbols_in,symbols_out,symbols_out_pred))
+                    #symbols_out_pred = reverse_dictionary[int(tf.argmax(onehot_pred, 1).eval())]
+                    print("%s - [%s] vs [%s]" % (symbols_in,symbols_out,onehot_pred))
                 step += 1
                 offset += (n_input+1)
             print("Optimization Finished!")
