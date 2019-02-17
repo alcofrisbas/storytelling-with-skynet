@@ -184,6 +184,7 @@ if __name__ == '__main__':
                     loss_total = 0
                     symbols_in = [training_data[i] for i in range(offset, offset + n_input)]
                     symbols_out = training_data[offset + n_input]
+                    print(onehot_pred)
                     symbols_out_pred = reverse_dictionary[int(tf.argmax(onehot_pred, 1).eval())]
                     print("%s - [%s] vs [%s]" % (symbols_in,symbols_out,symbols_out_pred))
                 step += 1
