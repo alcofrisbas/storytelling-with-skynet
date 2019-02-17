@@ -3,6 +3,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.contrib.tensorboard.plugins import projector
 import logging
+from nltk.tokenize import sent_tokenize, word_tokenize
 
 training_file = 'RNN/data/train.txt'
 root_path = "RNN/models/"
@@ -18,12 +19,8 @@ def read(fname):
 
 file_content = read(training_file)
 
-
-#raw sentences is a list of sentences.
-raw_sentences = file_content.split('.')
-sentences = []
-for sentence in raw_sentences:
-    sentences.append(sentence.split())
+#get list of sentences
+sentences = [word_tokenize(t) for t in sent_tokenize(file_content)]
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
@@ -43,16 +40,6 @@ index_data = convert_data_to_index(file_content, model.wv)
 file_content = file_content.split()
 
 vocab_size = len(model.wv.vocab)
-len  = 109
-if len < vocab_size:
-    word = model.wv.index2word[len]
-    vec = model.wv[word]
-    #print(vec)
-else:
-    print("not in vocabulary")
-    unk = np.zeros((300,), dtype=np.float)
-    print(unk)
-    print(unk.shape)
 
 #saves the model to be reused
 model.save(root_path + "my_embedding_model")
