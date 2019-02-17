@@ -20,7 +20,11 @@ def int_to_bin(num):
 def bin_to_int(binary):
     return int(binary, 2)
 
-
+def num(s):
+    try:
+        return int(s)
+    except ValueError:
+        return float(s)
 
 
 if __name__ == '__main__':
