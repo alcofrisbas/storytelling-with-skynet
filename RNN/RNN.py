@@ -93,7 +93,7 @@ class RNNModel(object):
         #     print(sess.run(self.input_embedded))
 
 
-        
+
         # inputs = [1, 1, 5]
         #self.inputs = pad_up_to(self.input_batch, [1,100])
         #self.inputs = tf.slice(self.input_batch, [0, 1], [config.batch_size, 1])
@@ -107,7 +107,7 @@ class RNNModel(object):
         def make_cell():
             cell = tf.contrib.rnn.LSTMCell(size, state_is_tuple=True)
             if config.keep_prob < 1:
-                cell = tf.contrib.rnn.DropoutWrapper(cll, output_keep_prob=config.keep_prob)
+                cell = tf.contrib.rnn.DropoutWrapper(cell, output_keep_prob=config.keep_prob)
             return cell
 
 
