@@ -28,6 +28,8 @@ To start the webapp:
 venv/bin/python ./writerbot-webapp/manage.py runserver
 ```
 
+#### Please run all code from the root directory
+
 
 ### Meeting Schedule:
 | Day | Time|
