@@ -83,14 +83,17 @@ class RNNModel(object):
         self.input_batch, self.output_batch = iterator.get_next()
 
 
-        self.input_embedding_mat = tf.get_variable("input_embedding_mat",
-                                                   [self.vocab_size, size],
-                                                   dtype=tf.float32)
+        # self.input_embedding_mat = tf.get_variable("input_embedding_mat",
+        #                                            [self.vocab_size, size],
+        #                                            dtype=tf.float32)
+        #
+        # self.input_embedded = tf.nn.embedding_lookup(self.input_embedding_mat, self.input_batch)
+        # print(self.input_embedded)
+        # with tf.Session() as sess:
+        #     print(sess.run(self.input_embedded))
 
-        self.input_embedded = tf.nn.embedding_lookup(self.input_embedding_mat, self.input_batch)
-        print(self.input_embedded)
-        with tf.Session() as sess:
-            print(sess.run(self.input_embedded))
+
+        
         # inputs = [1, 1, 5]
         #self.inputs = pad_up_to(self.input_batch, [1,100])
         #self.inputs = tf.slice(self.input_batch, [0, 1], [config.batch_size, 1])
