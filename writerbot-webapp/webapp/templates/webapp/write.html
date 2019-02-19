@@ -22,7 +22,12 @@
     {% endif %}
     <button class="side-btn" type="submit" data-toggle="tooltip" data-placement="right" title="AI"
         value="true" name="side-toggle" id="side-toggle">
-        <i id="side-toggle-icon" class="fas fa-power-off {{ power }}"></i></button>
+        {% if AI %}
+            <i id="side-toggle-icon" class="fas fa-power-off glow"></i>
+        {% else %}
+            <i id="side-toggle-icon" class="fas fa-power-off"></i>
+        {% endif %}
+        </button>
     <span data-toggle="modal" data-target="#settingsModal" data-target="#id">
         <button class="side-btn" type="button" data-toggle="tooltip" data-placement="right" title="Settings"
             value="true" name="side-settings" id="side-settings">
@@ -107,6 +112,6 @@
           </div>
         </div>
     {% load staticfiles %}
-    <script src="{% static 'js/stretchy.min.js' %}" async></script>
+    <script src="{% static 'js/stretchy.min.js' %}" data-filter="#title-form, #title-form *" async></script>
 {#    https://leaverou.github.io/stretchy/#}
 {% endblock %}
