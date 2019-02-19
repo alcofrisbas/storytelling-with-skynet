@@ -13,7 +13,6 @@ sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'simpleRNN'))
 import random
 from webapp.words import ADJECTIVES, ANIMALS
 
-#sess, model, word_to_id, id_to_word = None, None, None, None
 
 #TODO: when user logs in, redirect to the page they logged in from
 #TODO: figure out how to clear empty stories and expired session data
@@ -22,6 +21,12 @@ from webapp.words import ADJECTIVES, ANIMALS
 def home(request):
     if request.user.is_authenticated:
         user = getOrCreateUser(request)
+        if request.session.get("story_id"):
+            cur_story = Story.objects.get(id=request.session.get("story_id"))
+            cur_story.author = user
+            cur_story.save()
+            user.stories.add(cur_story)
+            user.save()
         stories = user.stories.all()
     else:
         stories = []
@@ -89,12 +94,6 @@ def write(request):
     if "developer" not in request.session.keys():
         request.session["developer"] = False
 
-    #global sess, model, word_to_id, id_to_word
-
-    # I was tired of loading TODO: UNCOMMENT ME
-    # if not model:
-    #     sess, model, word_to_id, id_to_word = load_model(save=False)
-
     story = Story.objects.get(id = request.session["story_id"])
     suggestion = ""
     editing = request.session["editing"]
@@ -115,17 +114,6 @@ def write(request):
         if request.POST.get("title"):
             story.title = request.POST["title"]
             story.save()
-
-        # TODO: make Save button grayed out after saving, revert after edit
-        if request.POST.get("save"):
-            if request.user.is_authenticated:
-                user = getOrCreateUser(request)
-                title = request.POST["title"]
-                s = Story.objects.get(id = request.session["story_id"])
-                s.title = title
-                s.save()
-            else:
-                return render(request, 'webapp/error.html', context={'message': "Please log in before trying to save a story."})
 
         # same functionality as "Start a new story button"
         if request.POST.get("new"):

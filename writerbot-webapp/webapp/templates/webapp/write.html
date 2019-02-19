@@ -17,15 +17,6 @@
             </button>
         </span>
     {% endif %}
-    <span data-toggle="modal" data-target="#saveModal" data-target="#id">
-        <button class="side-btn" type="button" data-toggle="tooltip" data-placement="right" title="Save story"
-            value="true" name="side-save" data-placement="right" id="side-save">
-            <i class="far fa-save"></i>
-        </button>
-    </span>
-    <!-- <button class="side-btn" type="button" data-toggle="tooltip" data-placement="right" title="Edit story"
-        value="true" name="side-edit"  id="side-edit" onclick="setEdit()">
-        <i class="fas fa-pencil-alt"></i></button> -->
     <button class="side-btn"type="submit" data-toggle="tooltip" data-placement="right" title="Load"
         value="true" name="side-open" id="side-open">
         <i class="far fa-folder-open"></i></button>
@@ -63,38 +54,6 @@
             <button type="submit" class="btn btn-primary btn-lg">Add Sentence</button>
         </form><br>
 
-
-        <!-- Modal -->
-        <div class="modal fade" id="saveModal" tabindex="-1" role="dialog" aria-labelledby="saveModalLabel" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="saveModalLabel">Save</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <form method="post">
-                  {% csrf_token %}
-                  <div class="modal-body">
-                    {% if request.user.username %}
-                        Save your story as:
-                            <input type="text" name="title" placeholder="Add a title" class="form-control final" value= "{{ title }}"></input><br>
-                    {% else %}
-                        Please <a href="{% url 'social:begin' 'google-oauth2' %}">login with Google</a> to save your story.
-                    {% endif %}
-                  </div>
-                  {% if request.user.username %}
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button class="btn btn-danger final" type="submit"
-                        value="true" name="save">Save</button>
-                  </div>
-                  {% endif %}
-              </form>
-            </div>
-          </div>
-        </div>
 
         <div class="modal fade" id="newStoryModal" tabindex="-1" role="dialog" aria-labelledby="newStoryModalLabel" aria-hidden="true">
           <div class="modal-dialog" role="document">
