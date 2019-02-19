@@ -62,7 +62,7 @@ learning_rate = 0.001
 training_iters = 50000
 display_step = 1000
 n_input = 4
-
+batch_size = 2
 # number of units in RNN cell
 n_hidden = 300
 path_to_model = "RNN/models/"
@@ -71,20 +71,12 @@ embedding_model = gensim.models.Word2Vec.load(path_to_model + "my_embedding_mode
 vocab_size = len(embedding_model.wv.vocab)
 weights = {'out': embedding_model.syn1neg}
 # tf Graph input
-x = tf.placeholder("float", [None, n_input, n_hidden])
-y = tf.placeholder("float", [None, vocab_size])
+x = tf.placeholder("float", [batch_size, n_input, n_hidden])
+y = tf.placeholder("float", [batch_size, vocab_size])
 
 
 
 def RNN(x, weights):
-    """
-    # reshape to [1, n_input]
-    x = tf.reshape(x, [-1, n_input])
-
-    # Generate a n_input-element sequence of inputs
-    # (eg. [had] [a] [general] -> [20] [6] [33])
-    x = tf.split(x,n_input,1)
-    """
     # 2-layer LSTM, each layer has n_hidden units.
     # Average Accuracy= 95.20% at 50k iter
     rnn_cell = rnn.MultiRNNCell([rnn.BasicLSTMCell(n_hidden),rnn.BasicLSTMCell(n_hidden)])
@@ -98,6 +90,7 @@ def RNN(x, weights):
     # the shape of outputs is [batch_size, n_input, n_hidden]
     outputs, states = tf.nn.dynamic_rnn(cell=rnn_cell, inputs = x, dtype = tf.float32)
     output = states[-1].h
+    print(output)
     #outputs, states = rnn.static_rnn(rnn_cell, x, dtype=tf.float32)
 
     # there are n_input outputs but
@@ -160,30 +153,40 @@ if __name__ == '__main__':
                 # Generate a minibatch. Add some randomness on selection process.
                 if offset > (len(training_data)-end_offset):
                     offset = random.randint(0, n_input+1)
-                symbols = [str(training_data[i]) for i in range(offset, offset+n_input)]
-                embedded_symbols = []
-                for word in symbols:
+                symbols = []
+                for i in range(batch_size):
+                    symbol = [str(training_data[j]) for j in range(offset+i, offset+n_input+i)]
+                    symbols.append(symbol)
+                embedded_batch = []
+                for batch in symbols:
+                    embedded_symbols = []
+                    for word in batch:
+                        try:
+                            embedding = embedding_model.wv[word]
+                        except KeyError:
+                            print(word + " not in vocabulary")
+                            embedding = np.zeros((300,), dtype=np.float)
+                        embedded_symbols.append(embedding)
+                    embedded_batch.append(embedded_symbols)
+
+                # embeded_symbols shape [batch_size, n_input, n_hidden]
+
+                symbols_out_onehot = np.zeros([batch_size, vocab_size], dtype=float)
+                for i in range(batch_size):
                     try:
-                        embedding = embedding_model.wv[word]
-                    except KeyError:
-                        print(word + " not in vocabulary")
-                        embedding = np.zeros((300,), dtype=np.float)
-                    embedded_symbols.append(embedding)
-                # embeded_symbols shape [1, n_input, n_hidden]
-                embedded_symbols = [embedded_symbols]
-
-                symbols_out_onehot = np.zeros([1, vocab_size], dtype=float)
-                try:
-                    symbols_out_onehot[0][embedding_model.wv.vocab[training_data[offset+n_input]].index] = 1.0
-                except:
-                    symbols_out_onehot[0][0] = 1.0
-                symbols_out_onehot = np.reshape(symbols_out_onehot,[1,-1])
+                        symbols_out_onehot[i][embedding_model.wv.vocab[training_data[offset+n_input+i]].index] = 1.0
+                    except:
+                        symbols_out_onehot[i][0] = 1.0
+                #print(embedded_batch)
+                symbols_out_onehot = np.reshape(symbols_out_onehot,[batch_size,-1])
 
 
-                _, acc, loss, onehot_pred = session.run([optimizer, accuracy, cost, probas], \
-                                                        feed_dict={x: embedded_symbols, y: symbols_out_onehot})
+                _, acc, loss, embedding_pred = session.run([optimizer, accuracy, cost, probas], \
+                                                        feed_dict={x: embedded_batch, y: symbols_out_onehot})
+                predictions = []
+                for prediction in embedding_pred:
+                    predictions.append(embedding_model.wv.index2word[prediction])
 
-                onehot_pred = embedding_model.wv.index2word[onehot_pred[0]]
 
                 loss_total += loss
                 acc_total += acc
@@ -193,10 +196,16 @@ if __name__ == '__main__':
                           "{:.2f}%".format(100*acc_total/display_step))
                     acc_total = 0
                     loss_total = 0
-                    symbols_in = [training_data[i] for i in range(offset, offset + n_input)]
-                    symbols_out = training_data[offset + n_input]
+                    symbols_in = []
+                    symbols_out = []
+                    for batch in range(batch_size):
+                        symbol_in = [training_data[i] for i in range(offset+batch, offset + n_input + batch)]
+                        symbols_in.append(symbol_in)
+                        symbol_out = training_data[offset + n_input+batch]
+                        symbols_out.append(symbol_out)
                     #symbols_out_pred = reverse_dictionary[int(tf.argmax(onehot_pred, 1).eval())]
-                    print("%s - [%s] vs [%s]" % (symbols_in,symbols_out,onehot_pred))
+                    for batch in range(batch_size):
+                        print("%s - [%s] vs [%s]" % (symbols_in[batch],symbols_out[batch],predictions[batch]))
                 step += 1
                 offset += (n_input+1)
             print("Optimization Finished!")
@@ -227,10 +236,11 @@ if __name__ == '__main__':
                     embedded_symbols.append(embedding)
                 # embeded_symbols shape [1, n_input, n_hidden]
                 embedded_symbols = [embedded_symbols]
+                output_sent = "%s" % (input_sent)
                 for i in range(32):
                     onehot_pred = session.run(probas, feed_dict={x: embedded_symbols})
                     onehot_pred = embedding_model.wv.index2word[onehot_pred[0]]
-                    output_sent = "%s %s" % (input_sent, onehot_pred)
+                    output_sent +=  " %s" % (onehot_pred)
                     embedded_symbols = embedded_symbols[0][1:]
                     embedded_symbols.append(embedding_model.wv[onehot_pred])
                     embedded_symbols = [embedded_symbols]
