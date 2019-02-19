@@ -4,7 +4,12 @@
  Method of reproduction:
     bitwise crossover.
 
-use code from run.py 134-148 as a fitness function.
+Questions as of 19 February:
+    - how to evaluate fitness...
+        * obviously, we use an amalgamation of loss and accuracy,
+          but should I include an evaluate_individual function, or
+          let the user define a way to best evaluate an individual...
+
 """
 import sys, os
 import random
