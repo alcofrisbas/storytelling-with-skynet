@@ -88,28 +88,24 @@ def deleteStory(request, id):
 
 def write(request):
     if "story_id" not in request.session.keys() or not Story.objects.filter(id = request.session["story_id"]).exists():
-        print("starting new story")
         newStory(request)
 
-    if "developer" not in request.session.keys():
-        request.session["developer"] = False
+    if "AI" not in request.session.keys():
+        request.session["AI"] = True
 
-    story = Story.objects.get(id = request.session["story_id"])
+    story = Story.objects.get(id=request.session["story_id"])
     suggestion = ""
-    editing = request.session["editing"]
 
     if request.POST:
-        print("======== ===== ===== ====")
-        print(request.POST.keys())
         if request.POST.get("text"):
-            newSentence = request.POST["text"]
-            story.sentences += newSentence.strip()+ "\n"
+            new_sentence = request.POST["text"]
+            story.sentences += new_sentence.strip() + "\n"
             story.save()
 
-            if not editing:
-                suggestion = generateSuggestion(newSentence, develop=request.session["developer"])
+            if request.session["AI"] and not request.session["editing"]:
+                suggestion = generateSuggestion(new_sentence)
 
-            request.session["editing"] = not editing
+            request.session["editing"] = not request.session["editing"]
 
         if request.POST.get("title"):
             story.title = request.POST["title"]
@@ -123,16 +119,7 @@ def write(request):
             return redirect('/')
 
         if request.POST.get("side-toggle"):
-            print("toggle story Pressed")
-            request.session["developer"] = not request.session["developer"]
-            print("dev mode", request.session["developer"])
-
-        if request.POST.get("sentence-content"):
-            print("-- -- -- -- --")
-            print(request.POST["sentence-content"])
-            print("-- -- -- -- --")
-            story.sentences = request.POST["sentence-content"].strip()
-            story.save()
+            request.session["AI"] = not request.session["AI"]
 
     elif request.GET.get("new"):
         return redirect('/new_story')
@@ -141,15 +128,11 @@ def write(request):
     if story.sentences != "":
         last = story.sentences.split("\n")[-1]
 
-    power = "glow"
-    if request.session["developer"]:
-        power = ""
-
     return render(request, 'webapp/write.html',
                   context={"prompt": story.prompt,
                   "sentences": [s.strip() for s in story.sentences.split("\n")[:-1]],
-                  "suggestion": suggestion, "last":last,
-                  "title": story.title, "power":power})
+                  "suggestion": suggestion, "last": last,
+                  "title": story.title, "AI": request.session["AI"]})
 
 
 def about(request):
@@ -187,9 +170,7 @@ def generatePrompt(curPrompt=""):
     return curTopic
 
 
-def generateSuggestion(newSentence, develop=False):
-    if develop:
-        return "look! a {} {}".format(random.choice(ADJECTIVES), random.choice(ANIMALS))
+def generateSuggestion(newSentence):
     try:
         #suggestion = generate_text(sess, model, word_to_id, id_to_word, seed=newSentence)
         #suggestion = run(newSentence)
