@@ -119,8 +119,8 @@ def write(request):
         if request.POST.get("new"):
             return redirect('/new_story')
 
-        if request.POST.get("side-open"):
-            print("open story Pressed")
+        if request.POST.get("home"):
+            return redirect('/')
 
         if request.POST.get("side-toggle"):
             print("toggle story Pressed")
