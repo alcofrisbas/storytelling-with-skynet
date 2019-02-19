@@ -96,14 +96,15 @@ def RNN(x, weights):
     # generate prediction
     # the shape of outputs is [batch_size, n_input, n_hidden]
     outputs, states = tf.nn.dynamic_rnn(cell=rnn_cell, inputs = x, dtype = tf.float32)
+    output = states[-1].h
     #outputs, states = rnn.static_rnn(rnn_cell, x, dtype=tf.float32)
 
     # there are n_input outputs but
     # we only want the last output
-    return tf.matmul(tf.reshape(outputs, [n_input, n_hidden]), tf.transpose(weights['out']))
+    return tf.matmul(output, tf.transpose(weights['out']))
 
 pred = RNN(x, weights)
-probas = tf.nn.softmax(pred, name='p')
+probas = tf.argmax(pred, 1)
 # Loss and optimizer
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=pred, labels=y))
 optimizer = tf.train.RMSPropOptimizer(learning_rate=learning_rate).minimize(cost)
@@ -168,15 +169,21 @@ if __name__ == '__main__':
                         embedding = np.zeros((300,), dtype=np.float)
                     embedded_symbols.append(embedding)
                 # embeded_symbols shape [1, n_input, n_hidden]
-                embedded_symbols = [embedded_symbols]
+                embedded_symbols = np.array([embedded_symbols])
 
                 symbols_out_onehot = np.zeros([1, vocab_size], dtype=float)
+                try:
+                    symbols_out_onehot[0][embedding_model.wv.vocab[training_data[offset+n_input]].index] = 1.0
+                except:
+                    symbols_out_onehot[0][0] = 1.0
+                symbols_out_onehot = np.reshape(symbols_out_onehot,[1,-1])
+
 
                 _, acc, loss, onehot_pred = session.run([optimizer, accuracy, cost, probas], \
                                                         feed_dict={x: embedded_symbols, y: symbols_out_onehot})
 
-                onehot_pred = np.argmax(onehot_pred[3])
-                onehot_pred = embedding_model.wv.index2word[onehot_pred]
+                onehot_pred = embedding_model.wv.index2word[onehot_pred[0]]
+
                 loss_total += loss
                 acc_total += acc
                 if (step+1) % display_step == 0:
