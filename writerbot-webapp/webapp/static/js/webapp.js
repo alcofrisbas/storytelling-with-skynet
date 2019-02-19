@@ -110,13 +110,12 @@ $(document).ready(function(){
 
 $("#input-form").keyup(function(event)
 {
-    console.log("asdf");
     if (event.keyCode == 13)
     {
         event.preventDefault();
         $("#input-form").submit();
+        document.getElementById('input-form').focus();
     }
-    return true;
 });
 
 

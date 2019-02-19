@@ -59,7 +59,7 @@
 
         <form method="post" id="input-form">
             {% csrf_token %}
-            <textarea name="text" class="form-control">{{ suggestion }}</textarea><br>
+            <textarea name="text" class="form-control" autofocus>{{ suggestion }}</textarea><br>
             <button type="submit" class="btn btn-primary btn-lg">Add Sentence</button>
         </form><br>
 

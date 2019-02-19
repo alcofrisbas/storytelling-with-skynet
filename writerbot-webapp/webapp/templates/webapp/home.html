@@ -11,8 +11,8 @@
       {% else %}
             <h1 class="display-4">Welcome back, {{ user.first_name }}!</h1>
             <p class="lead">Continue your creative journey with WriterBot.</p>
-            <hr class="my-4">
             {% if stories %}
+                <hr class="my-4">
                 <p>Your current stories:</p>
                 {% for story in stories %}
                     <div class="card">
