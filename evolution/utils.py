@@ -1,6 +1,12 @@
 import struct
+import random
 
-import struct
+def random_list_int(low, high, k):
+    x = []
+    while len(x) < k:
+        x = sorted(list(set(random.sample(range(low, high),k))))
+
+    return x
 
 def float_to_bin(num):
     return format(struct.unpack('!I', struct.pack('!f', num))[0], '032b')
@@ -14,7 +20,11 @@ def int_to_bin(num):
 def bin_to_int(binary):
     return int(binary, 2)
 
-
+def num(s):
+    try:
+        return int(s)
+    except ValueError:
+        return float(s)
 
 
 if __name__ == '__main__':

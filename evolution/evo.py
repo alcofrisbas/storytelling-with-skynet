@@ -8,10 +8,37 @@ use code from run.py 134-148 as a fitness function.
 """
 import sys, os
 import random
+import json
 from utils import *
 
 
 class Individual:
+    """
+    An Individual is a member of a population. It contains genetic information
+    that will affect the outcome of our problem: the loss after one epoch of
+    training of our RNN.
+
+    :: labels: a list of attribute names
+    :: values: a list of attribute values
+    :: code: a binary representation of these values(32bit ints and floats)
+        this code is by default empty. If it is not, then init will
+        automatically convert it into values.
+    :: type_markers: a list of attribute types(either "float" or "int") used by
+        encode and decode.
+    :: exempt: a dictionary of labeled values that are passed down regardless of
+        performance. Used primarily for vocab_size in our case.
+
+    Two Individuals can reproduce, which involves both k-random recombination
+    and 1.0/l mutation. By encoding our values into binary, we provide a greater
+    diversity and potential for mutation. Each pair produces a pair of children,
+    both of which, combnined together contain ALL of both parents' genetic
+    material.
+
+    The other method that we considered is simply interpolating, or weigthing
+    an average between parents for each attribute, based on a random
+    distribution, but that only provides piece-wise variance, as opposed to bit-
+    wise variance.
+    """
     def __init__(self, labels, values, code="", type_markers=[], exempt={}):
         self.labels = labels
         self.values = values
@@ -21,8 +48,23 @@ class Individual:
             self.decode()
         else:
             self.encode()
+        self.exempt = exempt
+
+    def __str__(self):
+        s = "== inherited traits ==\n"
+        for l in range(len(self.labels)):
+            s += "{}\t{:.5}\n".format(self.labels[l], str(self.values[l]))
+        s += "== exempt traits ==\n"
+        for e in self.exempt:
+            s += ("{}\t{:.5}\n".format(e, str(self.exempt[e])))
+        s += "== code ==\n"
+        s += self.code
+        return s
 
     def encode(self):
+        """
+        Convert the list of values into bits and a list of types for decoding
+        """
         for v in self.values:
             if isinstance(v, int):
                 self.type_markers.append("int")
@@ -32,6 +74,9 @@ class Individual:
                 self.code += float_to_bin(v)
 
     def decode(self):
+        """
+        convert a string of bits into a list of values based on type markers
+        """
         for i,t in enumerate(self.type_markers):
             start = i*32
             end = start+32
@@ -43,11 +88,15 @@ class Individual:
                 self.values.append(bin_to_float(self.code[start: end]))
 
     def attributes(self):
+        """
+        return a dictionary of attributes, including exempt attributes
+        """
         d = {}
         for i in range(len(self.values)):
             d[self.labels[i]] = self.values[i]
-        d.update(exempt)
+        d.update(self.exempt)
         return d
+
 
 def mutate(s):
     prob = 1.0/len(s)
@@ -62,12 +111,16 @@ def mutate(s):
             new_s += s[i]
     return s
 
-def crossover(a, b, k=1):
+
+def reproduce(a, b, k=1):
+    """
+    first recombination, then mutation
+    """
     l = len(a.code)
     s1 = s2 = ""
     switch = 0
     rand = 0
-    randList = sorted(random.sample(range(0, l), k))
+    randList = random_list_int(0, l, k)
 
     for i in range(len(randList)):
         if i == 0:
@@ -93,37 +146,33 @@ def crossover(a, b, k=1):
         s2 += a.code[prev:rand]
     s1 = mutate(s1)
     s2 = mutate(s2)
-    return Individual(a.labels, [], s1, a.type_markers), Individual(a.labels, [], s2, a.type_markers)
+    return Individual(a.labels, [], s1, a.type_markers, exempt=a.exempt),Individual(a.labels, [], s2, a.type_markers, exempt=b.exempt)
 
+def population_from_file(fname):
+    with open(fname+".traits", 'r') as f:
+        indivs = f.read().strip().split('\n')
+        labels = indivs.pop(0).split(",")
+    population = []
+    for i in indivs:
+        values = [num(j) for j in i.split(",")]
+        population.append(Individual(labels,values))
+    with open(fname+".exempt", 'r') as f:
+        exempts = f.read().strip().split('\n')
+    for i in range(len(exempts)):
+        population[i].exempt = json.loads(exempts[i])
+    return population
 
+def file_from_population(fname, population):
+    with open(fname+".traits",'w') as w:
+        w.write(",".join(population[0].labels)+"\n")
+        for p in population:
+            w.write(",".join([str(i) for i in p.values]))
+            w.write("\n")
+    with open(fname+".exempt", 'w') as w:
+        for p in population:
+            w.write(json.dumps(p.exempt))
+            w.write("\n")
 
-def reproduce(a, b, k_bounds=(0.25,0.5)):
-    k = random.uniform(k_bounds[0], k_bounds[1])
-    offspring1 = linear_interpolate(a,b,k)
-    offspring2 = linear_interpolate(a,b,1.0-k)
-    return offspring1, offspring2
-
-def test_fitness(d):
-    d_new = {}
-    return d_new
-
-def load_individuals(fname):
-    pass
-
-def save_individuals(fname,d):
-    return
 
 if __name__ == '__main__':
-    labels = ["init_scale","learning_rate", "max_grad_norm", "num_layers",
-            "num_steps", "hidden_size", "max_epoch", "max_max_epoch", "keep_prob",
-            "lr_decay", "batch_size"]
-
-    values1 = [0.1, 1.0, 5, 2, 20, 200, 4, 1, 1.0, 0.5, 1]
-    values2 = [0.05, 1.0, 5, 2, 35, 650, 6, 1, 0.8, 0.8, 1]
-    exempt = {"vocab_size":10011}
-    i1 = Individual(labels, values2, exempt= exempt)
-    i2 = Individual(labels, values1,exempt = exempt)
-
-    i3, i4 = crossover(i1,i2, k=300)
-    for i in range(len(i3.labels)):
-        print("{}:\t{:.5}\t{:.5}".format( i3.labels[i], str(i4.values[i]), str(i3.values[i])))
+    pass

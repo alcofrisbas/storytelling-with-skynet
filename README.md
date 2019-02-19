@@ -5,6 +5,32 @@ Malcolm
 Ben
 Tenzin
 
+# To Run Our Code
+
+Install `virtualenv`:
+```
+pip3 install virtualenv
+```
+
+run our init_setup.sh:
+```
+chmod +x init_setup.sh
+./init_setup.sh
+```
+
+Now, to train our neural network:
+```
+venv/bin/python ./RNN/run.py
+```
+
+To start the webapp:
+```
+venv/bin/python ./writerbot-webapp/manage.py runserver
+```
+
+#### Please run all code from the root directory
+
+
 ### Meeting Schedule:
 | Day | Time|
 |-----|-----|

@@ -146,6 +146,7 @@ if TRAIN:
         print("---training---\n")
         loss = model.batch_train(sess, saver, config, FLAGS.train_file, FLAGS.valid_file)
 print("---finished training---\n")
+print(loss[0][0])
 """
 tf.reset_default_graph()
 gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.35)
