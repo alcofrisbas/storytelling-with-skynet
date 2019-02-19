@@ -78,41 +78,6 @@ def RNN(x, weights, biases):
     # we only want the last output
     return tf.matmul(outputs[-1], weights['out']) + biases['out']
 
-# def generateText(input):
-#     init = tf.global_variables_initializer()
-#     with tf.Session() as session:
-#         session.run(init)
-#         saver = tf.train.Saver()
-#         saver.restore(session, tf.train.latest_checkpoint('simpleRNN/models'))
-#         sentence = input.strip()
-#         words = sentence.split(' ')
-#
-#         print(words)
-#         if len(words) != n_input:
-#             words = words[(len(words) - n_input):-1]
-#
-#         print(words)
-#
-#         if len(words) == n_input:
-#             try:
-#                 symbols_in_keys = [dictionary[str(words[i])] for i in range(len(words))]
-#                 for i in range(32):
-#                     keys = np.reshape(np.array(symbols_in_keys), [-1, n_input, 1])
-#                     onehot_pred = session.run(pred, feed_dict={x: keys})
-#                     onehot_pred_index = int(tf.argmax(onehot_pred, 1).eval())
-#                     sentence = "%s %s" % (sentence, reverse_dictionary[onehot_pred_index])
-#                     symbols_in_keys = symbols_in_keys[1:]
-#                     symbols_in_keys.append(onehot_pred_index)
-#                 return sentence
-#             except Exception as e:
-#                 print(e)
-#                 return "Word not in dictionary"
-#         else:
-#             print(words)
-#             return "ya did your math wrong, doofus"
-#
-#
-
 def train(session, writer, training_data, dictionary, reverse_dictionary, vocab_size, optimizer, accuracy, cost, pred, x, y):
     step = 0
     offset = random.randint(0, n_input + 1)
@@ -154,77 +119,12 @@ def train(session, writer, training_data, dictionary, reverse_dictionary, vocab_
     print("Run on command line.")
     print("Point your web browser to: http://localhost:6006/")
     saver = tf.train.Saver()
-    saver.save(session, "simpleRNN/models/best_model.ckpt")
-
-
-def run(input):
-    # Target log path
-    logs_path = '/tmp/tensorflow/rnn_words'
-    writer = tf.summary.FileWriter(logs_path)
-
-    # Text file containing words for training
-    training_file = 'simpleRNN/belling_the_cat.txt'
-
-    training_data = read_data(training_file)
-    print("Loaded training data...")
-
-    dictionary, reverse_dictionary = build_dataset(training_data)
-    vocab_size = len(dictionary)
-
-    # tf Graph input
-    x = tf.placeholder("float", [None, n_input, 1])
-    y = tf.placeholder("float", [None, vocab_size])
-
-    # RNN output node weights and biases
-    weights = {
-        'out': tf.Variable(tf.random_normal([n_hidden, vocab_size]))
-    }
-    biases = {
-        'out': tf.Variable(tf.random_normal([vocab_size]))
-    }
-
-    pred = RNN(x, weights, biases)
-
-    # Loss and optimizer
-    cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=pred, labels=y))
-    optimizer = tf.train.RMSPropOptimizer(learning_rate=learning_rate).minimize(cost)
-
-    # Model evaluation
-    correct_pred = tf.equal(tf.argmax(pred,1), tf.argmax(y,1))
-    accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
-
-    # Initializing the variables
-    init = tf.global_variables_initializer()
-
-    # Launch the graph
-    with tf.Session() as session:
-        session.run(init)
-        saver = tf.train.Saver()
-        saver.restore(session, tf.train.latest_checkpoint('simpleRNN/models'))
-        while True:
-            #prompt = "%s words: " % n_input
-            sentence = input
-            sentence = sentence.strip()
-            words = sentence.split(' ')
-            if len(words) != n_input:
-                continue
-            try:
-                symbols_in_keys = [dictionary[str(words[i])] for i in range(len(words))]
-                for i in range(32):
-                    keys = np.reshape(np.array(symbols_in_keys), [-1, n_input, 1])
-                    onehot_pred = session.run(pred, feed_dict={x: keys})
-                    onehot_pred_index = int(tf.argmax(onehot_pred, 1).eval())
-                    sentence = "%s %s" % (sentence,reverse_dictionary[onehot_pred_index])
-                    symbols_in_keys = symbols_in_keys[1:]
-                    symbols_in_keys.append(onehot_pred_index)
-                return sentence
-            except:
-                return "Word not in dictionary"
+    saver.save(session, "simpleRNN/models2/best_model.ckpt")
 
 
 def setup():
     # Target log path
-    logs_path = '/tmp/tensorflow/rnn_words'
+    logs_path = '/tmp/tensorflow/rnn_words2'
     writer = tf.summary.FileWriter(logs_path)
 
     # Text file containing words for training

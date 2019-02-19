@@ -91,3 +91,14 @@ i {
 #title-header {
     padding-top: 50px;
 }
+
+#title-input {
+    font-size: 30px;
+    border-style: solid;
+    border-color: white;
+}
+
+#title-input:hover {
+    border-style: inset;
+    border-color: initial;
+}

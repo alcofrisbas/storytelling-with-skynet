@@ -97,14 +97,6 @@ function togglePower(){
 );
 }
 
-// $("#side-form").submit( function(eventObj) {
-//       $('<input />').attr('type', 'hidden')
-//           .attr('name', "something")
-//           .attr('value', "something")
-//           .appendTo('#side-form');
-//       return true;
-//   });
-
 
 //window.onload = init;
 window.onload = load;
@@ -127,21 +119,6 @@ $("#input-form").keyup(function(event)
     return true;
 });
 
-
-// document.addEventListener('keyup', function(e) {
-//   if (e.key === 'Enter' && e.target.tagName === 'P') {
-//     console.log('ENTER');
-//     $("#side-form").submit(
-//     //      function(eventObj) {
-//     //     $('<input />').attr('type', 'hidden')
-//     //             .attr('name', "something")
-//     //             .attr('value', "something")
-//     //             .appendTo('this');
-//     //     return true;
-//     // }
-//     );
-//   }
-// });
 
 $("#title-form").keyup(function(event)
 {

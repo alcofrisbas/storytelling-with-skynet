@@ -38,15 +38,11 @@
 </div>
 </form>
 <div class="main">
-<!-- {#        <form method="post" id="title-form">#}
-{#            {% csrf_token %}#}
-{#            <input type="text" name="title" placeholder="Untitled story" class="mt-5 form-control"></input>#}
-{#        </form>#} -->
-        <div>
-            <h4 id="title-header">{{ title }}</h4>
-            <h5>Prompt: {{ prompt }}</h5>
-        </div>
-
+    <form method="post" id="title-form">
+            {% csrf_token %}
+        <input id="title-input" type="text" name="title" placeholder="Untitled story" value="{{ title }}" class="mt-5"></form>
+    <hr class="my-2">
+    <h5>Prompt: {{ prompt }}</h5>
         {% if not sentences %}
             <p>Start writing here: </p>
         {% else %}
@@ -57,7 +53,7 @@
                     {{ sentence }}<br>
                 {% endif %}
             {% endfor %}
-            {{ last }}<br>
+            {{ last }}
             </p>
         {% endif %}
 
@@ -123,4 +119,7 @@
             </div>
           </div>
         </div>
+    {% load staticfiles %}
+    <script src="{% static 'js/stretchy.min.js' %}" async></script>
+{#    https://leaverou.github.io/stretchy/#}
 {% endblock %}

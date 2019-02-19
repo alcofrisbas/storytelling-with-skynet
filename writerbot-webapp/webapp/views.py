@@ -9,7 +9,7 @@ from webapp.models import User
 #sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'RNN'))
 #from rnn_test import load_model, generate_text
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'simpleRNN'))
-from rnn_words2 import run
+#from rnn_words2 import run
 import random
 from webapp.words import ADJECTIVES, ANIMALS
 
@@ -114,6 +114,7 @@ def write(request):
 
         if request.POST.get("title"):
             story.title = request.POST["title"]
+            story.save()
 
         # TODO: make Save button grayed out after saving, revert after edit
         if request.POST.get("save"):
@@ -206,7 +207,8 @@ def generateSuggestion(newSentence, develop=False):
         return "look! a {} {}".format(random.choice(ADJECTIVES), random.choice(ANIMALS))
     try:
         #suggestion = generate_text(sess, model, word_to_id, id_to_word, seed=newSentence)
-        suggestion = run(newSentence)
+        #suggestion = run(newSentence)
+        suggestion="placeholder"
     except Exception as e:
         print("ERROR (suggestion generation)")
         suggestion = e
