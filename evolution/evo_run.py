@@ -102,9 +102,26 @@ class LargeConfig(object):
     max_epoch = 20
     max_max_epoch = 30
     keep_prob = 0.35
-    lr_decay = 1 / 1.15
+    lr_decay = 1.0 / 1.15
     batch_size = 1
     vocab_size = 10000
+
+
+class Config(object):
+    init_scale = 0
+    learning_rate = 0
+    max_grad_norm = 0
+    num_layers = 0
+    num_steps = 0
+    hidden_size = 0
+    max_epoch = 0
+    max_max_epoch = 0
+    keep_prob = 0
+    lr_decay = 0
+    batch_size = 0
+    vocab_size = 0
+
+def set_config(): # need to make this change the above class's values
 
 def get_config():
     """Get model config."""
@@ -123,6 +140,8 @@ def get_config():
     return config
 
 def train(config):
+    tf.reset_default_graph()
+    print(config.__dict__)
     print("---beginning training process---\n")
     # generate vocabulary and ids for all data
     if not os.path.isfile("RNN/data/vocab.csv"):
@@ -139,8 +158,8 @@ def train(config):
     with open("RNN/data/vocab.csv") as vocab:
         vocab_size = len(vocab.readlines())
     print("---vocab created---")
-    #config = get_config()
-
+    config = get_config()
+    print(config.__dict__)
     def create_model(sess):
         model = RNN.RNNModel(vocab_size = vocab_size, config=config,
             num_train_samples=num_train_samples, num_valid_samples=num_valid_samples)
@@ -164,9 +183,12 @@ def train(config):
 
 if __name__ == '__main__':
     population = population_from_file("evolution/test_pop")
+    c = Config()
     for i in range(len(population)):
-        config = namedtuple("Config", population[i].attributes().keys())(*population[i].attributes().values())
-        train(config)
+        #config = namedtuple("Config", population[i].attributes().keys())(*population[i].attributes().values())
+        for a in population[i].attributes().keys():
+            setattr(c, a, population[i].attributes()[a])
+        train(c)
 
 """
 tf.reset_default_graph()
