@@ -9,13 +9,11 @@ from webapp.models import User
 #sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'RNN'))
 #from rnn_test import load_model, generate_text
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'simpleRNN'))
-from rnn_words import generateText
+from rnn_words2 import run
 import random
 from webapp.words import ADJECTIVES, ANIMALS
 
 #sess, model, word_to_id, id_to_word = None, None, None, None
-
-sess = None
 
 #TODO: when user logs in, redirect to the page they logged in from
 #TODO: figure out how to clear empty stories and expired session data
@@ -208,7 +206,7 @@ def generateSuggestion(newSentence, develop=False):
         return "look! a {} {}".format(random.choice(ADJECTIVES), random.choice(ANIMALS))
     try:
         #suggestion = generate_text(sess, model, word_to_id, id_to_word, seed=newSentence)
-        suggestion = generateText(newSentence)
+        suggestion = run(newSentence)
     except Exception as e:
         print("ERROR (suggestion generation)")
         suggestion = e
