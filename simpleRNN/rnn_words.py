@@ -14,6 +14,7 @@ from tensorflow.contrib import rnn
 import random
 import collections
 import time
+from nltk.tokenize import word_tokenize
 import gensim
 import sys
 
@@ -169,7 +170,7 @@ if __name__ == '__main__':
                         embedding = np.zeros((300,), dtype=np.float)
                     embedded_symbols.append(embedding)
                 # embeded_symbols shape [1, n_input, n_hidden]
-                embedded_symbols = np.array([embedded_symbols])
+                embedded_symbols = [embedded_symbols]
 
                 symbols_out_onehot = np.zeros([1, vocab_size], dtype=float)
                 try:
@@ -203,27 +204,36 @@ if __name__ == '__main__':
             print("Run on command line.")
             print("\ttensorboard --logdir=%s" % (logs_path))
             print("Point your web browser to: http://localhost:6006/")
-            saver = tf.train.Saver()
+            saver = tf.train.Saver()# -*- coding: utf-8 -*-
+
             saver.save(session, "simpleRNN/models/best_model.ckpt")
         else:
             saver = tf.train.Saver()
             saver.restore(session, tf.train.latest_checkpoint('simpleRNN/models'))
         while True:
             prompt = "%s words: " % n_input
-            sentence = input(prompt)
-            sentence = sentence.strip()
-            words = sentence.split(' ')
-            if len(words) != n_input:
+            input_sent = input(prompt)
+            input_sent = word_tokenize(input_sent)
+            embedded_symbols = []
+            if len(input_sent) != n_input:
                 continue
             try:
-                symbols_in_keys = [dictionary[str(words[i])] for i in range(len(words))]
+                for word in input_sent:
+                    try:
+                        embedding = embedding_model.wv[word]
+                    except KeyError:
+                        print(word + " not in vocabulary")
+                        embedding = np.zeros((300,), dtype=np.float)
+                    embedded_symbols.append(embedding)
+                # embeded_symbols shape [1, n_input, n_hidden]
+                embedded_symbols = [embedded_symbols]
                 for i in range(32):
-                    keys = np.reshape(np.array(symbols_in_keys), [-1, n_input, 1])
-                    onehot_pred = session.run(pred, feed_dict={x: keys})
-                    onehot_pred_index = int(tf.argmax(onehot_pred, 1).eval())
-                    sentence = "%s %s" % (sentence,reverse_dictionary[onehot_pred_index])
-                    symbols_in_keys = symbols_in_keys[1:]
-                    symbols_in_keys.append(onehot_pred_index)
-                print(sentence)
+                    onehot_pred = session.run(probas, feed_dict={x: embedded_symbols})
+                    onehot_pred = embedding_model.wv.index2word[onehot_pred[0]]
+                    output_sent = "%s %s" % (input_sent, onehot_pred)
+                    embedded_symbols = embedded_symbols[0][1:]
+                    embedded_symbols.append(embedding_model.wv[onehot_pred])
+                    embedded_symbols = [embedded_symbols]
+                print(output_sent)
             except:
                 print("Word not in dictionary")
