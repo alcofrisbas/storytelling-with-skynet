@@ -234,42 +234,49 @@ class SimpleRNN:
             saver = tf.train.Saver()# -*- coding: utf-8 -*-
 
             saver.save(session, self.path_to_model+"/"+self.model_name)
+
+    def load(self):
+        pass
+    def prompt(self):
+        pass
+        
     def run(self):
-        saver = tf.train.Saver()
-        saver.restore(session, tf.train.latest_checkpoint(self.path_to_model))
-        while True:
-            prompt = "%s words: " % self.n_input
-            input_sent = input(prompt)
-            input_sent = word_tokenize(input_sent)
-            embedded_symbols = []
-            if len(input_sent) != self.n_input:
-                continue
-            try:
-                for word in input_sent:
-                    try:
-                        embedding = self.embedding_model.wv[word]
-                    except KeyError:
-                        print(word + " not in vocabulary")
-                        embedding = np.zeros((300,), dtype=np.float)
-                    embedded_symbols.append(embedding)
-                # embeded_symbols shape [1, n_input, n_hidden]
-                embedded_symbols = [embedded_symbols]
-                output_sent = "%s" % (input_sent)
-                for i in range(23):
-                    onehot_pred = session.run(probas, feed_dict={x: embedded_symbols})
-                    onehot_pred = self.embedding_model.wv.index2word[onehot_pred[0]]
-                    output_sent +=  " %s" % (onehot_pred)
-                    embedded_symbols = embedded_symbols[0][1:]
-                    embedded_symbols.append(self.embedding_model.wv[onehot_pred])
+        with tf.Session() as session:
+            saver = tf.train.Saver()
+            saver.restore(session, tf.train.latest_checkpoint(self.path_to_model))
+            while True:
+                prompt = "%s words: " % self.n_input
+                input_sent = input(prompt)
+                input_sent = word_tokenize(input_sent)
+                embedded_symbols = []
+                if len(input_sent) != self.n_input:
+                    continue
+                try:
+                    for word in input_sent:
+                        try:
+                            embedding = self.embedding_model.wv[word]
+                        except KeyError:
+                            print(word + " not in vocabulary")
+                            embedding = np.zeros((300,), dtype=np.float)
+                        embedded_symbols.append(embedding)
+                    # embeded_symbols shape [1, n_input, n_hidden]
                     embedded_symbols = [embedded_symbols]
-                print(output_sent)
-            except:
-                print("Word not in dictionary")
+                    output_sent = "%s" % (input_sent)
+                    for i in range(23):
+                        onehot_pred = session.run(probas, feed_dict={x: embedded_symbols})
+                        onehot_pred = self.embedding_model.wv.index2word[onehot_pred[0]]
+                        output_sent +=  " %s" % (onehot_pred)
+                        embedded_symbols = embedded_symbols[0][1:]
+                        embedded_symbols.append(self.embedding_model.wv[onehot_pred])
+                        embedded_symbols = [embedded_symbols]
+                    print(output_sent)
+                except:
+                    print("Word not in dictionary")
 
 if __name__ == '__main__':
     args = sys.argv[1:]
     rnn = SimpleRNN(0.001,50000,1000,4,2,300,"RNN/models/","best_model")
-    if args[0] == "train":
+    if len(args) > 1 and args[0] == "train":
         rnn.train()
     else:
         rnn.run()
