@@ -122,9 +122,6 @@ def write(request):
         if request.POST.get("side-open"):
             print("open story Pressed")
 
-        if request.POST.get("side-settings"):
-            print("settings story Pressed")
-
         if request.POST.get("side-toggle"):
             print("toggle story Pressed")
             request.session["developer"] = not request.session["developer"]

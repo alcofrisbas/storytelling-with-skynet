@@ -20,9 +20,11 @@
     <button class="side-btn"type="submit" data-toggle="tooltip" data-placement="right" title="Load"
         value="true" name="side-open" id="side-open">
         <i class="far fa-folder-open"></i></button>
-    <button class="side-btn"type="submit" data-toggle="tooltip" data-placement="right" title="Settings"
-        value="true" name="side-settings" id="side-settings">
-        <i class="fas fa-cog"></i></button>
+    <span data-toggle="modal" data-target="#settingsModal" data-target="#id">
+        <button class="side-btn" type="button" data-toggle="tooltip" data-placement="right" title="Settings"
+            value="true" name="side-settings" id="side-settings">
+            <i class="fas fa-cog"></i></button>
+    </span>
     <button class="side-btn" type="submit" data-toggle="tooltip" data-placement="right" title="AI"
         value="true" name="side-toggle" id="side-toggle">
         <i id="side-toggle-icon" class="fas fa-power-off {{ power }}"></i></button>
@@ -73,6 +75,29 @@
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                     <button class="btn btn-danger final" type="submit" title="New story"
                         value="true" name="new">Yes</button>
+                  </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal fade" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="settingsModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              <form method="post">
+                  <div class="modal-body">
+
+                    </div>
+                  {% csrf_token %}
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary final" type="submit" value="true" name="apply">Apply and Close</button>
                   </div>
               </form>
             </div>
