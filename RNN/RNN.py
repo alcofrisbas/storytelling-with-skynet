@@ -60,7 +60,7 @@ class RNNModel(object):
         def parse(line):
             line_split = tf.string_split([line])
             input_seq = tf.string_to_number(line_split.values[:-1], out_type=tf.int32)
-            output_seq = [tf.string_to_number(line_split.values[2], out_type=tf.int32)]
+            output_seq = [tf.string_to_number(line_split.values[-1], out_type=tf.int32)]
             return input_seq, output_seq
 
         training_dataset = tf.data.TextLineDataset(self.file_name_train).map(parse).padded_batch(config.batch_size, padded_shapes=([None], [None]))
@@ -82,10 +82,22 @@ class RNNModel(object):
         # sequence_length refers to length of sentence + padding
         self.input_batch, self.output_batch = iterator.get_next()
 
-        # inputs = [1, 1, 20]
+
+        # self.input_embedding_mat = tf.get_variable("input_embedding_mat",
+        #                                            [self.vocab_size, size],
+        #                                            dtype=tf.float32)
+        #
+        # self.input_embedded = tf.nn.embedding_lookup(self.input_embedding_mat, self.input_batch)
+        # print(self.input_embedded)
+        # with tf.Session() as sess:
+        #     print(sess.run(self.input_embedded))
+
+
+
+        # inputs = [1, 1, 5]
         #self.inputs = pad_up_to(self.input_batch, [1,100])
-        self.inputs = tf.slice(self.input_batch, [0, 1], [1, 1])
-        self.inputs = tf.reshape(self.inputs, [1, 1, 1])
+        #self.inputs = tf.slice(self.input_batch, [0, 1], [config.batch_size, 1])
+        self.inputs = tf.reshape(self.input_batch, [config.batch_size, 1, 5])
         self.inputs = tf.cast(self.inputs, tf.float32)
 
         non_zero_weights = tf.sign(self.input_batch)
@@ -95,7 +107,7 @@ class RNNModel(object):
         def make_cell():
             cell = tf.contrib.rnn.LSTMCell(size, state_is_tuple=True)
             if config.keep_prob < 1:
-                cell = tf.contrib.rnn.DropoutWrapper(cll, output_keep_prob=config.keep_prob)
+                cell = tf.contrib.rnn.DropoutWrapper(cell, output_keep_prob=config.keep_prob)
             return cell
 
 
@@ -161,35 +173,36 @@ class RNNModel(object):
 
     def batch_train(self, sess, saver, config, train_file, valid_file):
         """Runs the model on the given data."""
+        loss = 0
         for i in range(self.max_max_epoch):
             lr_decay = self.lr_decay ** max(i + 1 - self.max_epoch, 0.0)
             self.learning_rate = self.assign_lr(config.learning_rate * lr_decay)
-            sess.run(self.training_init_op, {self.file_name_train: "RNN/data/train.txt.ids"})
+            sess.run(self.training_init_op, {self.file_name_train: "RNN/data/test_train.txt.ids"})
             state = sess.run(self.initial_state)
             costs = 0.0
             iters = 0
             for step in range(self.train_epoch):
                 start_time = time.time()
-                cost, current_learning_rate, final_state, _, probas, loss, cost, input= sess.run(
-                    [self.cost, self.learning_rate, self.final_state, self.updates, self.probas, self.loss, self.cost, self.input_batch])
+                cost, current_learning_rate, final_state, _, probas, loss, input= sess.run(
+                    [self.cost, self.learning_rate, self.final_state, self.updates, self.probas, self.loss, self.input_batch])
                 costs += cost
-
+                loss = loss
                 iters += self.num_steps
-                if step % (self.train_epoch // 10) == 10:
+                if step % (self.train_epoch // 1) == 10:
                     print("%.3f perplexity: %.3f speed: %.0f wps" %
                         (step * 1.0 /self.train_epoch, np.exp(costs/iters),
                         iters * self.batch_size / (time.time() - start_time)))
 
             print("Epoch: %d Learning rate: %.3f" % (i + 1, sess.run(self.learning_rate)))
-            sess.run(self.validation_init_op, {self.file_name_validation:"RNN/data/valid.txt.ids"})
+            sess.run(self.validation_init_op, {self.file_name_validation:"RNN/data/test_valid.txt.ids"})
             dev_costs = 0.0
             state = sess.run(self.initial_state)
             iters = 0
             for step in range(self.valid_epoch):
                 start_time = time.time()
-                dev_cost, final_state = sess.run(
-                    [self.cost, self.final_state])
-
+                dev_cost, final_state, input = sess.run(
+                    [self.cost, self.final_state, self.input_batch])
+                print(input)
                 dev_costs += dev_cost
                 iters += self.num_steps
                 """
@@ -201,7 +214,7 @@ class RNNModel(object):
 
             print("Epoch: %d Learning rate: %.3f" % (i + 1, sess.run(self.learning_rate)))
             saver.save(sess, "RNN/models/best_model.ckpt")
-
+            return loss
     def predict(self, sess, input_file, raw_file, verbose=False):
         # if verbose is true, then we print the ppl of every sequence
 

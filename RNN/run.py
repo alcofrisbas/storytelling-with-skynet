@@ -34,11 +34,11 @@ flags.DEFINE_string(
 
 flags.DEFINE_string("save_path",".RNN/models" ,
                     "Model output directory.")
-flags.DEFINE_string("train_file", "RNN/data/train.txt",
+flags.DEFINE_string("train_file", "RNN/data/test_train.txt",
                     "The file containing the training data")
-flags.DEFINE_string("valid_file", "RNN/data/valid.txt",
+flags.DEFINE_string("valid_file", "RNN/data/test_valid.txt",
                     "The file containing the validation data")
-flags.DEFINE_string("test_file", "RNN/data/test.txt",
+flags.DEFINE_string("test_file", "RNN/data/test_test.txt",
                     "The file containing the testing data")
 FLAGS = flags.FLAGS
 
@@ -144,8 +144,10 @@ if TRAIN:
         print("---model set---\n")
         saver = tf.train.Saver()
         print("---training---\n")
-        model.batch_train(sess, saver, config, FLAGS.train_file, FLAGS.valid_file)
+        loss = model.batch_train(sess, saver, config, FLAGS.train_file, FLAGS.valid_file)
 print("---finished training---\n")
+print(loss[0][0])
+"""
 tf.reset_default_graph()
 gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.35)
 with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
@@ -156,3 +158,4 @@ with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
     if not os.path.isfile(predict_id_file):
         reader.gen_id_seqs(test_file)
     model.predict(sess,predict_id_file, predict_id_file, verbose=VERBOSE)
+"""
