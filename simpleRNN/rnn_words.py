@@ -229,7 +229,7 @@ class SimpleRNN:
             print("Optimization Finished!")
             print("Elapsed time: ", self.elapsed(time.time() - self.start_time))
             print("Run on command line.")
-            print("\ttensorboard --logdir=%s" % (logs_path))
+            print("\ttensorboard --logdir=%s" % (self.logs_path))
             print("Point your web browser to: http://localhost:6006/")
             saver = tf.train.Saver()# -*- coding: utf-8 -*-
 
@@ -239,7 +239,7 @@ class SimpleRNN:
         pass
     def prompt(self):
         pass
-        
+
     def run(self):
         with tf.Session() as session:
             saver = tf.train.Saver()
@@ -275,8 +275,9 @@ class SimpleRNN:
 
 if __name__ == '__main__':
     args = sys.argv[1:]
-    rnn = SimpleRNN(0.001,50000,1000,4,2,300,"RNN/models/","best_model")
-    if len(args) > 1 and args[0] == "train":
+    rnn = SimpleRNN(0.001,1000,1000,4,2,300,"RNN/models/","best_model")
+    if len(args) >= 1 and args[0] == "train":
+        print("training now, mother fletcher")
         rnn.train()
     else:
         rnn.run()
