@@ -257,8 +257,19 @@ class SimpleRNN:
 
 if __name__ == '__main__':
     args = sys.argv[1:]
-    rnn = SimpleRNN(0.001, 5000, 1000, 4, 2, 300, "RNN/models/", "best_model")
+    learning_rate = 0.001
+    training_iters = 5000
+    display_step = 1000
+    n_input = 4
+    batch_size = 2
+    n_hidden = 300
+    path_to_model = "RNN/models/"
+    model_name = "best_model"
     if len(args) >= 1 and args[0] == "train":
+        rnn = SimpleRNN(learning_rate, training_iters, display_step, n_input,
+            batch_size, n_hidden, path_to_model, model_name)
         rnn.train()
     else:
+        rnn = SimpleRNN(learning_rate, training_iters, display_step, n_input,
+            1, n_hidden, path_to_model, model_name)
         rnn.run()
