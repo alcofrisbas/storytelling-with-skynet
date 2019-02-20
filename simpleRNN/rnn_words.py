@@ -258,7 +258,7 @@ class SimpleRNN:
 if __name__ == '__main__':
     args = sys.argv[1:]
     learning_rate = 0.001
-    training_iters = 5000
+    training_iters = 50000
     display_step = 1000
     n_input = 4
     batch_size = 2

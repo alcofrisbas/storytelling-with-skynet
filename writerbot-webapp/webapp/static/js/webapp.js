@@ -99,7 +99,7 @@ $(document).ready(function(){
 
 
 
-$("#input-form").keyup(function(event)
+$("#input-form").keydown(function(event)
 {
     if (event.keyCode == 13)
     {
