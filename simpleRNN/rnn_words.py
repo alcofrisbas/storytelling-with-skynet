@@ -19,7 +19,6 @@ from nltk.tokenize import word_tokenize
 import gensim
 
 
-
 """
 learning_rate = 0.001
 training_iters = 50000
@@ -31,11 +30,10 @@ n_hidden = 300
 path_to_model = "RNN/models/"
 """
 
-
 class SimpleRNN:
     # Parameters
     def __init__(self, learning_rate, training_iters, display_step, n_input,
-    batch_size ,n_hidden, path_to_model, model_name):
+    batch_size, n_hidden, path_to_model, model_name):
         self.learning_rate = learning_rate
         self.training_iters = training_iters
         self.display_step = display_step
@@ -94,8 +92,6 @@ class SimpleRNN:
         content = np.array(content)
         return content
 
-
-
     def build_dataset(self, words):
         count = collections.Counter(words).most_common()
         dictionary = dict()
@@ -103,15 +99,7 @@ class SimpleRNN:
             dictionary[word] = len(dictionary)
         reverse_dictionary = dict(zip(dictionary.values(), dictionary.keys()))
         return dictionary, reverse_dictionary
-
-
     #vocab_size = len(dictionary)
-
-
-
-
-
-
 
     def RNN(self):
         # 2-layer LSTM, each layer has self.n_hidden units.
@@ -133,8 +121,6 @@ class SimpleRNN:
         # we only want the last output
         return tf.matmul(output, tf.transpose(self.weights['out']))
 
-
-
     def generateText(input):
         with tf.Session() as session:
             session.run(init)
@@ -155,6 +141,7 @@ class SimpleRNN:
                     print(sentence)
                 except:
                     print("Word not in dictionary")
+
     def train(self):
         with tf.Session() as session:
             session.run(self.init)
@@ -235,11 +222,6 @@ class SimpleRNN:
 
             saver.save(session, self.path_to_model+"/"+self.model_name)
 
-    def load(self):
-        pass
-    def prompt(self):
-        pass
-
     def run(self):
         with tf.Session() as session:
             saver = tf.train.Saver()
@@ -263,21 +245,20 @@ class SimpleRNN:
                     embedded_symbols = [embedded_symbols]
                     output_sent = "%s" % (input_sent)
                     for i in range(23):
-                        onehot_pred = session.run(probas, feed_dict={x: embedded_symbols})
+                        onehot_pred = session.run(self.probas, feed_dict={self.x: embedded_symbols})
                         onehot_pred = self.embedding_model.wv.index2word[onehot_pred[0]]
                         output_sent +=  " %s" % (onehot_pred)
                         embedded_symbols = embedded_symbols[0][1:]
                         embedded_symbols.append(self.embedding_model.wv[onehot_pred])
                         embedded_symbols = [embedded_symbols]
                     print(output_sent)
-                except:
-                    print("Word not in dictionary")
+                except Exception as e:
+                    print(e)
 
 if __name__ == '__main__':
     args = sys.argv[1:]
-    rnn = SimpleRNN(0.001,1000,1000,4,2,300,"RNN/models/","best_model")
+    rnn = SimpleRNN(0.001, 5000, 1000, 4, 2, 300, "RNN/models/", "best_model")
     if len(args) >= 1 and args[0] == "train":
-        print("training now, mother fletcher")
         rnn.train()
     else:
         rnn.run()
