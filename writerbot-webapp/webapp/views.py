@@ -100,8 +100,9 @@ def write(request):
     if "AI" not in request.session.keys():
         request.session["AI"] = True
 
-    if "sess" not in request.session.keys():
-        request.session["sess"] = rnn.load()
+    # if "sess" not in request.session.keys():
+    #     request.session["sess"] = rnn.load()
+    sess = rnn.load()
 
     story = Story.objects.get(id=request.session["story_id"])
     suggestion = ""
@@ -113,7 +114,7 @@ def write(request):
             story.save()
 
             if request.session["AI"] and not request.session["editing"]:
-                suggestion = generateSuggestion(new_sentence)
+                suggestion = generateSuggestion(sess, new_sentence)
 
             request.session["editing"] = not request.session["editing"]
 
