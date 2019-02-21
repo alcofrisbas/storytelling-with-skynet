@@ -31,9 +31,11 @@ function setEdit(){
     editor.focus();
 }
 
+
 $("#para").keyup(function(event) {
     //console.log(event.keyCode);
 });
+
 
 $("#para").focusout(function(event) {
     var editor = document.getElementById("para");
@@ -74,10 +76,6 @@ function editUpdate(){
     console.log(editButton.type)
 }
 
-// function init(){
-//     console.log("listening?");
-//     document.getElementById('form').onsubmit = editUpdate;
-// }
 
 function togglePower(){
     console.log("power")
@@ -87,13 +85,6 @@ function togglePower(){
     document.getElementById('side-toggle').value="true";
     $("#side-form").submit(
         // this makes it so we can submit extra values for django purposes
-  //   function(eventObj) {
-  //     $('<input />').attr('type', 'hidden')
-  //         .attr('name', "something")
-  //         .attr('value', "something")
-  //         .appendTo('#side-form');
-  //     return true;
-  // }
 );
 }
 
@@ -108,7 +99,7 @@ $(document).ready(function(){
 
 
 
-$("#input-form").keyup(function(event)
+$("#input-form").keydown(function(event)
 {
     if (event.keyCode == 13)
     {

@@ -5,6 +5,9 @@
     {% csrf_token %}
 <div class="sidenav">
     {% if request.user.username %}
+        <button class="side-btn" type="submit" data-toggle="tooltip" data-placement="right" title="Home"
+            value="true" name="home" id="side-home">
+            <i class="fas fa-home"></i></button>
         <button class="side-btn" type="submit" data-toggle="tooltip" data-placement="right" title="New story"
             value="true" name="new" id="side-new">
             <i class="fas fa-plus"></i>
@@ -17,24 +20,19 @@
             </button>
         </span>
     {% endif %}
-    <span data-toggle="modal" data-target="#saveModal" data-target="#id">
-        <button class="side-btn" type="button" data-toggle="tooltip" data-placement="right" title="Save story"
-            value="true" name="side-save" data-placement="right" id="side-save">
-            <i class="far fa-save"></i>
-        </button>
-    </span>
-    <!-- <button class="side-btn" type="button" data-toggle="tooltip" data-placement="right" title="Edit story"
-        value="true" name="side-edit"  id="side-edit" onclick="setEdit()">
-        <i class="fas fa-pencil-alt"></i></button> -->
-    <button class="side-btn"type="submit" data-toggle="tooltip" data-placement="right" title="Load"
-        value="true" name="side-open" id="side-open">
-        <i class="far fa-folder-open"></i></button>
-    <button class="side-btn"type="submit" data-toggle="tooltip" data-placement="right" title="Settings"
-        value="true" name="side-settings" id="side-settings">
-        <i class="fas fa-cog"></i></button>
     <button class="side-btn" type="submit" data-toggle="tooltip" data-placement="right" title="AI"
         value="true" name="side-toggle" id="side-toggle">
-        <i id="side-toggle-icon" class="fas fa-power-off {{ power }}"></i></button>
+        {% if AI %}
+            <i id="side-toggle-icon" class="fas fa-power-off glow"></i>
+        {% else %}
+            <i id="side-toggle-icon" class="fas fa-power-off"></i>
+        {% endif %}
+        </button>
+    <span data-toggle="modal" data-target="#settingsModal" data-target="#id">
+        <button class="side-btn" type="button" data-toggle="tooltip" data-placement="right" title="Settings"
+            value="true" name="side-settings" id="side-settings">
+            <i class="fas fa-cog"></i></button>
+    </span>
 </div>
 </form>
 <div class="main">
@@ -43,9 +41,7 @@
         <input id="title-input" type="text" name="title" placeholder="Untitled story" value="{{ title }}" class="mt-5"></form>
     <hr class="my-2">
     <h5>Prompt: {{ prompt }}</h5>
-        {% if not sentences %}
-            <p>Start writing here: </p>
-        {% else %}
+        {% if sentences %}
         <!-- <p id = "para" style="padding:1px" contenteditable="{{ contentEdit }}"> -->
             <p>
             {% for sentence in sentences %}
@@ -55,46 +51,20 @@
             {% endfor %}
             {{ last }}
             </p>
+            <form method="post" id="input-form">
+                {% csrf_token %}
+                <textarea name="text" class="form-control" autofocus>{{ suggestion }}</textarea><br>
+                <button type="submit" class="btn btn-primary btn-lg">Add Sentence</button>
+            </form><br>
+        {% else %}
+            <br>
+            <form method="post" id="input-form">
+                {% csrf_token %}
+                <textarea name="text" class="form-control" placeholder="Start writing here"></textarea><br>
+                <button type="submit" class="btn btn-primary btn-lg">Add Sentence</button>
+            </form><br>
         {% endif %}
 
-        <form method="post" id="input-form">
-            {% csrf_token %}
-            <textarea name="text" class="form-control" autofocus>{{ suggestion }}</textarea><br>
-            <button type="submit" class="btn btn-primary btn-lg">Add Sentence</button>
-        </form><br>
-
-
-        <!-- Modal -->
-        <div class="modal fade" id="saveModal" tabindex="-1" role="dialog" aria-labelledby="saveModalLabel" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="saveModalLabel">Save</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <form method="post">
-                  {% csrf_token %}
-                  <div class="modal-body">
-                    {% if request.user.username %}
-                        Save your story as:
-                            <input type="text" name="title" placeholder="Add a title" class="form-control final" value= "{{ title }}"></input><br>
-                    {% else %}
-                        Please <a href="{% url 'social:begin' 'google-oauth2' %}">login with Google</a> to save your story.
-                    {% endif %}
-                  </div>
-                  {% if request.user.username %}
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button class="btn btn-danger final" type="submit"
-                        value="true" name="save">Save</button>
-                  </div>
-                  {% endif %}
-              </form>
-            </div>
-          </div>
-        </div>
 
         <div class="modal fade" id="newStoryModal" tabindex="-1" role="dialog" aria-labelledby="newStoryModalLabel" aria-hidden="true">
           <div class="modal-dialog" role="document">
@@ -119,7 +89,29 @@
             </div>
           </div>
         </div>
+
+        <div class="modal fade" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="settingsModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              <form method="post">
+                  {% csrf_token %}
+                  <div class="modal-body">
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-success final" type="submit" value="true" name="apply">Save</button>
+                  </div>
+              </form>
+            </div>
+          </div>
+        </div>
     {% load staticfiles %}
-    <script src="{% static 'js/stretchy.min.js' %}" async></script>
+    <script src="{% static 'js/stretchy.min.js' %}" data-filter="#title-form, #title-form *" async></script>
 {#    https://leaverou.github.io/stretchy/#}
 {% endblock %}

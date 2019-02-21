@@ -13,7 +13,6 @@ sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'simpleRNN'))
 import random
 from webapp.words import ADJECTIVES, ANIMALS
 
-#sess, model, word_to_id, id_to_word = None, None, None, None
 
 #TODO: when user logs in, redirect to the page they logged in from
 #TODO: figure out how to clear empty stories and expired session data
@@ -22,6 +21,12 @@ from webapp.words import ADJECTIVES, ANIMALS
 def home(request):
     if request.user.is_authenticated:
         user = getOrCreateUser(request)
+        if request.session.get("story_id"):
+            cur_story = Story.objects.get(id=request.session.get("story_id"))
+            cur_story.author = user
+            cur_story.save()
+            user.stories.add(cur_story)
+            user.save()
         stories = user.stories.all()
     else:
         stories = []
@@ -83,71 +88,38 @@ def deleteStory(request, id):
 
 def write(request):
     if "story_id" not in request.session.keys() or not Story.objects.filter(id = request.session["story_id"]).exists():
-        print("starting new story")
         newStory(request)
 
-    if "developer" not in request.session.keys():
-        request.session["developer"] = False
+    if "AI" not in request.session.keys():
+        request.session["AI"] = True
 
-    #global sess, model, word_to_id, id_to_word
-
-    # I was tired of loading TODO: UNCOMMENT ME
-    # if not model:
-    #     sess, model, word_to_id, id_to_word = load_model(save=False)
-
-    story = Story.objects.get(id = request.session["story_id"])
+    story = Story.objects.get(id=request.session["story_id"])
     suggestion = ""
-    editing = request.session["editing"]
 
     if request.POST:
-        print("======== ===== ===== ====")
-        print(request.POST.keys())
         if request.POST.get("text"):
-            newSentence = request.POST["text"]
-            story.sentences += newSentence.strip()+ "\n"
+            new_sentence = request.POST["text"]
+            story.sentences += new_sentence.strip() + "\n"
             story.save()
 
-            if not editing:
-                suggestion = generateSuggestion(newSentence, develop=request.session["developer"])
+            if request.session["AI"] and not request.session["editing"]:
+                suggestion = generateSuggestion(new_sentence)
 
-            request.session["editing"] = not editing
+            request.session["editing"] = not request.session["editing"]
 
         if request.POST.get("title"):
             story.title = request.POST["title"]
             story.save()
 
-        # TODO: make Save button grayed out after saving, revert after edit
-        if request.POST.get("save"):
-            if request.user.is_authenticated:
-                user = getOrCreateUser(request)
-                title = request.POST["title"]
-                s = Story.objects.get(id = request.session["story_id"])
-                s.title = title
-                s.save()
-            else:
-                return render(request, 'webapp/error.html', context={'message': "Please log in before trying to save a story."})
-
         # same functionality as "Start a new story button"
         if request.POST.get("new"):
             return redirect('/new_story')
 
-        if request.POST.get("side-open"):
-            print("open story Pressed")
-
-        if request.POST.get("side-settings"):
-            print("settings story Pressed")
+        if request.POST.get("home"):
+            return redirect('/')
 
         if request.POST.get("side-toggle"):
-            print("toggle story Pressed")
-            request.session["developer"] = not request.session["developer"]
-            print("dev mode", request.session["developer"])
-
-        if request.POST.get("sentence-content"):
-            print("-- -- -- -- --")
-            print(request.POST["sentence-content"])
-            print("-- -- -- -- --")
-            story.sentences = request.POST["sentence-content"].strip()
-            story.save()
+            request.session["AI"] = not request.session["AI"]
 
     elif request.GET.get("new"):
         return redirect('/new_story')
@@ -156,15 +128,11 @@ def write(request):
     if story.sentences != "":
         last = story.sentences.split("\n")[-1]
 
-    power = "glow"
-    if request.session["developer"]:
-        power = ""
-
     return render(request, 'webapp/write.html',
                   context={"prompt": story.prompt,
                   "sentences": [s.strip() for s in story.sentences.split("\n")[:-1]],
-                  "suggestion": suggestion, "last":last,
-                  "title": story.title, "power":power})
+                  "suggestion": suggestion, "last": last,
+                  "title": story.title, "AI": request.session["AI"]})
 
 
 def about(request):
@@ -202,9 +170,7 @@ def generatePrompt(curPrompt=""):
     return curTopic
 
 
-def generateSuggestion(newSentence, develop=False):
-    if develop:
-        return "look! a {} {}".format(random.choice(ADJECTIVES), random.choice(ANIMALS))
+def generateSuggestion(newSentence):
     try:
         #suggestion = generate_text(sess, model, word_to_id, id_to_word, seed=newSentence)
         #suggestion = run(newSentence)

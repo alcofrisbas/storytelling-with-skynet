@@ -65,5 +65,7 @@
         window.location = $("#".concat(caller)).attr("href");
         });
     </script>
+    {% load tz_detect %}
+    {% tz_detect %}
 </body>
 </html>

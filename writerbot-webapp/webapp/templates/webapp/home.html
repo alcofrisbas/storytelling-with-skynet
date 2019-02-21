@@ -1,5 +1,4 @@
 {%  extends "webapp/header.html" %}
-
 {% block content %}
     <div class="jumbotron">
         {% if not user.username %}
@@ -14,20 +13,32 @@
             {% if stories %}
                 <hr class="my-4">
                 <p>Your current stories:</p>
+{#                {% for story in stories %}#}
+{#                    <div class="card">#}
+{#                        <div class="card-body">#}
+{#                            {% if story.title %}#}
+{#                                <h5 class="card-title">{{ story.title }}</h5>#}
+{#                            {% else %}#}
+{#                                <h5 class="card-title">Untitled</h5>#}
+{#                            {% endif %}#}
+{#                            <a href="/load_story/{{ story.id }}" class="btn btn-primary">Continue this story</a>#}
+{#                            <a href="/delete_story/{{ story.id }}" class="confirm-delete" title= "Delete" data-toggle="modal" data-target= "#confirmDeleteModal" id= "deleteButton{{story.id}}">#}
+{#                                <i class="fa fa-trash fa-2x" style= "float: right; color: red;"></i> </a>#}
+{#                          </div>#}
+{#                    </div>#}
+{#                {% endfor %}#}
+                <div class="list-group">
                 {% for story in stories %}
-                    <div class="card">
-                        <div class="card-body">
-                            {% if story.title %}
-                                <h5 class="card-title">{{ story.title }}</h5>
-                            {% else %}
-                                <h5 class="card-title">Untitled</h5>
-                            {% endif %}
-                            <a href="/load_story/{{ story.id }}" class="btn btn-primary">Continue this story</a>
-                            <a href="/delete_story/{{ story.id }}" class="confirm-delete" title= "Delete" data-toggle="modal" data-target= "#confirmDeleteModal" id= "deleteButton{{story.id}}">
-                                <i class="fa fa-trash fa-2x" style= "float: right; color: red;"></i> </a>
-                          </div>
+                  <a href="/load_story/{{ story.id }}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                      <h5 class="mb-1">{{ story.title }}</h5>
+                      <small>{{ story.created }}</small>
                     </div>
+{#                    <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>#}
+{#                    <small>Donec id elit non mi porta.</small>#}
+                  </a>
                 {% endfor %}
+                </div>
             {% endif %}
             <hr class="my-4">
             <a class="btn btn-primary btn-lg" href="/new_story" role="button">Start a New Story</a>

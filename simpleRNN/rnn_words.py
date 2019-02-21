@@ -7,57 +7,19 @@ Project: https://github.com/roatienza/Deep-Learning-Experiments
 '''
 
 from __future__ import print_function
+import random
+import collections
+import time
+import sys
 
 import numpy as np
 import tensorflow as tf
 from tensorflow.contrib import rnn
-import random
-import collections
-import time
 from nltk.tokenize import word_tokenize
 import gensim
-import sys
-
-start_time = time.time()
-def elapsed(sec):
-    if sec<60:
-        return str(sec) + " sec"
-    elif sec<(60*60):
-        return str(sec/60) + " min"
-    else:
-        return str(sec/(60*60)) + " hr"
 
 
-# Target log path
-logs_path = '/tmp/tensorflow/rnn_word'
-writer = tf.summary.FileWriter(logs_path)
-
-# Text file containing words for training
-training_file = "RNN/data/train.txt"#'simpleRNN/belling_the_cat.txt'
-
-def read_data(fname):
-    with open(fname) as f:
-        content = f.readlines()
-    content = [x.strip() for x in content]
-    content = [word for i in range(len(content)) for word in content[i].split()]
-    content = np.array(content)
-    return content
-
-training_data = read_data(training_file)
-print("Loaded training data...")
-
-def build_dataset(words):
-    count = collections.Counter(words).most_common()
-    dictionary = dict()
-    for word, _ in count:
-        dictionary[word] = len(dictionary)
-    reverse_dictionary = dict(zip(dictionary.values(), dictionary.keys()))
-    return dictionary, reverse_dictionary
-
-dictionary, reverse_dictionary = build_dataset(training_data)
-#vocab_size = len(dictionary)
-
-# Parameters
+"""
 learning_rate = 0.001
 training_iters = 50000
 display_step = 1000
@@ -66,184 +28,248 @@ batch_size = 2
 # number of units in RNN cell
 n_hidden = 300
 path_to_model = "RNN/models/"
+"""
 
-embedding_model = gensim.models.Word2Vec.load(path_to_model + "my_embedding_model")
-vocab_size = len(embedding_model.wv.vocab)
-weights = {'out': embedding_model.syn1neg}
-# tf Graph input
-x = tf.placeholder("float", [batch_size, n_input, n_hidden])
-y = tf.placeholder("float", [batch_size, vocab_size])
+class SimpleRNN:
+    # Parameters
+    def __init__(self, learning_rate, training_iters, display_step, n_input,
+    batch_size, n_hidden, path_to_model, model_name):
+        self.learning_rate = learning_rate
+        self.training_iters = training_iters
+        self.display_step = display_step
+        self.n_input = n_input
+        self.batch_size = batch_size
+        # number of units in RNN cell
+        self.n_hidden = n_hidden
+        self.path_to_model = path_to_model
+        self.model_name = model_name
 
+        self.start_time = time.time()
+        # Target log path
+        self.logs_path = '/tmp/tensorflow/rnn_word'
+        self.writer = tf.summary.FileWriter(self.logs_path)
 
+        # Text file containing words for training
+        self.training_file = "RNN/data/train.txt"#'simpleRNN/belling_the_cat.txt'
+        self.training_data = self.read_data(self.training_file)
+        print("Loaded training data...")
+        self.dictionary, self.reverse_dictionary = self.build_dataset(self.training_data)
 
-def RNN(x, weights):
-    # 2-layer LSTM, each layer has n_hidden units.
-    # Average Accuracy= 95.20% at 50k iter
-    rnn_cell = rnn.MultiRNNCell([rnn.BasicLSTMCell(n_hidden),rnn.BasicLSTMCell(n_hidden)])
+        self.embedding_model = gensim.models.Word2Vec.load(self.path_to_model + "my_embedding_model")
 
-    # 1-layer LSTM with n_hidden units but with lower accuracy.
-    # Average Accuracy= 90.60% 50k iter
-    # Uncomment line below to test but comment out the 2-layer rnn.MultiRNNCell above
-    # rnn_cell = rnn.BasicLSTMCell(n_hidden)
+        self.vocab_size = len(self.embedding_model.wv.vocab)
+        self.weights = {'out': self.embedding_model.syn1neg}
+        # tf Graph input
+        self.x = tf.placeholder("float", [self.batch_size, self.n_input, self.n_hidden])
+        self.y = tf.placeholder("float", [self.batch_size, self.vocab_size])
 
-    # generate prediction
-    # the shape of outputs is [batch_size, n_input, n_hidden]
-    outputs, states = tf.nn.dynamic_rnn(cell=rnn_cell, inputs = x, dtype = tf.float32)
-    output = states[-1].h
-    print(output)
-    #outputs, states = rnn.static_rnn(rnn_cell, x, dtype=tf.float32)
+        self.pred = self.RNN()
+        self.probas = tf.argmax(self.pred, 1)
+        # Loss and optimizer
+        self.cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=self.pred, labels=self.y))
+        self.optimizer = tf.train.RMSPropOptimizer(learning_rate=self.learning_rate).minimize(self.cost)
 
-    # there are n_input outputs but
-    # we only want the last output
-    return tf.matmul(output, tf.transpose(weights['out']))
+        # Model evaluation
+        self.correct_pred = tf.equal(tf.argmax(self.pred,1), tf.argmax(self.y,1))
+        self.accuracy = tf.reduce_mean(tf.cast(self.correct_pred, tf.float32))
 
-pred = RNN(x, weights)
-probas = tf.argmax(pred, 1)
-# Loss and optimizer
-cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=pred, labels=y))
-optimizer = tf.train.RMSPropOptimizer(learning_rate=learning_rate).minimize(cost)
+        # Initializing the variables
+        self.init = tf.global_variables_initializer()
 
-# Model evaluation
-correct_pred = tf.equal(tf.argmax(pred,1), tf.argmax(y,1))
-accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
+    def elapsed(self,sec):
+        if sec<60:
+            return str(sec) + " sec"
+        elif sec<(60*60):
+            return str(sec/60) + " min"
+        else:
+            return str(sec/(60*60)) + " hr"
 
-# Initializing the variables
-init = tf.global_variables_initializer()
-training = False
+    def read_data(self,fname):
+        with open(fname) as f:
+            content = f.readlines()
+        content = [x.strip() for x in content]
+        content = [word for i in range(len(content)) for word in content[i].split()]
+        content = np.array(content)
+        return content
 
-def generateText(input):
-    with tf.Session() as session:
-        session.run(init)
-        saver = tf.train.Saver()
-        saver.restore(session, tf.train.latest_checkpoint('simpleRNN/models'))
-        sentence = input.strip()
-        words = sentence.split(' ')
-        if len(words) == n_input:
-            try:
-                symbols_in_keys = [dictionary[str(words[i])] for i in range(len(words))]
-                for i in range(32):
-                    keys = np.reshape(np.array(symbols_in_keys), [-1, n_input, 1])
-                    onehot_pred = session.run(pred, feed_dict={x: keys})
-                    onehot_pred_index = int(tf.argmax(onehot_pred, 1).eval())
-                    sentence = "%s %s" % (sentence, reverse_dictionary[onehot_pred_index])
-                    symbols_in_keys = symbols_in_keys[1:]
-                    symbols_in_keys.append(onehot_pred_index)
-                print(sentence)
-            except:
-                print("Word not in dictionary")
+    def build_dataset(self, words):
+        count = collections.Counter(words).most_common()
+        dictionary = dict()
+        for word, _ in count:
+            dictionary[word] = len(dictionary)
+        reverse_dictionary = dict(zip(dictionary.values(), dictionary.keys()))
+        return dictionary, reverse_dictionary
+    #vocab_size = len(dictionary)
 
+    def RNN(self):
+        # 2-layer LSTM, each layer has self.n_hidden units.
+        # Average Accuracy= 95.20% at 50k iter
+        rnn_cell = rnn.MultiRNNCell([rnn.BasicLSTMCell(self.n_hidden),rnn.BasicLSTMCell(self.n_hidden)])
 
-if __name__ == '__main__':
+        # 1-layer LSTM with self.n_hidden units but with lower accuracy.
+        # Average Accuracy= 90.60% 50k iter
+        # Uncomment line below to test but comment out the 2-layer rnn.MultiRNNCell above
+        # rnn_cell = rnn.BasicLSTMCell(self.n_hidden)
 
-    if len(sys.argv) > 1 and sys.argv[1] == "train":
-        training = True
-    # Launch the graph
-    with tf.Session() as session:
-        session.run(init)
-        if training:
+        # generate prediction
+        # the shape of outputs is [self.batch_size, self.n_input, self.n_hidden]
+        outputs, states = tf.nn.dynamic_rnn(cell=rnn_cell, inputs = self.x, dtype = tf.float32)
+        output = states[-1].h
+        #outputs, states = rnn.static_rnn(rnn_cell, x, dtype=tf.float32)
+
+        # there are self.n_input outputs but
+        # we only want the last output
+        return tf.matmul(output, tf.transpose(self.weights['out']))
+
+    def generateText(input):
+        with tf.Session() as session:
+            session.run(init)
+            saver = tf.train.Saver()
+            saver.restore(session, tf.train.latest_checkpoint(self.path_to_model))
+            sentence = input.strip()
+            words = sentence.split(' ')
+            if len(words) == self.n_input:
+                try:
+                    symbols_in_keys = [dictionary[str(words[i])] for i in range(len(words))]
+                    for i in range(32):
+                        keys = np.reshape(np.array(symbols_in_keys), [-1, self.n_input, 1])
+                        onehot_pred = session.run(self.pred, feed_dict={x: keys})
+                        onehot_pred_index = int(tf.argmax(onehot_pred, 1).eval())
+                        sentence = "%s %s" % (sentence, reverse_dictionary[onehot_pred_index])
+                        symbols_in_keys = symbols_in_keys[1:]
+                        symbols_in_keys.append(onehot_pred_index)
+                    print(sentence)
+                except:
+                    print("Word not in dictionary")
+
+    def train(self):
+        with tf.Session() as session:
+            session.run(self.init)
             step = 0
-            offset = random.randint(0,n_input+1)
-            end_offset = n_input + 1
+            offset = random.randint(0,self.n_input+1)
+            end_offset = self.n_input + 1
             acc_total = 0
             loss_total = 0
 
-            writer.add_graph(session.graph)
+            self.writer.add_graph(session.graph)
 
-            while step < training_iters:
+            while step < self.training_iters:
                 # Generate a minibatch. Add some randomness on selection process.
-                if offset > (len(training_data)-end_offset):
-                    offset = random.randint(0, n_input+1)
+                if offset > (len(self.training_data)-end_offset):
+                    offset = random.randint(0, self.n_input+1)
                 symbols = []
-                for i in range(batch_size):
-                    symbol = [str(training_data[j]) for j in range(offset+i, offset+n_input+i)]
+                for i in range(self.batch_size):
+                    symbol = [str(self.training_data[j]) for j in range(offset+i, offset+self.n_input+i)]
                     symbols.append(symbol)
                 embedded_batch = []
                 for batch in symbols:
                     embedded_symbols = []
                     for word in batch:
                         try:
-                            embedding = embedding_model.wv[word]
+                            embedding = self.embedding_model.wv[word]
                         except KeyError:
                             print(word + " not in vocabulary")
                             embedding = np.zeros((300,), dtype=np.float)
                         embedded_symbols.append(embedding)
                     embedded_batch.append(embedded_symbols)
 
-                # embeded_symbols shape [batch_size, n_input, n_hidden]
+                # embeded_symbols shape [self.batch_size, self.n_input, self.n_hidden]
 
-                symbols_out_onehot = np.zeros([batch_size, vocab_size], dtype=float)
-                for i in range(batch_size):
+                symbols_out_onehot = np.zeros([self.batch_size, self.vocab_size], dtype=float)
+                for i in range(self.batch_size):
                     try:
-                        symbols_out_onehot[i][embedding_model.wv.vocab[training_data[offset+n_input+i]].index] = 1.0
+                        symbols_out_onehot[i][self.embedding_model.wv.vocab[self.training_data[offset+self.n_input+i]].index] = 1.0
                     except:
                         symbols_out_onehot[i][0] = 1.0
                 #print(embedded_batch)
-                symbols_out_onehot = np.reshape(symbols_out_onehot,[batch_size,-1])
+                symbols_out_onehot = np.reshape(symbols_out_onehot,[self.batch_size,-1])
 
 
-                _, acc, loss, embedding_pred = session.run([optimizer, accuracy, cost, probas], \
-                                                        feed_dict={x: embedded_batch, y: symbols_out_onehot})
+                _, acc, loss, embedding_pred = session.run([self.optimizer, self.accuracy, self.cost, self.probas], \
+                                                        feed_dict={self.x: embedded_batch, self.y: symbols_out_onehot})
                 predictions = []
                 for prediction in embedding_pred:
-                    predictions.append(embedding_model.wv.index2word[prediction])
+                    predictions.append(self.embedding_model.wv.index2word[prediction])
 
 
                 loss_total += loss
                 acc_total += acc
-                if (step+1) % display_step == 0:
+                if (step+1) % self.display_step == 0:
                     print("Iter= " + str(step+1) + ", Average Loss= " + \
-                          "{:.6f}".format(loss_total/display_step) + ", Average Accuracy= " + \
-                          "{:.2f}%".format(100*acc_total/display_step))
+                          "{:.6f}".format(loss_total/self.display_step) + ", Average Accuracy= " + \
+                          "{:.2f}%".format(100*acc_total/self.display_step))
+                    print("Elapsed time: ", self.elapsed(time.time() - self.start_time))
                     acc_total = 0
                     loss_total = 0
                     symbols_in = []
                     symbols_out = []
-                    for batch in range(batch_size):
-                        symbol_in = [training_data[i] for i in range(offset+batch, offset + n_input + batch)]
+                    for batch in range(self.batch_size):
+                        symbol_in = [self.training_data[i] for i in range(offset+batch, offset + self.n_input + batch)]
                         symbols_in.append(symbol_in)
-                        symbol_out = training_data[offset + n_input+batch]
+                        symbol_out = self.training_data[offset + self.n_input+batch]
                         symbols_out.append(symbol_out)
                     #symbols_out_pred = reverse_dictionary[int(tf.argmax(onehot_pred, 1).eval())]
-                    for batch in range(batch_size):
+                    for batch in range(self.batch_size):
                         print("%s - [%s] vs [%s]" % (symbols_in[batch],symbols_out[batch],predictions[batch]))
                 step += 1
-                offset += (n_input+1)
+                offset += (self.n_input+1)
             print("Optimization Finished!")
-            print("Elapsed time: ", elapsed(time.time() - start_time))
+            print("Elapsed time: ", self.elapsed(time.time() - self.start_time))
             print("Run on command line.")
-            print("\ttensorboard --logdir=%s" % (logs_path))
+            print("\ttensorboard --logdir=%s" % (self.logs_path))
             print("Point your web browser to: http://localhost:6006/")
             saver = tf.train.Saver()# -*- coding: utf-8 -*-
 
-            saver.save(session, "simpleRNN/models/best_model.ckpt")
-        else:
+            saver.save(session, self.path_to_model+"/"+self.model_name)
+
+    def run(self):
+        with tf.Session() as session:
             saver = tf.train.Saver()
-            saver.restore(session, tf.train.latest_checkpoint('simpleRNN/models'))
-        while True:
-            prompt = "%s words: " % n_input
-            input_sent = input(prompt)
-            input_sent = word_tokenize(input_sent)
-            embedded_symbols = []
-            if len(input_sent) != n_input:
-                continue
-            try:
-                for word in input_sent:
-                    try:
-                        embedding = embedding_model.wv[word]
-                    except KeyError:
-                        print(word + " not in vocabulary")
-                        embedding = np.zeros((300,), dtype=np.float)
-                    embedded_symbols.append(embedding)
-                # embeded_symbols shape [1, n_input, n_hidden]
-                embedded_symbols = [embedded_symbols]
-                output_sent = "%s" % (input_sent)
-                for i in range(32):
-                    onehot_pred = session.run(probas, feed_dict={x: embedded_symbols})
-                    onehot_pred = embedding_model.wv.index2word[onehot_pred[0]]
-                    output_sent +=  " %s" % (onehot_pred)
-                    embedded_symbols = embedded_symbols[0][1:]
-                    embedded_symbols.append(embedding_model.wv[onehot_pred])
+            saver.restore(session, tf.train.latest_checkpoint(self.path_to_model))
+            while True:
+                prompt = "%s words: " % self.n_input
+                input_sent = input(prompt)
+                input_sent = word_tokenize(input_sent)
+                embedded_symbols = []
+                if len(input_sent) != self.n_input:
+                    continue
+                try:
+                    for word in input_sent:
+                        try:
+                            embedding = self.embedding_model.wv[word]
+                        except KeyError:
+                            print(word + " not in vocabulary")
+                            embedding = np.zeros((300,), dtype=np.float)
+                        embedded_symbols.append(embedding)
+                    # embeded_symbols shape [1, n_input, n_hidden]
                     embedded_symbols = [embedded_symbols]
-                print(output_sent)
-            except:
-                print("Word not in dictionary")
+                    output_sent = "%s" % (input_sent)
+                    for i in range(23):
+                        onehot_pred = session.run(self.probas, feed_dict={self.x: embedded_symbols})
+                        onehot_pred = self.embedding_model.wv.index2word[onehot_pred[0]]
+                        output_sent +=  " %s" % (onehot_pred)
+                        embedded_symbols = embedded_symbols[0][1:]
+                        embedded_symbols.append(self.embedding_model.wv[onehot_pred])
+                        embedded_symbols = [embedded_symbols]
+                    print(output_sent)
+                except Exception as e:
+                    print(e)
+
+if __name__ == '__main__':
+    args = sys.argv[1:]
+    learning_rate = 0.001
+    training_iters = 50000
+    display_step = 1000
+    n_input = 4
+    batch_size = 2
+    n_hidden = 300
+    path_to_model = "RNN/models/"
+    model_name = "best_model"
+    if len(args) >= 1 and args[0] == "train":
+        rnn = SimpleRNN(learning_rate, training_iters, display_step, n_input,
+            batch_size, n_hidden, path_to_model, model_name)
+        rnn.train()
+    else:
+        rnn = SimpleRNN(learning_rate, training_iters, display_step, n_input,
+            1, n_hidden, path_to_model, model_name)
+        rnn.run()
