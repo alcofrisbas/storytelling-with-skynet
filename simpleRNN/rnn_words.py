@@ -59,8 +59,8 @@ class SimpleRNN:
         self.vocab_size = len(self.embedding_model.wv.vocab)
         self.weights = {'out': self.embedding_model.syn1neg}
         # tf Graph input
-        self.x = tf.placeholder(tf.int32, [self.batch_size, self.n_input])
-        self.y = tf.placeholder(tf.int32, [self.batch_size, None])
+        self.x = tf.placeholder(tf.int32, [None, None])
+        self.y = tf.placeholder(tf.int32, [None, None])
         self.outputs = tf.placeholder(tf.int32, (None, None), 'output')
 
         self.logits = self.RNN()
@@ -190,8 +190,10 @@ class SimpleRNN:
 
             while step < self.training_iters:
                 # Generate a minibatch. Add some randomness on selection process.
+                """
                 if offset > (len(self.training_data)-end_offset):
                     offset = random.randint(0, self.n_input+1)
+                """
                 symbols = []
                 for i in range(self.batch_size):
                     symbol = [str(self.training_data[j]) for j in range(offset+i, offset+self.n_input+i)]
@@ -301,7 +303,7 @@ if __name__ == '__main__':
     training_iters = 5000
     display_step = 1000
     n_input = 4
-    batch_size = 2
+    batch_size = 1
     n_hidden = 300
     path_to_model = "RNN/models/"
     model_name = "best_model"
