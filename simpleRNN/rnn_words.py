@@ -70,7 +70,7 @@ class SimpleRNN:
         with tf.name_scope("optimization"):
             # loss function
             self.loss = tf.contrib.seq2seq.sequence_loss(self.logits, self.y,
-                tf.ones([self.batch_size, self.output_seq_length]))
+                tf.ones([self.batch_size, 4]))
             self.cost = tf.reduce_mean(self.loss)
             # optimizer
             self.optimizer = tf.train.RMSPropOptimizer(learning_rate=self.learning_rate).minimize(self.loss)
@@ -222,9 +222,9 @@ class SimpleRNN:
                 # embeded_symbols shape [self.batch_size, self.n_input]
 
                 targets = []
-                for word in self.training_data[sent_num+1][1:]:
+                for word in self.training_data[sent_num+1][1:5]:
                     targets.append(self.embedding_model.wv.vocab[word].index)
-                self.output_seq_length = len(targets) -1
+                #self.output_seq_length = len(targets) -1
                 targets = [targets]
                 """
 
@@ -236,7 +236,7 @@ class SimpleRNN:
                 #print(embedded_batch)
                 """
                 outputs = []
-                for word in self.training_data[sent_num+1][:-1]:
+                for word in self.training_data[sent_num+1][:4]:
                     outputs.append(self.embedding_model.wv.vocab[word].index)
                 outputs = [outputs]
                 #symbols_out_onehot = np.reshape(symbols_out_onehot,[self.batch_size,-1])
@@ -249,7 +249,6 @@ class SimpleRNN:
                 predictions = []
                 for prediction in embedding_pred[0]:
                     predictions.append(self.embedding_model.wv.index2word[prediction])
-                print(predictions)
 
                 loss_total += loss
                 acc_total += acc
