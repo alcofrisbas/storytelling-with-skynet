@@ -50,7 +50,7 @@ class SimpleRNN:
         self.writer = tf.summary.FileWriter(self.logs_path)
 
         # Text file containing words for training
-        self.training_file = "RNN/data/train.txt"#'simpleRNN/belling_the_cat.txt'
+        self.training_file = 'simpleRNN/belling_the_cat.txt' #"RNN/data/train.txt"#
         self.training_data = self.read_data(self.training_file)
         print("Loaded training data...")
         self.dictionary, self.reverse_dictionary = self.build_dataset(self.training_data)
@@ -120,27 +120,6 @@ class SimpleRNN:
         # there are self.n_input outputs but
         # we only want the last output
         return tf.matmul(output, tf.transpose(self.weights['out']))
-
-    def generateText(input):
-        with tf.Session() as session:
-            session.run(init)
-            saver = tf.train.Saver()
-            saver.restore(session, tf.train.latest_checkpoint(self.path_to_model))
-            sentence = input.strip()
-            words = sentence.split(' ')
-            if len(words) == self.n_input:
-                try:
-                    symbols_in_keys = [dictionary[str(words[i])] for i in range(len(words))]
-                    for i in range(32):
-                        keys = np.reshape(np.array(symbols_in_keys), [-1, self.n_input, 1])
-                        onehot_pred = session.run(self.pred, feed_dict={x: keys})
-                        onehot_pred_index = int(tf.argmax(onehot_pred, 1).eval())
-                        sentence = "%s %s" % (sentence, reverse_dictionary[onehot_pred_index])
-                        symbols_in_keys = symbols_in_keys[1:]
-                        symbols_in_keys.append(onehot_pred_index)
-                    print(sentence)
-                except:
-                    print("Word not in dictionary")
 
     def train(self):
         with tf.Session() as session:
@@ -221,6 +200,40 @@ class SimpleRNN:
             saver = tf.train.Saver()# -*- coding: utf-8 -*-
 
             saver.save(session, self.path_to_model+"/"+self.model_name)
+
+    def load(self):
+        with tf.Session() as session:
+            saver = tf.train.Saver()
+            saver.restore(session, tf.train.latest_checkpoint(self.path_to_model))
+            return session
+
+    def generate_suggestion(self, session, input):
+        prompt = "%s words: " % self.n_input
+        input_sent = input(prompt)
+        input_sent = word_tokenize(input_sent)
+        embedded_symbols = []
+        if len(input_sent) == self.n_input:
+            try:
+                for word in input_sent:
+                    try:
+                        embedding = self.embedding_model.wv[word]
+                    except KeyError:
+                        print(word + " not in vocabulary")
+                        embedding = np.zeros((300,), dtype=np.float)
+                    embedded_symbols.append(embedding)
+                # embeded_symbols shape [1, n_input, n_hidden]
+                embedded_symbols = [embedded_symbols]
+                output_sent = "%s" % (input_sent)
+                for i in range(23):
+                    onehot_pred = session.run(self.probas, feed_dict={self.x: embedded_symbols})
+                    onehot_pred = self.embedding_model.wv.index2word[onehot_pred[0]]
+                    output_sent += " %s" % (onehot_pred)
+                    embedded_symbols = embedded_symbols[0][1:]
+                    embedded_symbols.append(self.embedding_model.wv[onehot_pred])
+                    embedded_symbols = [embedded_symbols]
+                return output_sent
+            except Exception as e:
+                print(e)
 
     def run(self):
         with tf.Session() as session:
