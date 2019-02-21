@@ -26,7 +26,9 @@ logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=lo
 
 # model gets trained in gensim
 model = gensim.models.Word2Vec(sentences, iter=100, min_count=1, size=300, workers=10)
-
+f = open(root_path +"vocab", "w+")
+for word in model.wv.index2word:
+    f.write(word + "\n")
 #returns the list of indexes of each owrd in the word vector vocab
 def convert_data_to_index(string_data, wv):
     index_data = []
