@@ -200,10 +200,10 @@ class SimpleRNN:
             saver.save(session, self.path_to_model+"/"+self.model_name)
 
     def load(self):
-        with tf.Session() as session:
-            saver = tf.train.Saver()
-            saver.restore(session, tf.train.latest_checkpoint(self.path_to_model))
-            return session
+        session = tf.Session()
+        saver = tf.train.Saver()
+        saver.restore(session, tf.train.latest_checkpoint(self.path_to_model))
+        return
 
     def generate_suggestion(self, session, input):
         prompt = "%s words: " % self.n_input
@@ -265,6 +265,8 @@ class SimpleRNN:
                     print(output_sent)
                 except Exception as e:
                     print(e)
+
+
 
 if __name__ == '__main__':
     args = sys.argv[1:]
