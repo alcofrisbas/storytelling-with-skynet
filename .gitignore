@@ -22,3 +22,6 @@
 venv*
 
 *.develop
+
+#ignore models
+RNN/models/*
