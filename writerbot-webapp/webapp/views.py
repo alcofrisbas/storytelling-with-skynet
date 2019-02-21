@@ -14,16 +14,12 @@ from rnn_words import SimpleRNN
 import random
 from webapp.words import ADJECTIVES, ANIMALS
 
-learning_rate = 0.001
-training_iters = 50000
+
+args_dict = {"n_input": 4, "batch_size": 2, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000}
 display_step = 1000
-n_input = 4
-batch_size = 2
-n_hidden = 300
 path_to_model = "RNN/models/"
 model_name = "best_model"
-rnn = SimpleRNN(learning_rate, training_iters, display_step, n_input,
-            batch_size, n_hidden, path_to_model, model_name)
+rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
 
 #TODO: when user logs in, redirect to the page they logged in from
 #TODO: figure out how to clear empty stories and expired session data
