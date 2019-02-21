@@ -119,6 +119,7 @@ class SimpleRNN:
         # we only want the last output
         return tf.matmul(output, tf.transpose(self.weights['out']))
 
+    # train the model
     def train(self):
         with tf.Session() as session:
             session.run(self.init)
@@ -198,16 +199,16 @@ class SimpleRNN:
             saver = tf.train.Saver()# -*- coding: utf-8 -*-
 
             saver.save(session, self.path_to_model+"/"+self.model_name)
-
+    # load the rnn for the purposes of views.py in our webapp
     def load(self):
         session = tf.Session()
         saver = tf.train.Saver()
         saver.restore(session, tf.train.latest_checkpoint(self.path_to_model))
         return session
-
+    # close for the same purpose
     def close(self, session):
         session.close()
-
+    # generate a suggestion given a session and a string _input
     def generate_suggestion(self, session, _input):
         input_sent = word_tokenize(_input)
         embedded_symbols = []
@@ -237,6 +238,7 @@ class SimpleRNN:
                 return output_sent
             except Exception as e:
                 print(e)
+                return "RNN Error"
 
     def run(self):
         with tf.Session() as session:
