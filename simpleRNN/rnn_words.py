@@ -203,16 +203,20 @@ class SimpleRNN:
         session = tf.Session()
         saver = tf.train.Saver()
         saver.restore(session, tf.train.latest_checkpoint(self.path_to_model))
-        return
+        return session
 
-    def generate_suggestion(self, session, input):
-        prompt = "%s words: " % self.n_input
-        input_sent = input(prompt)
-        input_sent = word_tokenize(input_sent)
+    def close(self, session):
+        session.close()
+
+    def generate_suggestion(self, session, _input):
+        input_sent = word_tokenize(_input)
         embedded_symbols = []
+        print(_input)
         if len(input_sent) == self.n_input:
+            print("len works")
             try:
                 for word in input_sent:
+                    print(word)
                     try:
                         embedding = self.embedding_model.wv[word]
                     except KeyError:
@@ -229,6 +233,7 @@ class SimpleRNN:
                     embedded_symbols = embedded_symbols[0][1:]
                     embedded_symbols.append(self.embedding_model.wv[onehot_pred])
                     embedded_symbols = [embedded_symbols]
+                #print(output_sent)
                 return output_sent
             except Exception as e:
                 print(e)
@@ -277,6 +282,17 @@ if __name__ == '__main__':
     if len(args) >= 1 and args[0] == "train":
         rnn = SimpleRNN(d, display_step, path_to_model, model_name)
         rnn.train()
+    elif (len(args) >= 1 and args[0] == "manual"):
+        d["batch_size"] = 1
+        rnn = SimpleRNN(d, display_step, path_to_model, model_name)
+        #rnn.train()
+        sess = rnn.load()
+        s = input("enter a sent(4): ")
+        while s != "quit":
+            out_ = rnn.generate_suggestion(sess, s)
+            print (out)
+            s = input("enter a sent(4): ")
+        rnn.close(sess)
     else:
         d["batch_size"] = 1
         rnn = SimpleRNN(d, display_step, path_to_model, model_name)
