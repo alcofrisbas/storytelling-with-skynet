@@ -9,10 +9,21 @@ from webapp.models import User
 #sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'RNN'))
 #from rnn_test import load_model, generate_text
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'simpleRNN'))
+from rnn_words import SimpleRNN
 #from rnn_words2 import run
 import random
 from webapp.words import ADJECTIVES, ANIMALS
 
+learning_rate = 0.001
+training_iters = 50000
+display_step = 1000
+n_input = 4
+batch_size = 2
+n_hidden = 300
+path_to_model = "RNN/models/"
+model_name = "best_model"
+rnn = SimpleRNN(learning_rate, training_iters, display_step, n_input,
+            batch_size, n_hidden, path_to_model, model_name)
 
 #TODO: when user logs in, redirect to the page they logged in from
 #TODO: figure out how to clear empty stories and expired session data
@@ -93,6 +104,9 @@ def write(request):
     if "AI" not in request.session.keys():
         request.session["AI"] = True
 
+    if "sess" not in request.session.keys():
+        request.session["sess"] = rnn.load()
+
     story = Story.objects.get(id=request.session["story_id"])
     suggestion = ""
 
@@ -170,11 +184,11 @@ def generatePrompt(curPrompt=""):
     return curTopic
 
 
-def generateSuggestion(newSentence):
+def generateSuggestion(session, newSentence):
     try:
         #suggestion = generate_text(sess, model, word_to_id, id_to_word, seed=newSentence)
-        #suggestion = run(newSentence)
-        suggestion="placeholder"
+        suggestion = rnn.generate_suggestion(session, newSentence)
+        #suggestion="placeholder"
     except Exception as e:
         print("ERROR (suggestion generation)")
         suggestion = e
