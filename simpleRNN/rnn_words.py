@@ -56,21 +56,31 @@ class SimpleRNN:
         self.dictionary, self.reverse_dictionary = self.build_dataset(self.training_data)
 
         self.embedding_model = gensim.models.Word2Vec.load(self.path_to_model + "my_embedding_model")
-
         self.vocab_size = len(self.embedding_model.wv.vocab)
         self.weights = {'out': self.embedding_model.syn1neg}
         # tf Graph input
-        self.x = tf.placeholder("float", [self.batch_size, self.n_input, self.n_hidden])
-        self.y = tf.placeholder("float", [self.batch_size, self.vocab_size])
+        self.x = tf.placeholder(tf.int32, [self.batch_size, self.n_input])
+        self.y = tf.placeholder(tf.int32, [self.batch_size, None])
+        self.outputs = tf.placeholder(tf.int32, (None, None), 'output')
 
-        self.pred = self.RNN()
-        self.probas = tf.argmax(self.pred, 1)
+        self.logits = self.RNN()
+        self.probas = tf.argmax(self.logits, 2)
         # Loss and optimizer
+        with tf.name_scope("optimization"):
+            # loss function
+            self.cost = tf.reduce_mean(tf.contrib.seq2seq.sequence_loss(self.logits, self.y,
+                tf.ones([self.batch_size, 1])))
+            # optimizer
+            self.optimizer = tf.train.RMSPropOptimizer(learning_rate=self.learning_rate).minimize(self.cost)
+        """
         self.cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=self.pred, labels=self.y))
         self.optimizer = tf.train.RMSPropOptimizer(learning_rate=self.learning_rate).minimize(self.cost)
+        """
 
         # Model evaluation
-        self.correct_pred = tf.equal(tf.argmax(self.pred,1), tf.argmax(self.y,1))
+        print(tf.argmax(self.logits, 2))
+        print(tf.argmax(self.y, 1))
+        self.correct_pred = tf.equal(tf.argmax(self.logits,2), tf.argmax(self.y,1))
         self.accuracy = tf.reduce_mean(tf.cast(self.correct_pred, tf.float32))
 
         # Initializing the variables
@@ -104,6 +114,31 @@ class SimpleRNN:
     def RNN(self):
         # 2-layer LSTM, each layer has self.n_hidden units.
         # Average Accuracy= 95.20% at 50k iter
+
+        # defining tensors to be fed into graph
+        inputs = self.x
+        targets = self.y
+
+        # seq2seq embedding layers
+        embedded_input = tf.nn.embedding_lookup(self.embedding_model.wv.syn0, inputs)
+        embedded_output = tf.nn.embedding_lookup(self.embedding_model.syn1neg, self.outputs)
+
+        with tf.variable_scope("encoding") as encoding_scope:
+            lstm_encoding = rnn.MultiRNNCell([rnn.BasicLSTMCell(self.n_hidden),rnn.BasicLSTMCell(self.n_hidden)])
+            _, last_state = tf.nn.dynamic_rnn(lstm_encoding, inputs=embedded_input, dtype=tf.float32)
+
+        with tf.variable_scope("decoding") as decoding_scope:
+            lstm_decoding = rnn.MultiRNNCell([rnn.BasicLSTMCell(self.n_hidden), rnn.BasicLSTMCell(self.n_hidden)])
+            dec_outputs, _ = tf.nn.dynamic_rnn(lstm_decoding, inputs=embedded_output, initial_state=last_state)
+
+        logits = tf.contrib.layers.fully_connected(dec_outputs, num_outputs=self.vocab_size,
+            activation_fn=None)
+        return logits
+        """
+        # connect outputs to
+        logits = tf.contrib.layers.fully_connected(dec_outputs, num_outputs=self.vocab_size,
+            activation_fn=None)
+
         rnn_cell = rnn.MultiRNNCell([rnn.BasicLSTMCell(self.n_hidden),rnn.BasicLSTMCell(self.n_hidden)])
 
         # 1-layer LSTM with self.n_hidden units but with lower accuracy.
@@ -120,7 +155,7 @@ class SimpleRNN:
         # there are self.n_input outputs but
         # we only want the last output
         return tf.matmul(output, tf.transpose(self.weights['out']))
-
+        """
     def generateText(input):
         with tf.Session() as session:
             session.run(init)
@@ -161,35 +196,37 @@ class SimpleRNN:
                 for i in range(self.batch_size):
                     symbol = [str(self.training_data[j]) for j in range(offset+i, offset+self.n_input+i)]
                     symbols.append(symbol)
+
                 embedded_batch = []
                 for batch in symbols:
                     embedded_symbols = []
                     for word in batch:
                         try:
-                            embedding = self.embedding_model.wv[word]
+                            embedding = self.embedding_model.wv.vocab[word].index
                         except KeyError:
                             print(word + " not in vocabulary")
-                            embedding = np.zeros((300,), dtype=np.float)
+                            embedding = 0
                         embedded_symbols.append(embedding)
                     embedded_batch.append(embedded_symbols)
 
-                # embeded_symbols shape [self.batch_size, self.n_input, self.n_hidden]
+                # embeded_symbols shape [self.batch_size, self.n_input]
 
-                symbols_out_onehot = np.zeros([self.batch_size, self.vocab_size], dtype=float)
+                symbols_out_onehot = np.zeros([self.batch_size, 1], dtype=np.int32)
+
                 for i in range(self.batch_size):
                     try:
-                        symbols_out_onehot[i][self.embedding_model.wv.vocab[self.training_data[offset+self.n_input+i]].index] = 1.0
+                        symbols_out_onehot[i] = self.embedding_model.wv.vocab[self.training_data[offset+self.n_input+i]].index
                     except:
-                        symbols_out_onehot[i][0] = 1.0
+                        symbols_out_onehot[i] = 0
                 #print(embedded_batch)
                 symbols_out_onehot = np.reshape(symbols_out_onehot,[self.batch_size,-1])
 
-
+                outputs = np.zeros([self.batch_size, self.n_input], dtype=int)
                 _, acc, loss, embedding_pred = session.run([self.optimizer, self.accuracy, self.cost, self.probas], \
-                                                        feed_dict={self.x: embedded_batch, self.y: symbols_out_onehot})
+                                                        feed_dict={self.x: embedded_batch, self.y: symbols_out_onehot, self.outputs: symbols_out_onehot})
                 predictions = []
                 for prediction in embedding_pred:
-                    predictions.append(self.embedding_model.wv.index2word[prediction])
+                    predictions.append(self.embedding_model.wv.index2word[prediction[0]])
 
 
                 loss_total += loss
@@ -234,6 +271,7 @@ class SimpleRNN:
                 if len(input_sent) != self.n_input:
                     continue
                 try:
+                    """
                     for word in input_sent:
                         try:
                             embedding = self.embedding_model.wv[word]
@@ -243,9 +281,11 @@ class SimpleRNN:
                         embedded_symbols.append(embedding)
                     # embeded_symbols shape [1, n_input, n_hidden]
                     embedded_symbols = [embedded_symbols]
+                    """
                     output_sent = "%s" % (input_sent)
+                    input_sent = [input_sent]
                     for i in range(23):
-                        onehot_pred = session.run(self.probas, feed_dict={self.x: embedded_symbols})
+                        onehot_pred = session.run(self.probas, feed_dict={self.x: input_sent})
                         onehot_pred = self.embedding_model.wv.index2word[onehot_pred[0]]
                         output_sent +=  " %s" % (onehot_pred)
                         embedded_symbols = embedded_symbols[0][1:]
