@@ -22,25 +22,17 @@ import gensim
 """
 learning_rate = 0.001
 training_iters = 50000
-display_step = 1000
 n_input = 4
 batch_size = 2
-# number of units in RNN cell
 n_hidden = 300
-path_to_model = "RNN/models/"
 """
+
 
 class SimpleRNN:
     # Parameters
-    def __init__(self, learning_rate, training_iters, display_step, n_input,
-    batch_size, n_hidden, path_to_model, model_name):
-        self.learning_rate = learning_rate
-        self.training_iters = training_iters
+    def __init__(self, d, display_step, path_to_model, model_name):
+        self.__dict__.update(d)
         self.display_step = display_step
-        self.n_input = n_input
-        self.batch_size = batch_size
-        # number of units in RNN cell
-        self.n_hidden = n_hidden
         self.path_to_model = path_to_model
         self.model_name = model_name
 
@@ -75,6 +67,12 @@ class SimpleRNN:
 
         # Initializing the variables
         self.init = tf.global_variables_initializer()
+
+    def set_model_name(self, n):
+        self.model_name = n
+
+    def set_path_to_model(self, n):
+        self.path_to_model = n
 
     def elapsed(self,sec):
         if sec<60:
@@ -257,19 +255,14 @@ class SimpleRNN:
 
 if __name__ == '__main__':
     args = sys.argv[1:]
-    learning_rate = 0.001
-    training_iters = 50000
-    display_step = 1000
-    n_input = 4
-    batch_size = 2
-    n_hidden = 300
+    d = {"learning_rate": 0.001, "training_iters" : 1000,"n_input" : 4,"batch_size" : 2, "n_hidden" : 300}
     path_to_model = "RNN/models/"
     model_name = "best_model"
+    display_step = 100
     if len(args) >= 1 and args[0] == "train":
-        rnn = SimpleRNN(learning_rate, training_iters, display_step, n_input,
-            batch_size, n_hidden, path_to_model, model_name)
+        rnn = SimpleRNN(d, display_step, path_to_model, model_name)
         rnn.train()
     else:
-        rnn = SimpleRNN(learning_rate, training_iters, display_step, n_input,
-            1, n_hidden, path_to_model, model_name)
+        d["batch_size"] = 1
+        rnn = SimpleRNN(d, display_step, path_to_model, model_name)
         rnn.run()
