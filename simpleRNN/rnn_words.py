@@ -131,10 +131,13 @@ class SimpleRNN:
         with tf.variable_scope("decoding") as decoding_scope:
             lstm_decoding = rnn.MultiRNNCell([rnn.BasicLSTMCell(self.n_hidden), rnn.BasicLSTMCell(self.n_hidden)])
             dec_outputs, _ = tf.nn.dynamic_rnn(lstm_decoding, inputs=embedded_output, initial_state=last_state)
-
-        logits = tf.contrib.layers.fully_connected(dec_outputs, num_outputs=self.vocab_size,
-            activation_fn=None)
-        return logits
+        #logits = tf.matmul(dec_outputs, tf.transpose(self.weights['out']))
+        def wxplusb(output):
+            return tf.matmul(output, tf.transpose(self.weights['out']))
+        self.logits = tf.map_fn(wxplusb, dec_outputs)
+        #logits = tf.contrib.layers.fully_connected(self.dec_outputs, num_outputs=self.vocab_size,
+        #    activation_fn=None)
+        return self.logits
         """
         # connect outputs to
         logits = tf.contrib.layers.fully_connected(dec_outputs, num_outputs=self.vocab_size,
@@ -249,6 +252,7 @@ class SimpleRNN:
                 #outputs = np.zeros([self.batch_size, self.n_input], dtype=int)
                 _, acc, loss, embedding_pred = session.run([self.optimizer, self.accuracy, self.cost, self.probas], \
                                                         feed_dict={self.x: embedded_batch, self.y: targets, self.outputs: outputs})
+
 
                 #print(embedding_pred)
                 predictions = []
