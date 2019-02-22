@@ -73,7 +73,7 @@ class SimpleRNN:
                 tf.ones([self.batch_size, 4]))
             self.cost = tf.reduce_mean(self.loss)
             # optimizer
-            self.optimizer = tf.train.RMSPropOptimizer(learning_rate=self.learning_rate).minimize(self.loss)
+            self.optimizer = tf.train.RMSPropOptimizer(learning_rate=self.learning_rate).minimize(self.cost)
         """
         self.cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=self.pred, labels=self.y))
         self.optimizer = tf.train.RMSPropOptimizer(learning_rate=self.learning_rate).minimize(self.cost)
@@ -273,9 +273,9 @@ class SimpleRNN:
                         symbols_out.append(symbol_out)
                     #symbols_out_pred = reverse_dictionary[int(tf.argmax(onehot_pred, 1).eval())]
                     for batch in range(self.batch_size):
-                        print("%s - [%s] vs [%s]" % (symbols_in[batch],symbols_out[batch],predictions[batch]))
+                        print("%s - [%s] vs [%s]" % (symbols_in[batch],symbols_out[batch],predictions))
                 step += 1
-                sent_num += 1
+                sent_num += 2
             print("Optimization Finished!")
             print("Elapsed time: ", self.elapsed(time.time() - self.start_time))
             print("Run on command line.")
@@ -309,14 +309,25 @@ class SimpleRNN:
                     embedded_symbols = [embedded_symbols]
                     """
                     output_sent = "%s" % (input_sent)
-                    input_sent = [input_sent]
-                    for i in range(23):
-                        onehot_pred = session.run(self.probas, feed_dict={self.x: input_sent})
-                        onehot_pred = self.embedding_model.wv.index2word[onehot_pred[0]]
-                        output_sent +=  " %s" % (onehot_pred)
-                        embedded_symbols = embedded_symbols[0][1:]
-                        embedded_symbols.append(self.embedding_model.wv[onehot_pred])
-                        embedded_symbols = [embedded_symbols]
+                    input_sent_one_hot = []
+                    for word in input_sent:
+                        input_sent_one_hot.append(self.embedding_model.wv.vocab[word].index)
+                    input_sent = [input_sent_one_hot]
+                    target_sent = [39, 39, 39]
+                    target_sent.append(self.embedding_model.wv.vocab['GO'].index)
+                    print(target_sent)
+                    target_sent = [target_sent]
+                   # for i in range(23):
+                    onehot_pred = session.run(self.probas, feed_dict={self.x: input_sent, self.outputs: target_sent})
+                    predict_sent = []
+                    for word in onehot_pred[0]:
+                        predict_sent.append(self.embedding_model.wv.index2word[word])
+                    #onehot_pred = self.embedding_model.wv.index2word[onehot_pred[0]]
+                    for word in predict_sent:
+                        output_sent +=  " %s" % (word)
+                    #input_sent = input_sent[0][1:]
+                    #input_sent.append(self.embedding_model.vocab[onehot_pred].index)
+                    #input_sent = [input_sent]
                     print(output_sent)
                 except Exception as e:
                     print(e)
