@@ -226,10 +226,11 @@ if __name__ == '__main__':
                     embedded_symbols.append(embedding)
                 # embeded_symbols shape [1, n_input, n_hidden]
                 embedded_symbols = [embedded_symbols]
+                output_sent = "%s" % (input_sent)
                 for i in range(32):
                     onehot_pred = session.run(probas, feed_dict={x: embedded_symbols})
                     onehot_pred = embedding_model.wv.index2word[onehot_pred[0]]
-                    output_sent = "%s %s" % (input_sent, onehot_pred)
+                    output_sent = output_sent + " %s" % (onehot_pred)
                     embedded_symbols = embedded_symbols[0][1:]
                     embedded_symbols.append(embedding_model.wv[onehot_pred])
                     embedded_symbols = [embedded_symbols]
