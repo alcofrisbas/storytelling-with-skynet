@@ -199,6 +199,8 @@ class SimpleRNN:
                 if offset > (len(self.training_data)-end_offset):
                     offset = random.randint(0, self.n_input+1)
                 """
+                if sent_num >= len(self.training_data):
+                    sent_num = 0
                 symbols = self.training_data[sent_num]
                 """
                 with open("RNN/data/train.txt") as file:
@@ -339,7 +341,7 @@ class SimpleRNN:
 if __name__ == '__main__':
     args = sys.argv[1:]
     learning_rate = 0.001
-    training_iters = 5000
+    training_iters = 50000
     display_step = 1000
     n_input = 4
     batch_size = 1
