@@ -225,7 +225,7 @@ class SimpleRNN:
                 for word in self.training_data[sent_num+1][1:5]:
                     targets.append(self.embedding_model.wv.vocab[word].index)
                 #self.output_seq_length = len(targets) -1
-                while (len(targets < 4)):
+                while (len(targets) < 4):
                     targets.append(0)
                 targets = [targets]
 
@@ -241,7 +241,7 @@ class SimpleRNN:
                 outputs = []
                 for word in self.training_data[sent_num+1][:4]:
                     outputs.append(self.embedding_model.wv.vocab[word].index)
-                while (len(outputs < 4)):
+                while (len(outputs) < 4):
                     outputs.append(0)
                 outputs = [outputs]
                 #symbols_out_onehot = np.reshape(symbols_out_onehot,[self.batch_size,-1])
