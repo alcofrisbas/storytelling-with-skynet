@@ -9,7 +9,7 @@ from webapp.models import User
 #sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'RNN'))
 #from rnn_test import load_model, generate_text
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'simpleRNN'))
-from rnn_words import SimpleRNN
+#from rnn_words import SimpleRNN
 #from rnn_words2 import run
 import random
 from webapp.words import ADJECTIVES, ANIMALS
@@ -19,7 +19,7 @@ args_dict = {"n_input": 4, "batch_size": 2, "n_hidden": 300, "learning_rate": 0.
 display_step = 1000
 path_to_model = "RNN/models/"
 model_name = "best_model"
-rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
+#rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
 
 #TODO: when user logs in, redirect to the page they logged in from
 #TODO: figure out how to clear empty stories and expired session data
@@ -102,7 +102,7 @@ def write(request):
 
     # if "sess" not in request.session.keys():
     #     request.session["sess"] = rnn.load()
-    sess = rnn.load()
+    #sess = rnn.load()
 
     story = Story.objects.get(id=request.session["story_id"])
     suggestion = ""
@@ -114,7 +114,7 @@ def write(request):
             story.save()
 
             if request.session["AI"] and not request.session["editing"]:
-                suggestion = generateSuggestion(sess, new_sentence)
+                suggestion = generateSuggestion(None, new_sentence)
 
             request.session["editing"] = not request.session["editing"]
 
@@ -184,8 +184,8 @@ def generatePrompt(curPrompt=""):
 def generateSuggestion(session, newSentence):
     try:
         #suggestion = generate_text(sess, model, word_to_id, id_to_word, seed=newSentence)
-        suggestion = rnn.generate_suggestion(session, newSentence)
-        #suggestion="placeholder"
+        #suggestion = rnn.generate_suggestion(session, newSentence)
+        suggestion="placeholder"
     except Exception as e:
         print("ERROR (suggestion generation)")
         suggestion = e

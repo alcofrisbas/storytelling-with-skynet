@@ -29,14 +29,31 @@
 {#                {% endfor %}#}
                 <div class="list-group">
                 {% for story in stories %}
-                  <a href="/load_story/{{ story.id }}" class="list-group-item list-group-item-action">
-                    <div class="d-flex w-100 justify-content-between">
-                      <h5 class="mb-1">{{ story.title }}</h5>
-                      <small>{{ story.created }}</small>
-                    </div>
+{#                  <a href="/load_story/{{ story.id }}" class="list-group-item list-group-item-action">#}
+{#                    <div class="d-flex w-100 justify-content-between">#}
+{#                      <h5 class="mb-1">{{ story.title }}</h5>#}
+{#                      <small>{{ story.created }}</small>#}
+{#                        <button class="btn btn-xs btn-primary" onclick="alert('Action2 -> Play'); event.stopPropagation();">O</button>#}
+{#                    </div>#}
 {#                    <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>#}
 {#                    <small>Donec id elit non mi porta.</small>#}
-                  </a>
+{#                  </a>#}
+
+                    <a class="list-group-item list-group-item-action" href="/load_story/{{ story.id }}">
+                        <div class="d-flex w-100 justify-content-between">
+                            <div class="align-self-center"><h5>{{ story.title }}</h5></div>
+                            <span>
+                                <small>{{ story.created }}</small>
+                                <span class="pull-right" onclick="return false;">
+                                    <span class="btn-group" role="group" aria-label="...">
+                                     <span class="btn btn-xs" data-toggle="modal" data-target= "#confirmDeleteModal" id= "deleteButton{{story.id}}">
+                                            <i class="fa fa-trash fa-2x" style= "float: right; color: red;"></i>
+                                    </span>
+                                    </span>
+                                </span>
+                            </span>
+                        </div>
+                    </a>
                 {% endfor %}
                 </div>
             {% endif %}
