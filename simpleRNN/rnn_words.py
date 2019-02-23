@@ -196,7 +196,7 @@ class SimpleRNN:
             max_size = 0
             for sent in self.training_data:
                 if max_size < len(sent):
-                    maz_size = len(sent)
+                    max_size = len(sent)
 
             while step < self.training_iters:
                 # Generate a minibatch. Add some randomness on selection process.
