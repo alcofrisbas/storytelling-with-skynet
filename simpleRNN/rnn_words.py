@@ -122,8 +122,9 @@ class SimpleRNN:
 
         # seq2seq embedding layers
         embedded_input = tf.nn.embedding_lookup(self.embedding_model.wv.syn0, inputs)
-        embedded_output = tf.nn.embedding_lookup(self.embedding_model.syn1neg, self.outputs)
+        embedded_output = tf.nn.embedding_lookup(self.embedding_model.wv.syn0, self.outputs)
 
+        # consider using GRU cells
         with tf.variable_scope("encoding") as encoding_scope:
             lstm_encoding = rnn.MultiRNNCell([rnn.BasicLSTMCell(self.n_hidden),rnn.BasicLSTMCell(self.n_hidden)])
             _, last_state = tf.nn.dynamic_rnn(lstm_encoding, inputs=embedded_input, dtype=tf.float32)
