@@ -70,7 +70,7 @@ class SimpleRNN:
         with tf.name_scope("optimization"):
             # loss function
             self.loss = tf.contrib.seq2seq.sequence_loss(self.logits, self.y,
-                tf.ones([self.batch_size, 4]))
+                tf.ones([self.batch_size, 85]))
             self.cost = tf.reduce_mean(self.loss)
             # optimizer
             self.optimizer = tf.train.RMSPropOptimizer(learning_rate=self.learning_rate).minimize(self.loss)
@@ -197,7 +197,6 @@ class SimpleRNN:
             for sent in self.training_data:
                 if max_size < len(sent):
                     max_size = len(sent)
-
             while step < self.training_iters:
                 # Generate a minibatch. Add some randomness on selection process.
                 """
