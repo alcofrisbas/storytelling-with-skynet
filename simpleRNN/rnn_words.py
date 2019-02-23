@@ -193,6 +193,10 @@ class SimpleRNN:
             loss_total = 0
 
             self.writer.add_graph(session.graph)
+            max_size = 0
+            for sent in self.training_data:
+                if max_size < len(sent):
+                    maz_size = len(sent)
 
             while step < self.training_iters:
                 # Generate a minibatch. Add some randomness on selection process.
@@ -228,10 +232,10 @@ class SimpleRNN:
                 # embeded_symbols shape [self.batch_size, self.n_input]
 
                 targets = []
-                for word in self.training_data[sent_num+1][1:5]:
+                for word in self.training_data[sent_num+1][1:]:
                     targets.append(self.embedding_model.wv.vocab[word].index)
                 #self.output_seq_length = len(targets) -1
-                while (len(targets) < 4):
+                while (len(targets) < max_size):
                     targets.append(0)
                 targets = [targets]
 
@@ -245,9 +249,9 @@ class SimpleRNN:
                 #print(embedded_batch)
                 """
                 outputs = []
-                for word in self.training_data[sent_num+1][:4]:
+                for word in self.training_data[sent_num+1][:-1]:
                     outputs.append(self.embedding_model.wv.vocab[word].index)
-                while (len(outputs) < 4):
+                while (len(outputs) < max_size):
                     outputs.append(0)
                 outputs = [outputs]
                 #symbols_out_onehot = np.reshape(symbols_out_onehot,[self.batch_size,-1])
