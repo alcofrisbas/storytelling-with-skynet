@@ -74,8 +74,20 @@ embedding_matrix[vocab_size + 1] = np.zeros((vector_dim))
 saved_embeddings = tf.constant(embedding_matrix)
 embedding = tf.Variable(initial_value=saved_embeddings, trainable=False)
 
+output_embedding_matrix = np.zeros((vocab_size +2, vector_dim))
+for i in range(vocab_size):
+    output_embedding_vector = model.syn1neg[i]
+    output_embedding_matrix[i] = output_embedding_vector
+
+output_embedding_matrix[vocab_size] = np.zeros((vector_dim))
+output_embedding_matrix[vocab_size + 1] = np.zeros((vector_dim))
+
+saved_output_embeddings = tf.constant(output_embedding_matrix)
+output_embedding = tf.Variable(initial_value=saved_output_embeddings, trainable=False)
+
 #creata a file and store the index to vector matrix
-file_path = root_path + "my_embedding_model"
+file_path = root_path + "input_embedding_model"
+np.save(root_path+"output_embedding_model", output_embedding_matrix)
 np.save(file_path, embedding_matrix)
 """
 tsv_file_path = root_path +"tensorboard/metadata.tsv"

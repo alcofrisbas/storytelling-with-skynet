@@ -61,10 +61,11 @@ class SimpleRNN:
         self.embedding_model = gensim.models.Word2Vec.load(self.path_to_model + "my_embedding_model")
 
         #file containing the index to vector including the paddings
-        self.embedding_matrix = np.load(self.path_to_model + "my_embedding_model.npy")
-        self.file = open(self.path_to_model + "vocab")
-        self.vocab_size = self.embedding_matrix.shape[0]
-        self.weights = {'out': self.embedding_model.syn1neg}
+        self.input_embedding_matrix = np.load(self.path_to_model + "input_embedding_model.npy")
+        self.output_embedding_matrix = tf.cast(np.load(self.path_to_model + "output_embedding_model.npy"), tf.float32)
+        self.file = open(self.path_to_model + "vocab.csv")
+        self.vocab_size = self.input_embedding_matrix.shape[0]
+        self.weights = {'out': self.output_embedding_matrix}
         # tf Graph input
         self.x = tf.placeholder(tf.int32, [None, None])
         self.y = tf.placeholder(tf.int32, [None, None])
@@ -129,8 +130,8 @@ class SimpleRNN:
         inputs = self.x
         targets = self.y
         # seq2seq embedding layers
-        embedded_input = tf.nn.embedding_lookup(self.embedding_model.wv.syn0, inputs)
-        embedded_output = tf.nn.embedding_lookup(self.embedding_model.wv.syn0, self.outputs)
+        embedded_input = tf.cast(tf.nn.embedding_lookup(self.input_embedding_matrix, inputs), tf.float32)
+        embedded_output = tf.cast(tf.nn.embedding_lookup(self.input_embedding_matrix, self.outputs), tf.float32)
 
         # consider using GRU cells
         with tf.variable_scope("encoding") as encoding_scope:
@@ -229,10 +230,10 @@ class SimpleRNN:
                 for word in symbols:
                     try:
                         embedding = self.embedding_model.wv.vocab[word].index
-                        itemindex = np.where(self.index2word== word)
+                        #itemindex = np.where(self.index2word== word)
                     except KeyError:
                         print(word + " not in vocabulary")
-                        embedding = 0
+                        embedding = self.embedding_model.wv.vocab['UNK'].index
                     embedded_batch.append(embedding)
                 embedded_batch = [embedded_batch]
                 #embedded_batch.append(embedded_symbols)
@@ -247,7 +248,7 @@ class SimpleRNN:
                     targets.append(self.embedding_model.wv.vocab[word].index)
                 #self.output_seq_length = len(targets) -1
                 while (len(targets) < max_size):
-                    targets.append(0)
+                    targets.append(len(self.input_embedding_matrix)-1)
                 targets = [targets]
 
                 """
@@ -266,7 +267,7 @@ class SimpleRNN:
                     #outputs.append(ind)
                     outputs.append(self.embedding_model.wv.vocab[word].index)
                 while (len(outputs) < max_size):
-                    outputs.append(0)
+                    outputs.append(len(self.input_embedding_matrix)-1)
                 outputs = [outputs]
                 #symbols_out_onehot = np.reshape(symbols_out_onehot,[self.batch_size,-1])
 
