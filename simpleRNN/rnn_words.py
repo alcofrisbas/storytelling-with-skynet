@@ -60,7 +60,7 @@ class SimpleRNN:
 
         self.embedding_model = gensim.models.Word2Vec.load(self.path_to_model + "my_embedding_model")
 
-        #file containing the index to vector including the paddings 
+        #file containing the index to vector including the paddings
         self.embedding_matrix = np.load(self.path_to_model + "my_embedding_model.npy")
         self.file = open(self.path_to_model + "vocab")
         self.vocab_size = self.embedding_matrix.shape[0]
@@ -95,7 +95,7 @@ class SimpleRNN:
         #file containing the vocab
         self.index2word = genfromtxt(self.path_to_model + "vocab.csv",  dtype=str)
 
-    def elapsed(self,sec):    
+    def elapsed(self,sec):
         if sec<60:
             return str(sec) + " sec"
         elif sec<(60*60):
@@ -371,7 +371,7 @@ if __name__ == '__main__':
     n_input = 4
     batch_size = 1
     n_hidden = 300
-    path_to_model = "RNN/models/"
+    path_to_model = "simpleRNN/models/"
     model_name = "best_model"
     if len(args) >= 1 and args[0] == "train":
         rnn = SimpleRNN(learning_rate, training_iters, display_step, n_input,
