@@ -248,7 +248,7 @@ class SimpleRNN:
                     targets.append(self.embedding_model.wv.vocab[word].index)
                 #self.output_seq_length = len(targets) -1
                 while (len(targets) < max_size):
-                    targets.append(len(self.input_embedding_matrix)-1)
+                    targets.append(len(self.input_embedding_matrix)-2)
                 targets = [targets]
 
                 """
@@ -267,7 +267,8 @@ class SimpleRNN:
                     #outputs.append(ind)
                     outputs.append(self.embedding_model.wv.vocab[word].index)
                 while (len(outputs) < max_size):
-                    outputs.append(len(self.input_embedding_matrix)-1)
+
+                    outputs.append(len(self.input_embedding_matrix)-2)
                 outputs = [outputs]
                 #symbols_out_onehot = np.reshape(symbols_out_onehot,[self.batch_size,-1])
 
