@@ -241,10 +241,10 @@ class SimpleRNN:
 
                 targets = []
                 for word in self.training_data[sent_num+1][1:]:
-                    itemindex = np.where(self.index2word== word)
-                    ind = itemindex[0][0]
-                    targets.append(ind)
-                    #targets.append(self.embedding_model.wv.vocab[word].index)
+                    #itemindex = np.where(self.index2word== word)
+                    #ind = itemindex[0][0]
+                    #targets.append(ind)
+                    targets.append(self.embedding_model.wv.vocab[word].index)
                 #self.output_seq_length = len(targets) -1
                 while (len(targets) < max_size):
                     targets.append(0)
@@ -261,10 +261,10 @@ class SimpleRNN:
                 """
                 outputs = []
                 for word in self.training_data[sent_num+1][:-1]:
-                    itemindex = np.where(self.index2word== word)
-                    ind = itemindex[0][0]
-                    outputs.append(ind)
-                    #outputs.append(self.embedding_model.wv.vocab[word].index)
+                    #itemindex = np.where(self.index2word== word)
+                    #ind = itemindex[0][0]
+                    #outputs.append(ind)
+                    outputs.append(self.embedding_model.wv.vocab[word].index)
                 while (len(outputs) < max_size):
                     outputs.append(0)
                 outputs = [outputs]
