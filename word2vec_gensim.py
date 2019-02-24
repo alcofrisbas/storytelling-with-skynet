@@ -4,6 +4,7 @@ import tensorflow as tf
 from tensorflow.contrib.tensorboard.plugins import projector
 import logging
 from nltk.tokenize import sent_tokenize, word_tokenize
+import csv
 
 training_file = 'RNN/data/train.txt'
 root_path = "RNN/models/"
@@ -25,10 +26,7 @@ sentences = [word_tokenize(t) for t in sent_tokenize(file_content)]
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
 # model gets trained in gensim
-model = gensim.models.Word2Vec(sentences, iter=100, min_count=1, size=300, workers=10)
-f = open(root_path +"vocab", "w+")
-for word in model.wv.index2word:
-    f.write(word + "\n")
+model = gensim.models.Word2Vec(sentences, iter=100, min_count=1, size=300,  workers=10)
 #returns the list of indexes of each owrd in the word vector vocab
 def convert_data_to_index(string_data, wv):
     index_data = []
@@ -50,18 +48,35 @@ model = gensim.models.Word2Vec.load(root_path + "my_embedding_model")
 # print(model.wv.syn0) #prints input embedding
 # print(model.syn1neg) #prints output embedding
 
+#create a csv file to store vocab
+file_csv = open(root_path +"vocab.csv", "w")
+writer = csv.writer(file_csv)
+file_csv.close
+
+#add special tokens to the vocab
+for word in model.wv.index2word:
+    writer.writerow([word])
+writer.writerow(["UNK"])
+writer.writerow(["POS"])
+
 
 # convert the wv word vectors into a numpy matrix that is suitable for insertion
 # into our TensorFlow model
-embedding_matrix = np.zeros((vocab_size, vector_dim))
+embedding_matrix = np.zeros((vocab_size + 2, vector_dim))
 for i in range(vocab_size):
     embedding_vector = model.wv[model.wv.index2word[i]]
     if embedding_vector is not None:
         embedding_matrix[i] = embedding_vector
-
+#add vector of zeros for special tokens in matrix
+embedding_matrix[vocab_size] = np.zeros((vector_dim))
+embedding_matrix[vocab_size + 1] = np.zeros((vector_dim))
 # embedding layer weights are frozen to avoid updating embeddings while training
 saved_embeddings = tf.constant(embedding_matrix)
 embedding = tf.Variable(initial_value=saved_embeddings, trainable=False)
+
+#creata a file and store the index to vector matrix
+file_path = root_path + "my_embedding_model"
+np.save(file_path, embedding_matrix)
 """
 tsv_file_path = root_path +"tensorboard/metadata.tsv"
 with open(tsv_file_path,'w+', encoding='utf-8') as file_metadata:
