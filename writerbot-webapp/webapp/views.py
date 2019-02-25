@@ -29,11 +29,15 @@ def home(request):
     if request.user.is_authenticated:
         user = getOrCreateUser(request)
         if request.session.get("story_id"):
-            cur_story = Story.objects.get(id=request.session.get("story_id"))
-            cur_story.author = user
-            cur_story.save()
-            user.stories.add(cur_story)
-            user.save()
+            try:
+                cur_story = Story.objects.get(id=request.session.get("story_id"))
+                cur_story.author = user
+                cur_story.save()
+                user.stories.add(cur_story)
+                user.save()
+            except Exception as e:
+                print(e)
+                print("id: {}".format(request.session.get("story_id")))
         stories = user.stories.all()
     else:
         stories = []
@@ -81,10 +85,11 @@ def loadStory(request, id):
 def deleteStory(request, id):
     if Story.objects.filter(id=id).exists():
         s = Story.objects.get(id=id)
+        if id == request.session.get("story_id"):
+            print("deleting request.session {}".format(id))
+            request.session.pop("story_id")
         if s.author.email == request.user.email:
             s.delete()
-            if id == request.session.get("story_id"):
-                request.session.pop("story_id")
             return redirect('/')
         else:
             return render(request, 'webapp/error.html',
