@@ -70,6 +70,7 @@ class SimpleRNN:
         self.x = tf.placeholder(tf.int32, [None, None])
         self.y = tf.placeholder(tf.int32, [None, None])
         self.outputs = tf.placeholder(tf.int32, (None, None), 'output')
+        self.decoder_lengths = tf.placeholder(tf.int32, shape=(self.batch_size), name="decoder_length")
 
         self.logits = self.RNN()
         self.probas = tf.argmax(self.logits, 2)
@@ -136,15 +137,23 @@ class SimpleRNN:
         # consider using GRU cells
         with tf.variable_scope("encoding") as encoding_scope:
             lstm_encoding = rnn.MultiRNNCell([rnn.BasicLSTMCell(self.n_hidden),rnn.BasicLSTMCell(self.n_hidden)])
-            _, last_state = tf.nn.dynamic_rnn(lstm_encoding, inputs=embedded_input, dtype=tf.float32)
+            encoder_outputs, last_state = tf.nn.dynamic_rnn(lstm_encoding, inputs=embedded_input, dtype=tf.float32)
 
         with tf.variable_scope("decoding") as decoding_scope:
             lstm_decoding = rnn.MultiRNNCell([rnn.BasicLSTMCell(self.n_hidden), rnn.BasicLSTMCell(self.n_hidden)])
-            dec_outputs, _ = tf.nn.dynamic_rnn(lstm_decoding, inputs=embedded_output, initial_state=last_state)
+            # Attention mechanism and wrapper
+            helper = tf.contrib.seq2seq.TrainingHelper(embedded_output, self.decoder_lengths)
+            attention_mechanism = tf.contrib.seq2seq.LuongAttention(num_units=self.n_hidden, memory=encoder_outputs)
+            decoder_cell = tf.contrib.seq2seq.AttentionWrapper(lstm_decoding, attention_mechanism, attention_layer_size=self.n_hidden)
+            initial_state = decoder_cell.zero_state(self.batch_size, tf.float32).clone(cell_state=last_state)
+            decoder = tf.contrib.seq2seq.BasicDecoder(decoder_cell, helper, initial_state)
+            final_outputs, _final_state, _final_sequence_lenghts = tf.contrib.seq2seq.dynamic_decode(decoder)
+            print(final_outputs.rnn_output)
+            #dec_outputs, _ = tf.nn.dynamic_rnn(lstm_decoding, inputs=embedded_output, initial_state=last_state)
         #logits = tf.matmul(dec_outputs, tf.transpose(self.weights['out']))
         def wxplusb(output):
             return tf.matmul(output, tf.transpose(self.weights['out']))
-        self.logits = tf.map_fn(wxplusb, dec_outputs)
+        self.logits = tf.map_fn(wxplusb, final_outputs.rnn_output)
         #logits = tf.contrib.layers.fully_connected(self.dec_outputs, num_outputs=self.vocab_size,
         #    activation_fn=None)
         return self.logits
@@ -274,7 +283,8 @@ class SimpleRNN:
 
                 #outputs = np.zeros([self.batch_size, self.n_input], dtype=int)
                 _, acc, loss, embedding_pred = session.run([self.optimizer, self.accuracy, self.cost, self.probas], \
-                                                        feed_dict={self.x: embedded_batch, self.y: targets, self.outputs: outputs})
+                                                        feed_dict={self.x: embedded_batch, self.y: targets, self.outputs: outputs,
+                                                                    self.decoder_lengths: [85]})
 
                 predictions = []
                 for prediction in embedding_pred[0]:
