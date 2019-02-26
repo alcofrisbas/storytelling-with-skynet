@@ -119,11 +119,7 @@ class SimpleRNN:
         # there are self.n_input outputs but
         # we only want the last output
         return tf.matmul(output, tf.transpose(self.weights['out']))
-<<<<<<< HEAD
 
-    # train the model
-=======
->>>>>>> 4e98b9b3d8f7d38a2a4ff458b584caeb6455ab7b
     def train(self):
         with tf.Session() as session:
             session.run(self.init)
@@ -204,29 +200,11 @@ class SimpleRNN:
 
             saver.save(session, self.path_to_model+"/"+self.model_name)
 
-
-    # load the rnn for the purposes of views.py in our webapp
-    def load(self):
-        session = tf.Session()
-        imported_graph = tf.train.import_meta_graph(self.path_to_model + 'best_model.meta')
-        # saver = tf.train.Saver()
-        # saver.restore(session, tf.train.latest_checkpoint(self.path_to_model))
-        return session
-
-
-    # close for the same purpose
-    def close(self, session):
-        session.close()
-
-
     # generate a suggestion given a session and a string _input
     def generate_suggestion(self, session, _input):
-        print(session)
         input_sent = word_tokenize(_input)
         embedded_symbols = []
-        print(_input)
         if len(input_sent) == self.n_input:
-            print("len works")
             try:
                 for word in input_sent:
                     print(word)
@@ -239,8 +217,6 @@ class SimpleRNN:
                 # embeded_symbols shape [1, n_input, n_hidden]
                 embedded_symbols = [embedded_symbols]
                 output_sent = ""
-                print(output_sent)
-                print("1")
                 for i in range(23):
                     onehot_pred = session.run(self.probas, feed_dict={self.x: embedded_symbols})
                     onehot_pred = self.embedding_model.wv.index2word[onehot_pred[0]]
@@ -248,12 +224,10 @@ class SimpleRNN:
                     embedded_symbols = embedded_symbols[0][1:]
                     embedded_symbols.append(self.embedding_model.wv[onehot_pred])
                     embedded_symbols = [embedded_symbols]
-                print(output_sent)
-                print("2")
                 return output_sent
             except Exception as e:
                 print(e)
-                return "RNN Error"
+                return e
 
     def run(self):
         with tf.Session() as session:
@@ -287,8 +261,6 @@ class SimpleRNN:
                     print(output_sent)
                 except Exception as e:
                     print(e)
-
-
 
 if __name__ == '__main__':
     args = sys.argv[1:]
