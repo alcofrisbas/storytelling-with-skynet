@@ -1,5 +1,6 @@
 import numpy as np
 from nltk.tokenize import sent_tokenize
+import pickle
 import time
 
 class Trie:
@@ -89,7 +90,7 @@ def train(fname, n=5, l=200000):
             break
     return root
 
-def generate_sentence(root, sent, l=200):
+def generate_sentence(root:Trie, sent:str, l=200, m=3):
     sentence = sent.split()
     for i in range(l):
         next = predict_next(root, sentence[-m:])
@@ -101,7 +102,9 @@ def generate_sentence(root, sent, l=200):
 if __name__ == '__main__':
     trie = {}
     process_data("./ngrams/dickens.txt")
-    root = train("./ngrams/dickens.txt.tkn")
+    root = train("./ngrams/dickens.txt.tkn",l=50000)
+    with open("./ngrams/testRoot",'wb') as p:
+        pickle.dump(root, p)
 
     sent = input("enter a sentence: ").lower()
     # cap length of sentence
