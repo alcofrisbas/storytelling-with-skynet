@@ -9,7 +9,7 @@ from webapp.models import User
 #sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'RNN'))
 #from rnn_test import load_model, generate_text
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'simpleRNN'))
-from rnn_words import SimpleRNN
+#from rnn_words import SimpleRNN
 #from rnn_words2 import run
 import random
 from webapp.words import ADJECTIVES, ANIMALS
@@ -19,7 +19,12 @@ args_dict = {"n_input": 4, "batch_size": 2, "n_hidden": 300, "learning_rate": 0.
 display_step = 1000
 path_to_model = "RNN/models/"
 model_name = "best_model"
+<<<<<<< HEAD
 rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
+session = None
+=======
+#rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
+>>>>>>> 8eaae64d3ef43c29e0e8c7f801258d3d33a785ef
 
 #TODO: when user logs in, redirect to the page they logged in from
 #TODO: figure out how to clear empty stories and expired session data
@@ -29,11 +34,15 @@ def home(request):
     if request.user.is_authenticated:
         user = getOrCreateUser(request)
         if request.session.get("story_id"):
-            cur_story = Story.objects.get(id=request.session.get("story_id"))
-            cur_story.author = user
-            cur_story.save()
-            user.stories.add(cur_story)
-            user.save()
+            try:
+                cur_story = Story.objects.get(id=request.session.get("story_id"))
+                cur_story.author = user
+                cur_story.save()
+                user.stories.add(cur_story)
+                user.save()
+            except Exception as e:
+                print(e)
+                print("id: {}".format(request.session.get("story_id")))
         stories = user.stories.all()
     else:
         stories = []
@@ -81,10 +90,11 @@ def loadStory(request, id):
 def deleteStory(request, id):
     if Story.objects.filter(id=id).exists():
         s = Story.objects.get(id=id)
+        if id == request.session.get("story_id"):
+            print("deleting request.session {}".format(id))
+            request.session.pop("story_id")
         if s.author.email == request.user.email:
             s.delete()
-            if id == request.session.get("story_id"):
-                request.session.pop("story_id")
             return redirect('/')
         else:
             return render(request, 'webapp/error.html',
@@ -102,7 +112,7 @@ def write(request):
 
     # if "sess" not in request.session.keys():
     #     request.session["sess"] = rnn.load()
-    sess = rnn.load()
+    #sess = rnn.load()
 
     story = Story.objects.get(id=request.session["story_id"])
     suggestion = ""
@@ -114,7 +124,7 @@ def write(request):
             story.save()
 
             if request.session["AI"] and not request.session["editing"]:
-                suggestion = generateSuggestion(sess, new_sentence)
+                suggestion = generateSuggestion(None, new_sentence)
 
             request.session["editing"] = not request.session["editing"]
 
@@ -184,8 +194,8 @@ def generatePrompt(curPrompt=""):
 def generateSuggestion(session, newSentence):
     try:
         #suggestion = generate_text(sess, model, word_to_id, id_to_word, seed=newSentence)
-        suggestion = rnn.generate_suggestion(session, newSentence)
-        #suggestion="placeholder"
+        #suggestion = rnn.generate_suggestion(session, newSentence)
+        suggestion="placeholder"
     except Exception as e:
         print("ERROR (suggestion generation)")
         suggestion = e

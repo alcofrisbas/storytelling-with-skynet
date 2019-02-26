@@ -50,7 +50,12 @@ class SimpleRNN:
         self.writer = tf.summary.FileWriter(self.logs_path)
 
         # Text file containing words for training
+<<<<<<< HEAD
         self.training_file = "RNN/data/train.txt"#'simpleRNN/belling_the_cat.txt'
+=======
+        self.training_file = "RNN/data/train.txt"#
+
+>>>>>>> 0fca48d932ae6939f9b25de113c618536d76c6f4
         self.training_data = self.read_data(self.training_file)
         print("Loaded training data...")
         #self.dictionary, self.reverse_dictionary = self.build_dataset(self.training_data)

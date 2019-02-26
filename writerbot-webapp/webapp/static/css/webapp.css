@@ -102,3 +102,7 @@ i {
     border-style: inset;
     border-color: initial;
 }
+
+.list-group-item>.pull-right{
+   cursor: default;
+}
