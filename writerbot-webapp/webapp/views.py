@@ -20,6 +20,7 @@ display_step = 1000
 path_to_model = "RNN/models/"
 model_name = "best_model"
 rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
+session = None
 
 #TODO: when user logs in, redirect to the page they logged in from
 #TODO: figure out how to clear empty stories and expired session data

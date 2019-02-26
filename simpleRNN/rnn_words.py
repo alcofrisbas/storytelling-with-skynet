@@ -42,7 +42,7 @@ class SimpleRNN:
         self.writer = tf.summary.FileWriter(self.logs_path)
 
         # Text file containing words for training
-        self.training_file = 'simpleRNN/belling_the_cat.txt' #"RNN/data/train.txt"#
+        self.training_file = "RNN/data/train.txt"#
         self.training_data = self.read_data(self.training_file)
         print("Loaded training data...")
         self.dictionary, self.reverse_dictionary = self.build_dataset(self.training_data)
@@ -292,7 +292,7 @@ if __name__ == '__main__':
         s = input("enter a sent(4): ")
         while s != "quit":
             out_ = rnn.generate_suggestion(sess, s)
-            print (out)
+            print (out_)
             s = input("enter a sent(4): ")
         rnn.close(sess)
     else:
