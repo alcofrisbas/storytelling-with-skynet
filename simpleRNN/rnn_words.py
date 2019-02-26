@@ -132,28 +132,6 @@ class SimpleRNN:
         # there are self.n_input outputs but
         # we only want the last output
         return tf.matmul(output, tf.transpose(self.weights['out']))
-    """
-    def generateText(input):
-        with tf.Session() as session:
-            session.run(init)
-            saver = tf.train.Saver()
-            saver.restore(session, tf.train.latest_checkpoint(self.path_to_model))
-            words = word_tokenize(input)
-            print(words)
-            if len(words) == self.n_input:
-                try:
-                    symbols_in_keys = [dictionary[str(words[i])] for i in range(len(words))]
-                    for i in range(32):
-                        keys = np.reshape(np.array(symbols_in_keys), [-1, self.n_input, 1])
-                        onehot_pred = session.run(self.pred, feed_dict={x: keys})
-                        onehot_pred_index = int(tf.argmax(onehot_pred, 1).eval())
-                        sentence = "%s %s" % (sentence, reverse_dictionary[onehot_pred_index])
-                        symbols_in_keys = symbols_in_keys[1:]
-                        symbols_in_keys.append(onehot_pred_index)
-                    print(sentence)
-                except:
-                    print("Word not in dictionary")
-    """
     def train(self):
         with tf.Session() as session:
             session.run(self.init)
