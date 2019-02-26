@@ -119,8 +119,11 @@ class SimpleRNN:
         # there are self.n_input outputs but
         # we only want the last output
         return tf.matmul(output, tf.transpose(self.weights['out']))
+<<<<<<< HEAD
 
     # train the model
+=======
+>>>>>>> 4e98b9b3d8f7d38a2a4ff458b584caeb6455ab7b
     def train(self):
         with tf.Session() as session:
             session.run(self.init)
