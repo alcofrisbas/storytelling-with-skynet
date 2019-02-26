@@ -95,10 +95,6 @@ class SimpleRNN:
             sent = word_tokenize(sent)
             for word in sent:
                 sentences.append(word)
-        """
-        content = [x.strip() for x in content]
-        content = [word for i in range(len(content)) for word in content[i].split()]
-        """
         content = np.array(sentences)
         return content
 
@@ -114,7 +110,10 @@ class SimpleRNN:
     def RNN(self):
         # 2-layer LSTM, each layer has self.n_hidden units.
         # Average Accuracy= 95.20% at 50k iter
-        rnn_cell = rnn.MultiRNNCell([rnn.BasicLSTMCell(self.n_hidden),rnn.BasicLSTMCell(self.n_hidden)])
+        fw_rnn_cell = rnn.MultiRNNCell([rnn.BasicLSTMCell(self.n_hidden),rnn.BasicLSTMCell(self.n_hidden)])
+
+        bw_rnn_cell = rnn.MultiRNNCell([rnn.BasicLSTMCell(self.n_hidden),rnn.BasicLSTMCell(self.n_hidden)])
+
 
         # 1-layer LSTM with self.n_hidden units but with lower accuracy.
         # Average Accuracy= 90.60% 50k iter
@@ -123,9 +122,11 @@ class SimpleRNN:
 
         # generate prediction
         # the shape of outputs is [self.batch_size, self.n_input, self.n_hidden]
-        outputs, states = tf.nn.dynamic_rnn(cell=rnn_cell, inputs = self.x, dtype = tf.float32)
-        print(outputs)
-        output = states[-1].h
+        outputs, states = tf.nn.bidirectional_dynamic_rnn(cell_fw=fw_rnn_cell, cell_bw=bw_rnn_cell, inputs=self.x, dtype=tf.float32)
+        #outputs, states = tf.nn.dynamic_rnn(cell=rnn_cell, inputs = self.x, dtype = tf.float32)
+        print(outputs[-1])
+        #print(states[-1][-1])
+        output = states[-1][-1].h
         #outputs, states = rnn.static_rnn(rnn_cell, x, dtype=tf.float32)
 
         # there are self.n_input outputs but
