@@ -22,25 +22,17 @@ import gensim
 """
 learning_rate = 0.001
 training_iters = 50000
-display_step = 1000
 n_input = 4
 batch_size = 2
-# number of units in RNN cell
 n_hidden = 300
-path_to_model = "RNN/models/"
 """
+
 
 class SimpleRNN:
     # Parameters
-    def __init__(self, learning_rate, training_iters, display_step, n_input,
-    batch_size, n_hidden, path_to_model, model_name):
-        self.learning_rate = learning_rate
-        self.training_iters = training_iters
+    def __init__(self, d, display_step, path_to_model, model_name):
+        self.__dict__.update(d)
         self.display_step = display_step
-        self.n_input = n_input
-        self.batch_size = batch_size
-        # number of units in RNN cell
-        self.n_hidden = n_hidden
         self.path_to_model = path_to_model
         self.model_name = model_name
 
@@ -50,21 +42,19 @@ class SimpleRNN:
         self.writer = tf.summary.FileWriter(self.logs_path)
 
         # Text file containing words for training
-        self.training_file = "RNN/data/train.txt"#'simpleRNN/belling_the_cat.txt'
         self.training_file = "RNN/data/train.txt"#
 
         self.training_data = self.read_data(self.training_file)
         print("Loaded training data...")
-        #self.dictionary, self.reverse_dictionary = self.build_dataset(self.training_data)
+        self.dictionary, self.reverse_dictionary = self.build_dataset(self.training_data)
 
         self.embedding_model = gensim.models.Word2Vec.load(self.path_to_model + "my_embedding_model")
 
         self.vocab_size = len(self.embedding_model.wv.vocab)
         self.weights = {'out': self.embedding_model.syn1neg}
         # tf Graph input
-        # TRY SETTING POS 0 to None instead of self.batch_size
-        self.x = tf.placeholder("float", [None, self.n_input, self.n_hidden])
-        self.y = tf.placeholder("float", [None, self.vocab_size])
+        self.x = tf.placeholder("float", [self.batch_size, self.n_input, self.n_hidden])
+        self.y = tf.placeholder("float", [self.batch_size, self.vocab_size])
 
         self.pred = self.RNN()
         self.probas = tf.argmax(self.pred, 1)
@@ -79,6 +69,12 @@ class SimpleRNN:
         # Initializing the variables
         self.init = tf.global_variables_initializer()
 
+    def set_model_name(self, n):
+        self.model_name = n
+
+    def set_path_to_model(self, n):
+        self.path_to_model = n
+
     def elapsed(self,sec):
         if sec<60:
             return str(sec) + " sec"
@@ -90,16 +86,9 @@ class SimpleRNN:
     def read_data(self,fname):
         with open(fname) as f:
             content = f.readlines()
-        sentences = []
-        for sent in content:
-            sent = word_tokenize(sent)
-            for word in sent:
-                sentences.append(word)
-        """
         content = [x.strip() for x in content]
         content = [word for i in range(len(content)) for word in content[i].split()]
-        """
-        content = np.array(sentences)
+        content = np.array(content)
         return content
 
     def build_dataset(self, words):
@@ -124,35 +113,13 @@ class SimpleRNN:
         # generate prediction
         # the shape of outputs is [self.batch_size, self.n_input, self.n_hidden]
         outputs, states = tf.nn.dynamic_rnn(cell=rnn_cell, inputs = self.x, dtype = tf.float32)
-        print(outputs)
         output = states[-1].h
         #outputs, states = rnn.static_rnn(rnn_cell, x, dtype=tf.float32)
 
         # there are self.n_input outputs but
         # we only want the last output
         return tf.matmul(output, tf.transpose(self.weights['out']))
-    """
-    def generateText(input):
-        with tf.Session() as session:
-            session.run(init)
-            saver = tf.train.Saver()
-            saver.restore(session, tf.train.latest_checkpoint(self.path_to_model))
-            words = word_tokenize(input)
-            print(words)
-            if len(words) == self.n_input:
-                try:
-                    symbols_in_keys = [dictionary[str(words[i])] for i in range(len(words))]
-                    for i in range(32):
-                        keys = np.reshape(np.array(symbols_in_keys), [-1, self.n_input, 1])
-                        onehot_pred = session.run(self.pred, feed_dict={x: keys})
-                        onehot_pred_index = int(tf.argmax(onehot_pred, 1).eval())
-                        sentence = "%s %s" % (sentence, reverse_dictionary[onehot_pred_index])
-                        symbols_in_keys = symbols_in_keys[1:]
-                        symbols_in_keys.append(onehot_pred_index)
-                    print(sentence)
-                except:
-                    print("Word not in dictionary")
-    """
+
     def train(self):
         with tf.Session() as session:
             session.run(self.init)
@@ -233,6 +200,35 @@ class SimpleRNN:
 
             saver.save(session, self.path_to_model+"/"+self.model_name)
 
+    # generate a suggestion given a session and a string _input
+    def generate_suggestion(self, session, _input):
+        input_sent = word_tokenize(_input)
+        embedded_symbols = []
+        if len(input_sent) == self.n_input:
+            try:
+                for word in input_sent:
+                    print(word)
+                    try:
+                        embedding = self.embedding_model.wv[word]
+                    except KeyError:
+                        print(word + " not in vocabulary")
+                        embedding = np.zeros((300,), dtype=np.float)
+                    embedded_symbols.append(embedding)
+                # embeded_symbols shape [1, n_input, n_hidden]
+                embedded_symbols = [embedded_symbols]
+                output_sent = ""
+                for i in range(23):
+                    onehot_pred = session.run(self.probas, feed_dict={self.x: embedded_symbols})
+                    onehot_pred = self.embedding_model.wv.index2word[onehot_pred[0]]
+                    output_sent += " %s" % (onehot_pred)
+                    embedded_symbols = embedded_symbols[0][1:]
+                    embedded_symbols.append(self.embedding_model.wv[onehot_pred])
+                    embedded_symbols = [embedded_symbols]
+                return output_sent
+            except Exception as e:
+                print(e)
+                return e
+
     def run(self):
         with tf.Session() as session:
             saver = tf.train.Saver()
@@ -268,19 +264,24 @@ class SimpleRNN:
 
 if __name__ == '__main__':
     args = sys.argv[1:]
-    learning_rate = 0.001
-    training_iters = 50000
-    display_step = 1000
-    n_input = 4
-    batch_size = 2
-    n_hidden = 300
-    path_to_model = "simpleRNN/models2/"
+    d = {"learning_rate": 0.001, "training_iters" : 1000,"n_input" : 4,"batch_size" : 2, "n_hidden" : 300}
+    path_to_model = "RNN/models/"
     model_name = "best_model"
+    display_step = 100
     if len(args) >= 1 and args[0] == "train":
-        rnn = SimpleRNN(learning_rate, training_iters, display_step, n_input,
-            batch_size, n_hidden, path_to_model, model_name)
+        rnn = SimpleRNN(d, display_step, path_to_model, model_name)
         rnn.train()
+    elif (len(args) >= 1 and args[0] == "manual"):
+        d["batch_size"] = 1
+        rnn = SimpleRNN(d, display_step, path_to_model, model_name)
+        #rnn.train()
+        sess = rnn.load()
+        s = input("enter a sent(4): ")
+        while s != "quit":
+            out_ = rnn.generate_suggestion(sess, s)
+            s = input("enter a sent(4): ")
+        rnn.close(sess)
     else:
-        rnn = SimpleRNN(learning_rate, training_iters, display_step, n_input,
-            1, n_hidden, path_to_model, model_name)
+        d["batch_size"] = 1
+        rnn = SimpleRNN(d, display_step, path_to_model, model_name)
         rnn.run()

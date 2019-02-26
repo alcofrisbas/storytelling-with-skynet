@@ -1,36 +1,37 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout as auth_logout
-import sys
-import os
+
 from django.http import HttpResponse
 from webapp.models import Story
 from webapp.models import User
 
 #sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'RNN'))
 #from rnn_test import load_model, generate_text
+import sys
+import os
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'simpleRNN'))
-#from rnn_words import SimpleRNN
-#from rnn_words2 import run
+from rnn_words import SimpleRNN
+import tensorflow as tf
 import random
 from webapp.words import ADJECTIVES, ANIMALS
 
 
-args_dict = {"n_input": 4, "batch_size": 2, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000}
+args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000}
 display_step = 1000
-path_to_model = "RNN/models/"
+path_to_model = "simpleRNN/models2/"
 model_name = "best_model"
-<<<<<<< HEAD
+
 rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
-session = None
-=======
-#rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
->>>>>>> 8eaae64d3ef43c29e0e8c7f801258d3d33a785ef
+sess = tf.Session()
+saver = tf.train.Saver()
+saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
 
 #TODO: when user logs in, redirect to the page they logged in from
 #TODO: figure out how to clear empty stories and expired session data
 
 # Create your views here.
 def home(request):
+    print("SESSION: {}".format(sess))
     if request.user.is_authenticated:
         user = getOrCreateUser(request)
         if request.session.get("story_id"):
@@ -124,7 +125,7 @@ def write(request):
             story.save()
 
             if request.session["AI"] and not request.session["editing"]:
-                suggestion = generateSuggestion(None, new_sentence)
+                suggestion = generateSuggestion(sess, new_sentence)
 
             request.session["editing"] = not request.session["editing"]
 
@@ -194,8 +195,8 @@ def generatePrompt(curPrompt=""):
 def generateSuggestion(session, newSentence):
     try:
         #suggestion = generate_text(sess, model, word_to_id, id_to_word, seed=newSentence)
-        #suggestion = rnn.generate_suggestion(session, newSentence)
-        suggestion="placeholder"
+        suggestion = rnn.generate_suggestion(session, newSentence)
+        #suggestion="placeholder"
     except Exception as e:
         print("ERROR (suggestion generation)")
         suggestion = e
