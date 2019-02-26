@@ -43,6 +43,7 @@ class SimpleRNN:
 
         # Text file containing words for training
         self.training_file = "RNN/data/train.txt"#
+
         self.training_data = self.read_data(self.training_file)
         print("Loaded training data...")
         self.dictionary, self.reverse_dictionary = self.build_dataset(self.training_data)
@@ -202,8 +203,9 @@ class SimpleRNN:
     # load the rnn for the purposes of views.py in our webapp
     def load(self):
         session = tf.Session()
-        saver = tf.train.Saver()
-        saver.restore(session, tf.train.latest_checkpoint(self.path_to_model))
+        imported_graph = tf.train.import_meta_graph(self.path_to_model + 'best_model.meta')
+        # saver = tf.train.Saver()
+        # saver.restore(session, tf.train.latest_checkpoint(self.path_to_model))
         return session
     # close for the same purpose
     def close(self, session):
@@ -292,7 +294,6 @@ if __name__ == '__main__':
         s = input("enter a sent(4): ")
         while s != "quit":
             out_ = rnn.generate_suggestion(sess, s)
-            print (out_)
             s = input("enter a sent(4): ")
         rnn.close(sess)
     else:
