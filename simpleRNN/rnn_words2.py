@@ -18,7 +18,7 @@ import sys
 
 # Parameters
 learning_rate = 0.001
-training_iters = 15000
+training_iters = 50000
 display_step = 1000
 n_input = 4
 
@@ -128,7 +128,7 @@ def setup():
     writer = tf.summary.FileWriter(logs_path)
 
     # Text file containing words for training
-    training_file = 'simpleRNN/belling_the_cat.txt'
+    training_file = 'RNN/data/train.txt'
 
     training_data = read_data(training_file)
     print("Loaded training data...")
@@ -172,7 +172,7 @@ def setup():
             train(session, writer, training_data, dictionary, reverse_dictionary, vocab_size, optimizer, accuracy, cost, pred, x, y)
         else:
             saver = tf.train.Saver()
-            saver.restore(session, tf.train.latest_checkpoint('simpleRNN/models'))
+            saver.restore(session, tf.train.latest_checkpoint('simpleRNN/models2'))
         while True:
             prompt = "%s words: " % n_input
             sentence = input(prompt)

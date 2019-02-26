@@ -101,9 +101,11 @@ def RNN(x, weights):
 
     # there are n_input outputs but
     # we only want the last output
+    print(output)
     return tf.matmul(output, tf.transpose(weights['out']))
 
 pred = RNN(x, weights)
+print(pred)
 probas = tf.argmax(pred, 1)
 # Loss and optimizer
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=pred, labels=y))
