@@ -242,7 +242,7 @@ class SimpleRNN:
                         #itemindex = np.where(self.index2word== word)
                     except KeyError:
                         print(word + " not in vocabulary")
-                        embedding = self.embedding_model.wv.vocab['UNK'].index
+                        embedding = len(self.input_embedding_matrix)-3
                     embedded_batch.append(embedding)
                 embedded_batch = [embedded_batch]
                 #embedded_batch.append(embedded_symbols)
