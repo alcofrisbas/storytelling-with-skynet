@@ -13,6 +13,9 @@ import tensorflow as tf
 import random
 from webapp.words import ADJECTIVES, ANIMALS
 
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'ngrams'))
+import ngram
+
 from enum import Enum
 
 class Mode(Enum):
@@ -29,6 +32,8 @@ rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
 sess = tf.Session()
 saver = tf.train.Saver()
 saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
+
+ngram_root = ngram.train("./ngrams/dickens.txt.tkn")
 
 #TODO: when user logs in, redirect to the page they logged in from
 #TODO: figure out how to clear empty stories and expired session data
@@ -112,6 +117,7 @@ def write(request):
         newStory(request)
 
     if "mode" not in request.session.keys():
+        # using value instead of enum itself because enum is not JSON serializable so it can't be stored in session
         request.session["mode"] = Mode.RNN.value
 
     story = Story.objects.get(id=request.session["story_id"])
@@ -124,7 +130,7 @@ def write(request):
             story.save()
 
             if request.session.get("mode") != Mode.NONE.value and not request.session["editing"]:
-                suggestion = generateSuggestion(sess, new_sentence)
+                suggestion = generateSuggestion(sess, new_sentence, request.session.get("mode"))
 
             request.session["editing"] = not request.session["editing"]
 
@@ -132,15 +138,19 @@ def write(request):
             story.title = request.POST["title"]
             story.save()
 
-        # same functionality as "Start a new story button"
+        # same functionality as "Start a new story" button
         if request.POST.get("new"):
             return redirect('/new_story')
 
         if request.POST.get("home"):
             return redirect('/')
 
-        if request.POST.get("side-toggle"):
-            request.session["AI"] = not request.session["AI"]
+        if request.POST.get('mode') == "rnn_mode":
+            request.session["mode"] = Mode.RNN.value
+        elif request.POST.get('mode') == "ngram_mode":
+            request.session["mode"] = Mode.NGRAM.value
+        elif request.POST.get('mode') == "none_mode":
+            request.session["mode"] = Mode.NONE.value
 
     elif request.GET.get("new"):
         return redirect('/new_story')
@@ -153,7 +163,7 @@ def write(request):
                   context={"prompt": story.prompt,
                   "sentences": [s.strip() for s in story.sentences.split("\n")[:-1]],
                   "suggestion": suggestion, "last": last,
-                  "title": story.title})
+                  "title": story.title, "mode": request.session["mode"]})
 
 
 def about(request):
@@ -191,11 +201,14 @@ def generatePrompt(curPrompt=""):
     return curTopic
 
 
-def generateSuggestion(session, newSentence):
+def generateSuggestion(session, newSentence, mode):
     try:
-        #suggestion = generate_text(sess, model, word_to_id, id_to_word, seed=newSentence)
-        suggestion = rnn.generate_suggestion(session, newSentence)
-        #suggestion="placeholder"
+        if mode == Mode.RNN.value:
+            suggestion = rnn.generate_suggestion(session, newSentence)
+        elif mode == Mode.NGRAM.value:
+            suggestion = ngram.generate_sentence(ngram_root, newSentence)
+        else:
+            suggestion="placeholder"
     except Exception as e:
         print("ERROR (suggestion generation)")
         suggestion = e
