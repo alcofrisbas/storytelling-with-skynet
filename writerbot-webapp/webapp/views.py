@@ -5,8 +5,6 @@ from django.http import HttpResponse
 from webapp.models import Story
 from webapp.models import User
 
-#sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'RNN'))
-#from rnn_test import load_model, generate_text
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'simpleRNN'))
@@ -15,6 +13,12 @@ import tensorflow as tf
 import random
 from webapp.words import ADJECTIVES, ANIMALS
 
+from enum import Enum
+
+class Mode(Enum):
+     RNN = 1
+     NGRAM = 2
+     NONE = 3
 
 args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000}
 display_step = 1000
@@ -31,7 +35,6 @@ saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
 
 # Create your views here.
 def home(request):
-    print("SESSION: {}".format(sess))
     if request.user.is_authenticated:
         user = getOrCreateUser(request)
         if request.session.get("story_id"):
@@ -108,12 +111,8 @@ def write(request):
     if "story_id" not in request.session.keys() or not Story.objects.filter(id = request.session["story_id"]).exists():
         newStory(request)
 
-    if "AI" not in request.session.keys():
-        request.session["AI"] = True
-
-    # if "sess" not in request.session.keys():
-    #     request.session["sess"] = rnn.load()
-    #sess = rnn.load()
+    if "mode" not in request.session.keys():
+        request.session["mode"] = Mode.RNN.value
 
     story = Story.objects.get(id=request.session["story_id"])
     suggestion = ""
@@ -124,7 +123,7 @@ def write(request):
             story.sentences += new_sentence.strip() + "\n"
             story.save()
 
-            if request.session["AI"] and not request.session["editing"]:
+            if request.session.get("mode") != Mode.NONE.value and not request.session["editing"]:
                 suggestion = generateSuggestion(sess, new_sentence)
 
             request.session["editing"] = not request.session["editing"]
@@ -154,7 +153,7 @@ def write(request):
                   context={"prompt": story.prompt,
                   "sentences": [s.strip() for s in story.sentences.split("\n")[:-1]],
                   "suggestion": suggestion, "last": last,
-                  "title": story.title, "AI": request.session["AI"]})
+                  "title": story.title})
 
 
 def about(request):

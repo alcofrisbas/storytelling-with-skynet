@@ -92,7 +92,6 @@ def generate_sentence(root, sent):
     return " ".join([str(word) for word in sentence[:-1]])
 
 if __name__ == '__main__':
-    trie = {}
     process_data("./ngrams/dickens.txt")
     root = train("./ngrams/dickens.txt.tkn")
 

@@ -207,7 +207,6 @@ class SimpleRNN:
         if len(input_sent) == self.n_input:
             try:
                 for word in input_sent:
-                    print(word)
                     try:
                         embedding = self.embedding_model.wv[word]
                     except KeyError:
