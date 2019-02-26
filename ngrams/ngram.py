@@ -1,5 +1,6 @@
 import numpy as np
 from nltk.tokenize import sent_tokenize
+import time
 
 class Trie:
     def __init__(self, key):
@@ -7,6 +8,7 @@ class Trie:
         self.payload = 1.0
         self.children = []
         self.done = False
+
     def __str__(self):
         return("{}\t{}".format(self.key, self.payload))
 
@@ -67,22 +69,27 @@ def process_data(fname):
         w.write(" ".join(sList))
 
 
-def train(fname, n=5):
+def train(fname, n=5, l=200000):
     with open(fname) as r:
-        s = r.read()
+        s = r.read(1000000)
+    print("done reading files")
     words = s.split()
     words = [w.lower() if w != 'STOP' else w for w in words ]
     root = Trie("*")
+    print("starting trie construction")
+    start = time.time()
     for i in range(len(words)-n):
         add(root,words[i:i+n])
         if i%2000 == 0:
-            print("{} substrings processed".format(str(i)))
+            now = time.time()-start
+            rate = float(i)/now
+            print("{} substrings processed at {}".format(str(i), str(rate)))
 
-        if i > 50000:
+        if i > l:
             break
     return root
 
-def generate_sentence(root, sent):
+def generate_sentence(root, sent, l=200):
     sentence = sent.split()
     for i in range(l):
         next = predict_next(root, sentence[-m:])
@@ -96,7 +103,9 @@ if __name__ == '__main__':
     root = train("./ngrams/dickens.txt.tkn")
 
     sent = input("enter a sentence: ").lower()
+    # cap length of sentence
     l = 200
+    # n-gram... after 3, it parrots
     m = 3
     while sent != "quit":
         print (generate_sentence(root, sent))
