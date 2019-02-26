@@ -17,6 +17,7 @@ import tensorflow as tf
 from tensorflow.contrib import rnn
 from nltk.tokenize import word_tokenize
 import gensim
+from numpy import genfromtxt
 
 
 """
@@ -46,15 +47,16 @@ class SimpleRNN:
 
         self.training_data = self.read_data(self.training_file)
         print("Loaded training data...")
-        self.dictionary, self.reverse_dictionary = self.build_dataset(self.training_data)
 
         self.embedding_model = gensim.models.Word2Vec.load(self.path_to_model + "my_embedding_model")
+        self.input_embedding_matrix = np.load(self.path_to_model + "input_embedding_model.npy")
+        self.output_embedding_matrix = tf.cast(np.load(self.path_to_model + "output_embedding_model.npy"), tf.float32)
 
-        self.vocab_size = len(self.embedding_model.wv.vocab)
-        self.weights = {'out': self.embedding_model.syn1neg}
+        self.vocab_size = self.input_embedding_matrix.shape[0]
+        self.weights = {'out': self.output_embedding_matrix}
         # tf Graph input
-        self.x = tf.placeholder("float", [self.batch_size, self.n_input, self.n_hidden])
-        self.y = tf.placeholder("float", [self.batch_size, self.vocab_size])
+        self.x = tf.placeholder(tf.int32, [self.batch_size, None])
+        self.y = tf.placeholder(tf.int32, [self.batch_size, self.vocab_size])
 
         self.pred = self.RNN()
         self.probas = tf.argmax(self.pred, 1)
@@ -68,6 +70,8 @@ class SimpleRNN:
 
         # Initializing the variables
         self.init = tf.global_variables_initializer()
+
+        self.index2word = genfromtxt(self.path_to_model + "vocab.csv",  dtype=str)
 
     def set_model_name(self, n):
         self.model_name = n
@@ -84,23 +88,18 @@ class SimpleRNN:
             return str(sec/(60*60)) + " hr"
 
     def read_data(self,fname):
+        sentences = []
         with open(fname) as f:
             content = f.readlines()
-        content = [x.strip() for x in content]
-        content = [word for i in range(len(content)) for word in content[i].split()]
-        content = np.array(content)
-        return content
+        for sent in content:
+            sent = word_tokenize(sent)
+            for word in sent:
+                sentences.append(word)
+        return sentences
 
-    def build_dataset(self, words):
-        count = collections.Counter(words).most_common()
-        dictionary = dict()
-        for word, _ in count:
-            dictionary[word] = len(dictionary)
-        reverse_dictionary = dict(zip(dictionary.values(), dictionary.keys()))
-        return dictionary, reverse_dictionary
-    #vocab_size = len(dictionary)
 
     def RNN(self):
+        embedded_input = tf.cast(tf.nn.embedding_lookup(self.input_embedding_matrix, self.x), tf.float32)
         # 2-layer LSTM, each layer has self.n_hidden units.
         # Average Accuracy= 95.20% at 50k iter
         rnn_cell = rnn.MultiRNNCell([rnn.BasicLSTMCell(self.n_hidden),rnn.BasicLSTMCell(self.n_hidden)])
@@ -112,7 +111,7 @@ class SimpleRNN:
 
         # generate prediction
         # the shape of outputs is [self.batch_size, self.n_input, self.n_hidden]
-        outputs, states = tf.nn.dynamic_rnn(cell=rnn_cell, inputs = self.x, dtype = tf.float32)
+        outputs, states = tf.nn.dynamic_rnn(cell=rnn_cell, inputs = embedded_input, dtype = tf.float32)
         output = states[-1].h
         #outputs, states = rnn.static_rnn(rnn_cell, x, dtype=tf.float32)
 
@@ -128,7 +127,6 @@ class SimpleRNN:
             end_offset = self.n_input + 1
             acc_total = 0
             loss_total = 0
-
             self.writer.add_graph(session.graph)
 
             while step < self.training_iters:
@@ -144,10 +142,10 @@ class SimpleRNN:
                     embedded_symbols = []
                     for word in batch:
                         try:
-                            embedding = self.embedding_model.wv[word]
+                            embedding = self.embedding_model.wv.vocab[word].index
                         except KeyError:
                             print(word + " not in vocabulary")
-                            embedding = np.zeros((300,), dtype=np.float)
+                            embedding = len(self.input_embedding_matrix)-3
                         embedded_symbols.append(embedding)
                     embedded_batch.append(embedded_symbols)
 
@@ -167,7 +165,7 @@ class SimpleRNN:
                                                         feed_dict={self.x: embedded_batch, self.y: symbols_out_onehot})
                 predictions = []
                 for prediction in embedding_pred:
-                    predictions.append(self.embedding_model.wv.index2word[prediction])
+                    predictions.append(self.index2word[prediction])
 
 
                 loss_total += loss
@@ -186,7 +184,6 @@ class SimpleRNN:
                         symbols_in.append(symbol_in)
                         symbol_out = self.training_data[offset + self.n_input+batch]
                         symbols_out.append(symbol_out)
-                    #symbols_out_pred = reverse_dictionary[int(tf.argmax(onehot_pred, 1).eval())]
                     for batch in range(self.batch_size):
                         print("%s - [%s] vs [%s]" % (symbols_in[batch],symbols_out[batch],predictions[batch]))
                 step += 1
@@ -208,20 +205,20 @@ class SimpleRNN:
             try:
                 for word in input_sent:
                     try:
-                        embedding = self.embedding_model.wv[word]
+                        embedding = self.embedding_model.wv.vocab[word].index
                     except KeyError:
                         print(word + " not in vocabulary")
-                        embedding = np.zeros((300,), dtype=np.float)
+                        embedding = len(self.input_embedding_matrix)-3
                     embedded_symbols.append(embedding)
                 # embeded_symbols shape [1, n_input, n_hidden]
                 embedded_symbols = [embedded_symbols]
                 output_sent = ""
                 for i in range(23):
                     onehot_pred = session.run(self.probas, feed_dict={self.x: embedded_symbols})
-                    onehot_pred = self.embedding_model.wv.index2word[onehot_pred[0]]
+                    onehot_pred = self.index2word[onehot_pred[0]]
                     output_sent += " %s" % (onehot_pred)
                     embedded_symbols = embedded_symbols[0][1:]
-                    embedded_symbols.append(self.embedding_model.wv[onehot_pred])
+                    embedded_symbols.append(self.embedding_model.wv.vocab[onehot_pred].index)
                     embedded_symbols = [embedded_symbols]
                 return output_sent
             except Exception as e:
@@ -233,29 +230,27 @@ class SimpleRNN:
             saver = tf.train.Saver()
             saver.restore(session, tf.train.latest_checkpoint(self.path_to_model))
             while True:
-                prompt = "%s words: " % self.n_input
+                prompt = "words: "
                 input_sent = input(prompt)
                 input_sent = word_tokenize(input_sent)
                 embedded_symbols = []
-                if len(input_sent) != self.n_input:
-                    continue
                 try:
                     for word in input_sent:
                         try:
-                            embedding = self.embedding_model.wv[word]
+                            embedding = self.embedding_model.wv.vocab[word].index
                         except KeyError:
                             print(word + " not in vocabulary")
-                            embedding = np.zeros((300,), dtype=np.float)
+                            embedding = len(self.input_embedding_matrix)-3ding])
                         embedded_symbols.append(embedding)
                     # embeded_symbols shape [1, n_input, n_hidden]
+                    output_sent = ""
                     embedded_symbols = [embedded_symbols]
-                    output_sent = "%s" % (input_sent)
                     for i in range(23):
                         onehot_pred = session.run(self.probas, feed_dict={self.x: embedded_symbols})
-                        onehot_pred = self.embedding_model.wv.index2word[onehot_pred[0]]
+                        onehot_pred = self.index2word[onehot_pred[0]]
                         output_sent +=  " %s" % (onehot_pred)
                         embedded_symbols = embedded_symbols[0][1:]
-                        embedded_symbols.append(self.embedding_model.wv[onehot_pred])
+                        embedded_symbols.append(self.embedding_model.wv.vocab[onehot_pred].index)
                         embedded_symbols = [embedded_symbols]
                     print(output_sent)
                 except Exception as e:
@@ -264,7 +259,7 @@ class SimpleRNN:
 if __name__ == '__main__':
     args = sys.argv[1:]
     d = {"learning_rate": 0.001, "training_iters" : 1000,"n_input" : 4,"batch_size" : 2, "n_hidden" : 300}
-    path_to_model = "RNN/models/"
+    path_to_model = "simpleRNN/models/"
     model_name = "best_model"
     display_step = 100
     if len(args) >= 1 and args[0] == "train":
