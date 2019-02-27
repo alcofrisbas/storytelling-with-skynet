@@ -6,89 +6,88 @@ import logging
 from nltk.tokenize import sent_tokenize, word_tokenize
 import csv
 
-training_file = 'RNN/data/train.txt'
-root_path = "simpleRNN/models/"
-vector_dim = 300
-TENSORBOARD_FILES_PATH = root_path+"/tensorboard"
+def create_embedding(training_file, root_path, model_name,n_hidden, min_count):
+    vector_dim = n_hidden
+    TENSORBOARD_FILES_PATH = root_path+"/tensorboard"
 
-#accepts a filename and returns a string of contents
-def read(fname):
-    with open(fname) as f:
-        fileList = f.readlines()
-    file_content = " ".join(str(x) for x in fileList)
-    return file_content
+    #accepts a filename and returns a string of contents
+    def read(fname):
+        with open(fname) as f:
+            fileList = f.readlines()
+        file_content = " ".join(str(x) for x in fileList)
+        return file_content
 
-file_content = read(training_file)
+    file_content = read(training_file)
 
-#get list of sentences
-sentences = [word_tokenize(t) for t in sent_tokenize(file_content)]
+    #get list of sentences
+    sentences = [word_tokenize(t) for t in sent_tokenize(file_content)]
 
-logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
-# model gets trained in gensim
-model = gensim.models.Word2Vec(sentences, iter=100, min_count=1, size=300,  workers=10)
-#returns the list of indexes of each owrd in the word vector vocab
-def convert_data_to_index(string_data, wv):
-    index_data = []
-    for word in string_data:
-        if word in wv:
-            index_data.append(wv.vocab[word].index)
-    return index_data
-index_data = convert_data_to_index(file_content, model.wv)
+    # model gets trained in gensim
+    model = gensim.models.Word2Vec(sentences, iter=100, min_count=min_count, size=n_hidden,  workers=10)
+    #returns the list of indexes of each owrd in the word vector vocab
+    def convert_data_to_index(string_data, wv):
+        index_data = []
+        for word in string_data:
+            if word in wv:
+                index_data.append(wv.vocab[word].index)
+        return index_data
+    index_data = convert_data_to_index(file_content, model.wv)
 
-#convert file to list of words
-file_content = file_content.split()
+    #convert file to list of words
+    file_content = file_content.split()
 
-vocab_size = len(model.wv.vocab)
+    vocab_size = len(model.wv.vocab)
 
-#saves the model to be reused
-model.save(root_path + "my_embedding_model")
-model = gensim.models.Word2Vec.load(root_path + "my_embedding_model")
+    #saves the model to be reused
+    model.save(root_path + model_name)
+    model = gensim.models.Word2Vec.load(root_path + model_name)
 
-# print(model.wv.syn0) #prints input embedding
-# print(model.syn1neg) #prints output embedding
+    # print(model.wv.syn0) #prints input embedding
+    # print(model.syn1neg) #prints output embedding
 
-#create a csv file to store vocab
-file_csv = open(root_path +"vocab.csv", "w")
-writer = csv.writer(file_csv)
-file_csv.close
+    #create a csv file to store vocab
+    file_csv = open(root_path + model_name + "_vocab.csv", "w")
+    writer = csv.writer(file_csv)
+    file_csv.close
 
-#add special tokens to the vocab
-for word in model.wv.index2word:
-    writer.writerow([word])
-writer.writerow(["UNK"])
-writer.writerow(["POS"])
+    #add special tokens to the vocab
+    for word in model.wv.index2word:
+        writer.writerow([word])
+    writer.writerow(["UNK"])
+    writer.writerow(["POS"])
 
 
-# convert the wv word vectors into a numpy matrix that is suitable for insertion
-# into our TensorFlow model
-embedding_matrix = np.zeros((vocab_size + 2, vector_dim))
-for i in range(vocab_size):
-    embedding_vector = model.wv[model.wv.index2word[i]]
-    if embedding_vector is not None:
-        embedding_matrix[i] = embedding_vector
-#add vector of zeros for special tokens in matrix
-embedding_matrix[vocab_size] = np.zeros((vector_dim))
-embedding_matrix[vocab_size + 1] = np.zeros((vector_dim))
-# embedding layer weights are frozen to avoid updating embeddings while training
-saved_embeddings = tf.constant(embedding_matrix)
-embedding = tf.Variable(initial_value=saved_embeddings, trainable=False)
+    # convert the wv word vectors into a numpy matrix that is suitable for insertion
+    # into our TensorFlow model
+    embedding_matrix = np.zeros((vocab_size + 2, vector_dim))
+    for i in range(vocab_size):
+        embedding_vector = model.wv[model.wv.index2word[i]]
+        if embedding_vector is not None:
+            embedding_matrix[i] = embedding_vector
+    #add vector of zeros for special tokens in matrix
+    embedding_matrix[vocab_size] = np.zeros((vector_dim))
+    embedding_matrix[vocab_size + 1] = np.zeros((vector_dim))
+    # embedding layer weights are frozen to avoid updating embeddings while training
+    saved_embeddings = tf.constant(embedding_matrix)
+    embedding = tf.Variable(initial_value=saved_embeddings, trainable=False)
 
-output_embedding_matrix = np.zeros((vocab_size +2, vector_dim))
-for i in range(vocab_size):
-    output_embedding_vector = model.syn1neg[i]
-    output_embedding_matrix[i] = output_embedding_vector
+    output_embedding_matrix = np.zeros((vocab_size +2, vector_dim))
+    for i in range(vocab_size):
+        output_embedding_vector = model.syn1neg[i]
+        output_embedding_matrix[i] = output_embedding_vector
 
-output_embedding_matrix[vocab_size] = np.zeros((vector_dim))
-output_embedding_matrix[vocab_size + 1] = np.zeros((vector_dim))
+    output_embedding_matrix[vocab_size] = np.zeros((vector_dim))
+    output_embedding_matrix[vocab_size + 1] = np.zeros((vector_dim))
 
-saved_output_embeddings = tf.constant(output_embedding_matrix)
-output_embedding = tf.Variable(initial_value=saved_output_embeddings, trainable=False)
+    saved_output_embeddings = tf.constant(output_embedding_matrix)
+    output_embedding = tf.Variable(initial_value=saved_output_embeddings, trainable=False)
 
-#creata a file and store the index to vector matrix
-file_path = root_path + "input_embedding_model"
-np.save(root_path+"output_embedding_model", output_embedding_matrix)
-np.save(file_path, embedding_matrix)
+    #creata a file and store the index to vector matrix
+    file_path = root_path + model_name + "_input_embedding_model"
+    np.save(root_path+ model_name + "_output_embedding_model", output_embedding_matrix)
+    np.save(file_path, embedding_matrix)
 """
 tsv_file_path = root_path +"tensorboard/metadata.tsv"
 with open(tsv_file_path,'w+', encoding='utf-8') as file_metadata:
