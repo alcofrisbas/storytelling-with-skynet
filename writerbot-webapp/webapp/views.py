@@ -33,7 +33,8 @@ sess = tf.Session()
 saver = tf.train.Saver()
 saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
 
-ngram_root = ngram.load_model("./ngrams/models/5max200000.model")
+#ngram_root = ngram.load_model("./ngrams/models/5max200000.model")
+ngram_root = ngram.train("./ngrams/dickens.txt.tkn", l=20000)
 
 #TODO: when user logs in, redirect to the page they logged in from
 #TODO: figure out how to clear empty stories and expired session data
@@ -119,8 +120,7 @@ def write(request):
 
     story = Story.objects.get(id=request.session["story_id"])
     if request.session.get("mode") != Mode.NONE.value and story.suggesting and story.sentences != "":
-        print(story.sentences)
-        last = story.sentences.split("\n")[-1]
+        last = story.sentences.split("\n")[-2]
         suggestion = generateSuggestion(sess, last, request.session.get("mode"))
     else:
         suggestion = ""
@@ -129,11 +129,13 @@ def write(request):
         if request.POST.get("text"):
             new_sentence = request.POST["text"]
             story.sentences += new_sentence.strip() + "\n"
+            story.suggesting = not story.suggesting
 
             if request.session.get("mode") != Mode.NONE.value and story.suggesting:
                 suggestion = generateSuggestion(sess, new_sentence, request.session.get("mode"))
+            else:
+                suggestion = ""
 
-            story.suggesting = not story.suggesting
             story.save()
 
         if request.POST.get("title"):
@@ -157,15 +159,11 @@ def write(request):
     elif request.GET.get("new"):
         return redirect('/new_story')
 
-    last = ""
-    if story.sentences != "":
-        last = story.sentences.split("\n")[-1]
-
     return render(request, 'webapp/write.html',
                   context={"prompt": story.prompt,
                   "sentences": [s.strip() for s in story.sentences.split("\n")[:-1]],
-                  "suggestion": suggestion, "last": last,
-                  "title": story.title, "mode": request.session["mode"]})
+                  "suggestion": suggestion, "title": story.title,
+                  "mode": request.session["mode"]})
 
 
 def about(request):

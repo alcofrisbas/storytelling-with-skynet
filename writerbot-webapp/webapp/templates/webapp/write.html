@@ -45,11 +45,8 @@
         <!-- <p id = "para" style="padding:1px" contenteditable="{{ contentEdit }}"> -->
             <p>
             {% for sentence in sentences %}
-                {% if not loop.last %}
-                    {{ sentence }}<br>
-                {% endif %}
+                {{ sentence }}<br>
             {% endfor %}
-            {{ last }}
             </p>
             <form method="post" id="input-form">
                 {% csrf_token %}
