@@ -193,11 +193,6 @@ def error(request, message):
     return render(request, 'webapp/error.html', context={'message': message})
 
 
-def saves(request):
-    stories = Story.objects.all()
-    return render(request, 'webapp/saves.html', context={'stories': stories})
-
-
 def logout(request):
     """Logs out user"""
     auth_logout(request)
