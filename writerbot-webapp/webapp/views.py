@@ -2,6 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import logout as auth_logout
 
 from django.http import HttpResponse
+from wsgiref.util import FileWrapper
+from io import StringIO
+
 from webapp.models import Story
 from webapp.models import User
 
@@ -144,6 +147,14 @@ def write(request):
 
         if request.POST.get("home"):
             return redirect('/')
+
+        if request.POST.get("export"):
+            print("exporting story...")
+            myfile = StringIO()
+            myfile.write(story.sentences)
+            response = HttpResponse(myfile.getvalue(), content_type='text/plain')
+            response['Content-Disposition'] = 'attachment; filename={}.txt'.format(story.title)
+            return response
 
         if request.POST.get('mode') == "rnn_mode":
             request.session["mode"] = Mode.RNN.value
