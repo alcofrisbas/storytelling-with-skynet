@@ -1,4 +1,6 @@
+import sys
 from pathlib import Path
+
 
 import simpleRNN.rnn_words as rnn_words
 import word2vec_gensim as word2vec
@@ -16,6 +18,12 @@ def train(training_file, root_path, model_name, n_hidden, min_count, learning_ra
         path_to_model=root_path,model_name=model_name, train=train)
 
 if __name__ == '__main__':
-    train(training_file="simpleRNN/data/train.txt",root_path="simpleRNN/models/",
-        model_name="ptb_model",n_hidden=300, min_count=3,learning_rate=0.001,
+    if len(sys.argv) <= 1:
+        training_file="simpleRNN/data/train.txt"
+        model_name="basic_model"
+    else:
+        sys.argsv[2] = training_file
+        sys.argsv[3] = model_name
+    train(training_file=training_file,root_path="simpleRNN/models/",
+        model_name=model_name,n_hidden=300, min_count=3,learning_rate=0.001,
         training_iters=1000, n_input=6, batch_size=10,train=True)
