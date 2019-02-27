@@ -33,7 +33,7 @@ sess = tf.Session()
 saver = tf.train.Saver()
 saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
 
-ngram_root = ngram.train("./ngrams/dickens.txt.tkn")
+ngram_root = ngram.load_model("./ngrams/models/5max200000.model")#ngram.train("./ngrams/dickens.txt.tkn")
 
 #TODO: when user logs in, redirect to the page they logged in from
 #TODO: figure out how to clear empty stories and expired session data
