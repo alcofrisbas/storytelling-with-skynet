@@ -225,8 +225,8 @@ class SimpleRNN:
                 embedded_symbols = [embedded_symbols]
 
             output_sent = output_sent.strip().capitalize()
-            if output_sentence[-1].isalpha() or output_sentence[-1].isdigit():
-                output_sentence += "."
+            if output_sent[-1].isalpha() or output_sent[-1].isdigit():
+                output_sent += "."
             return output_sent
         except Exception as e:
             print(e)
