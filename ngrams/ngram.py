@@ -70,7 +70,7 @@ def process_data(fname):
         w.write(" ".join(sList))
 
 
-def train(fname, n=5, l=200000):
+def train(fname, n=5, l=200000,display_step=2000):
     with open(fname) as r:
         s = r.read(1000000)
     print("done reading files")
@@ -81,13 +81,22 @@ def train(fname, n=5, l=200000):
     start = time.time()
     for i in range(len(words)-n):
         add(root,words[i:i+n])
-        if i%2000 == 0:
+        if i%display_step == 0:
             now = time.time()-start
             rate = float(i)/now
             print("{} substrings processed at {}".format(str(i), str(rate)))
 
         if i > l:
             break
+    return root
+
+def save_model(fname, model):
+    with open(fname,'wb') as p:
+        pickle.dump(model, p)
+
+def load_model(fname):
+    with open(fname, 'rb') as r:
+        root = pickle.load(r)
     return root
 
 def generate_sentence(root:Trie, sent:str, l=200, m=3):
@@ -108,9 +117,9 @@ def generate_sentence(root:Trie, sent:str, l=200, m=3):
 
 if __name__ == '__main__':
     process_data("./ngrams/dickens.txt")
-    root = train("./ngrams/dickens.txt.tkn",l=50000)
-    with open("./ngrams/testRoot",'wb') as p:
-        pickle.dump(root, p)
+    root = load_model("./ngrams/testRoot")
+    #root = train("./ngrams/dickens.txt.tkn",l=50000)
+    save_model("./ngrams/testRoot",root)
 
     sent = input("enter a sentence: ").lower()
     # cap length of sentence
