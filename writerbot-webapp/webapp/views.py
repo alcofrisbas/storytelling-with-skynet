@@ -13,7 +13,7 @@ import tensorflow as tf
 import random
 from webapp.words import ADJECTIVES, ANIMALS
 
-# little hacky shit to make pickling work  for loading the ngram model
+# little hacky shit to make pickling work for loading the ngram model
 # fastly.
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'./'))
 from ngrams import ngram
