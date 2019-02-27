@@ -91,13 +91,20 @@ def train(fname, n=5, l=200000):
     return root
 
 def generate_sentence(root:Trie, sent:str, l=200, m=3):
+    if sent[-1] == ".":
+        sent = sent[:-1]+ " STOP"
     sentence = sent.split()
+    cut = len(sentence)
     for i in range(l):
         next = predict_next(root, sentence[-m:])
         sentence.append(next)
         if sentence[-1] == "STOP":
             break
-    return " ".join([str(word) for word in sentence[:-1]])
+
+    outSent = " ".join([str(word) for word in sentence[cut:-1]])+"."
+    outSent = outSent[0].upper()+outSent[1:]
+    return outSent
+
 
 if __name__ == '__main__':
     process_data("./ngrams/dickens.txt")
@@ -111,5 +118,5 @@ if __name__ == '__main__':
     # n-gram... after 3, it parrots
     m = 3
     while sent != "quit":
-        print (generate_sentence(root, sent))
+        print (generate_sentence(root, sent,m=3))
         sent = input("enter a sentence: ").lower()
