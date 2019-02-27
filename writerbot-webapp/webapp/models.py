@@ -10,6 +10,7 @@ class Story(models.Model):
     prompt = models.CharField(max_length=255)
     last_edited = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
+    suggesting = models.BooleanField(default=False)
 
     def __str__(self):
         return self.sentences
