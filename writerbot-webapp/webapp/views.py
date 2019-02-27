@@ -2,6 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import logout as auth_logout
 
 from django.http import HttpResponse
+from wsgiref.util import FileWrapper
+from io import StringIO
+
 from webapp.models import Story
 from webapp.models import User
 
@@ -123,24 +126,16 @@ def write(request):
         request.session["mode"] = Mode.RNN.value
 
     story = Story.objects.get(id=request.session["story_id"])
-    if request.session.get("mode") != Mode.NONE.value and story.suggesting and story.sentences != "":
-        last = story.sentences.split("\n")[-2]
-        suggestion = generateSuggestion(sess, last, request.session.get("mode"))
-    else:
-        suggestion = ""
+    suggestion = ""
 
     if request.POST:
         if request.POST.get("text"):
             new_sentence = request.POST["text"]
             story.sentences += new_sentence.strip() + "\n"
             story.suggesting = not story.suggesting
-
+            story.save()
             if request.session.get("mode") != Mode.NONE.value and story.suggesting:
                 suggestion = generateSuggestion(sess, new_sentence, request.session.get("mode"))
-            else:
-                suggestion = ""
-
-            story.save()
 
         if request.POST.get("title"):
             story.title = request.POST["title"]
@@ -153,15 +148,26 @@ def write(request):
         if request.POST.get("home"):
             return redirect('/')
 
+        if request.POST.get("export"):
+            print("exporting story...")
+            myfile = StringIO()
+            myfile.write(story.sentences)
+            response = HttpResponse(myfile.getvalue(), content_type='text/plain')
+            response['Content-Disposition'] = 'attachment; filename={}.txt'.format(story.title)
+            return response
+
         if request.POST.get('mode') == "rnn_mode":
             request.session["mode"] = Mode.RNN.value
         elif request.POST.get('mode') == "ngram_mode":
             request.session["mode"] = Mode.NGRAM.value
         elif request.POST.get('mode') == "none_mode":
             request.session["mode"] = Mode.NONE.value
-
     elif request.GET.get("new"):
         return redirect('/new_story')
+    else:
+        if request.session.get("mode") != Mode.NONE.value and story.suggesting and story.sentences != "":
+            last = story.sentences.split("\n")[-2]
+            suggestion = generateSuggestion(sess, last, request.session.get("mode"))
 
     return render(request, 'webapp/write.html',
                   context={"prompt": story.prompt,

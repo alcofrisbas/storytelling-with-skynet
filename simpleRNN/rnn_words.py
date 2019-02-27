@@ -200,8 +200,6 @@ class SimpleRNN:
     # generate a suggestion given a session and a string sentence
     def generate_suggestion(self, session, sentence):
         sentence = sentence.strip()
-        if sentence[-1].isalpha() or sentence[-1].isdigit():
-            sentence += "."
         input_sent = word_tokenize(sentence)
         print(input_sent)
         embedded_symbols = []
