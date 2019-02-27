@@ -197,33 +197,40 @@ class SimpleRNN:
 
             saver.save(session, self.path_to_model+"/"+self.model_name)
 
-    # generate a suggestion given a session and a string _input
-    def generate_suggestion(self, session, _input):
-        input_sent = word_tokenize(_input)
+    # generate a suggestion given a session and a string sentence
+    def generate_suggestion(self, session, sentence):
+        sentence = sentence.strip()
+        if sentence[-1].isalpha() or sentence[-1].isdigit():
+            sentence += "."
+        input_sent = word_tokenize(sentence)
+        print(input_sent)
         embedded_symbols = []
-        if len(input_sent) == self.n_input:
-            try:
-                for word in input_sent:
-                    try:
-                        embedding = self.embedding_model.wv.vocab[word].index
-                    except KeyError:
-                        print(word + " not in vocabulary")
-                        embedding = len(self.input_embedding_matrix)-3
-                    embedded_symbols.append(embedding)
-                # embeded_symbols shape [1, n_input, n_hidden]
+        try:
+            for word in input_sent:
+                try:
+                    embedding = self.embedding_model.wv.vocab[word].index
+                except KeyError:
+                    print(word + " not in vocabulary")
+                    embedding = len(self.input_embedding_matrix)-3
+                embedded_symbols.append(embedding)
+            # embeded_symbols shape [1, n_input, n_hidden]
+            embedded_symbols = [embedded_symbols]
+            output_sent = ""
+            for i in range(23):
+                onehot_pred = session.run(self.probas, feed_dict={self.x: embedded_symbols})
+                onehot_pred = self.index2word[onehot_pred[0]]
+                output_sent += " %s" % (onehot_pred)
+                embedded_symbols = embedded_symbols[0][1:]
+                embedded_symbols.append(self.embedding_model.wv.vocab[onehot_pred].index)
                 embedded_symbols = [embedded_symbols]
-                output_sent = ""
-                for i in range(23):
-                    onehot_pred = session.run(self.probas, feed_dict={self.x: embedded_symbols})
-                    onehot_pred = self.index2word[onehot_pred[0]]
-                    output_sent += " %s" % (onehot_pred)
-                    embedded_symbols = embedded_symbols[0][1:]
-                    embedded_symbols.append(self.embedding_model.wv.vocab[onehot_pred].index)
-                    embedded_symbols = [embedded_symbols]
-                return output_sent
-            except Exception as e:
-                print(e)
-                return e
+
+            output_sent = output_sent.strip().capitalize()
+            if output_sentence[-1].isalpha() or output_sentence[-1].isdigit():
+                output_sentence += "."
+            return output_sent
+        except Exception as e:
+            print(e)
+            return e
 
     def run(self):
         with tf.Session() as session:
@@ -240,7 +247,7 @@ class SimpleRNN:
                             embedding = self.embedding_model.wv.vocab[word].index
                         except KeyError:
                             print(word + " not in vocabulary")
-                            embedding = len(self.input_embedding_matrix)-3ding])
+                            embedding = len(self.input_embedding_matrix)-3
                         embedded_symbols.append(embedding)
                     # embeded_symbols shape [1, n_input, n_hidden]
                     output_sent = ""
