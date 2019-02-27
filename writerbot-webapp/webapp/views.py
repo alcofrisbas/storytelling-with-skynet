@@ -33,7 +33,7 @@ sess = tf.Session()
 saver = tf.train.Saver()
 saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
 
-ngram_root = ngram.train("./ngrams/dickens.txt.tkn")
+ngram_root = ngram.train("./ngrams/dickens.txt.tkn", l=50000)
 
 #TODO: when user logs in, redirect to the page they logged in from
 #TODO: figure out how to clear empty stories and expired session data
@@ -79,7 +79,6 @@ def newStory(request):
         s.save()
         user.stories.add(s)
         user.save()
-    request.session["editing"] = False
     request.session["story_id"] = s.id
     return redirect('/write')
 
@@ -89,8 +88,6 @@ def newStory(request):
 def loadStory(request, id):
     if Story.objects.filter(id=id).exists():
         request.session["story_id"] = id
-        request.session["editing"] = False
-        request.session["prompt"] = ""
         return redirect('/write')
     else:
         return render(request, 'webapp/error.html', context= {'message': "Story not found."})
@@ -121,18 +118,23 @@ def write(request):
         request.session["mode"] = Mode.RNN.value
 
     story = Story.objects.get(id=request.session["story_id"])
-    suggestion = ""
+    if request.session.get("mode") != Mode.NONE.value and story.suggesting and story.sentences != "":
+        print(story.sentences)
+        last = story.sentences.split("\n")[-1]
+        suggestion = generateSuggestion(sess, last, request.session.get("mode"))
+    else:
+        suggestion = ""
 
     if request.POST:
         if request.POST.get("text"):
             new_sentence = request.POST["text"]
             story.sentences += new_sentence.strip() + "\n"
-            story.save()
 
-            if request.session.get("mode") != Mode.NONE.value and not request.session["editing"]:
+            if request.session.get("mode") != Mode.NONE.value and story.suggesting:
                 suggestion = generateSuggestion(sess, new_sentence, request.session.get("mode"))
 
-            request.session["editing"] = not request.session["editing"]
+            story.suggesting = not story.suggesting
+            story.save()
 
         if request.POST.get("title"):
             story.title = request.POST["title"]
@@ -206,7 +208,7 @@ def generateSuggestion(session, newSentence, mode):
         if mode == Mode.RNN.value:
             suggestion = rnn.generate_suggestion(session, newSentence)
         elif mode == Mode.NGRAM.value:
-            suggestion = ngram.generate_sentence(ngram_root, newSentence)
+            suggestion = ngram.generate_sentence(ngram_root, newSentence, m=2)
         else:
             suggestion="placeholder"
     except Exception as e:
