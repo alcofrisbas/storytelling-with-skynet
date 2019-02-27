@@ -96,7 +96,7 @@ def save_model(fname, model):
 
 def load_model(fname):
     with open(fname, 'rb') as r:
-        root = pickle.load(r)
+        root = pickle.load(r, fix_imports=True, encoding='bytes')
     return root
 
 def generate_sentence(root:Trie, sent:str, l=200, m=3):

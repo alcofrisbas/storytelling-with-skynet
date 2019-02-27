@@ -13,8 +13,12 @@ import tensorflow as tf
 import random
 from webapp.words import ADJECTIVES, ANIMALS
 
-sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'ngrams'))
-import ngram
+# little hacky shit to make pickling work  for loading the ngram model
+# fastly.
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'./'))
+from ngrams import ngram
+sys.modules["ngram"] = ngram
+
 
 from enum import Enum
 
@@ -32,6 +36,8 @@ rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
 sess = tf.Session()
 saver = tf.train.Saver()
 saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
+
+
 
 ngram_root = ngram.load_model("./ngrams/models/5max200000.model")#ngram.train("./ngrams/dickens.txt.tkn")
 
