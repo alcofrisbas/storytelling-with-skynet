@@ -48,9 +48,9 @@ class SimpleRNN:
         self.training_data = self.read_data(self.training_file)
         print("Loaded training data...")
 
-        self.embedding_model = gensim.models.Word2Vec.load(self.path_to_model + "my_embedding_model")
-        self.input_embedding_matrix = np.load(self.path_to_model + "input_embedding_model.npy")
-        self.output_embedding_matrix = tf.cast(np.load(self.path_to_model + "output_embedding_model.npy"), tf.float32)
+        self.embedding_model = gensim.models.Word2Vec.load(self.path_to_model + self.model_name)
+        self.input_embedding_matrix = np.load(self.path_to_model + self.model_name + "_input_embedding_model.npy")
+        self.output_embedding_matrix = tf.cast(np.load(self.path_to_model + self.model_name + "_output_embedding_model.npy"), tf.float32)
 
         self.vocab_size = self.input_embedding_matrix.shape[0]
         self.weights = {'out': self.output_embedding_matrix}
@@ -71,7 +71,7 @@ class SimpleRNN:
         # Initializing the variables
         self.init = tf.global_variables_initializer()
 
-        self.index2word = genfromtxt(self.path_to_model + "vocab.csv",  dtype=str)
+        self.index2word = genfromtxt(self.path_to_model + self.model_name + "_vocab.csv",  dtype=str)
 
     def set_model_name(self, n):
         self.model_name = n
@@ -200,8 +200,6 @@ class SimpleRNN:
     # generate a suggestion given a session and a string sentence
     def generate_suggestion(self, session, sentence):
         sentence = sentence.strip()
-        if sentence[-1].isalpha() or sentence[-1].isdigit():
-            sentence += "."
         input_sent = word_tokenize(sentence)
         print(input_sent)
         embedded_symbols = []
@@ -263,26 +261,26 @@ class SimpleRNN:
                 except Exception as e:
                     print(e)
 
-if __name__ == '__main__':
-    args = sys.argv[1:]
-    d = {"learning_rate": 0.001, "training_iters" : 1000,"n_input" : 4,"batch_size" : 2, "n_hidden" : 300}
-    path_to_model = "simpleRNN/models/"
-    model_name = "best_model"
+def run(learning_rate, training_iters, n_input, batch_size, n_hidden, path_to_model, model_name, train):
+    d = {"learning_rate": learning_rate, "training_iters" : training_iters,"n_input" : n_input,"batch_size" : batch_size, "n_hidden" : n_hidden}
     display_step = 100
-    if len(args) >= 1 and args[0] == "train":
+    if train:
         rnn = SimpleRNN(d, display_step, path_to_model, model_name)
         rnn.train()
-    elif (len(args) >= 1 and args[0] == "manual"):
-        d["batch_size"] = 1
-        rnn = SimpleRNN(d, display_step, path_to_model, model_name)
-        #rnn.train()
-        sess = rnn.load()
-        s = input("enter a sent(4): ")
-        while s != "quit":
-            out_ = rnn.generate_suggestion(sess, s)
-            s = input("enter a sent(4): ")
-        rnn.close(sess)
     else:
         d["batch_size"] = 1
         rnn = SimpleRNN(d, display_step, path_to_model, model_name)
         rnn.run()
+
+        """
+        elif (len(args) >= 1 and args[0] == "manual"):
+            d["batch_size"] = 1
+            rnn = SimpleRNN(d, display_step, path_to_model, model_name)
+            #rnn.train()
+            sess = rnn.load()
+            s = input("enter a sent(4): ")
+            while s != "quit":
+                out_ = rnn.generate_suggestion(sess, s)
+                s = input("enter a sent(4): ")
+            rnn.close(sess)
+        """

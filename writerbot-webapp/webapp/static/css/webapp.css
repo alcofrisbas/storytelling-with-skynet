@@ -106,3 +106,11 @@ i {
 .list-group-item>.pull-right{
    cursor: default;
 }
+
+.suggestion-sentence {
+    color: blue;
+}
+
+.suggestion-sentence:focus {
+    color: blue;
+}

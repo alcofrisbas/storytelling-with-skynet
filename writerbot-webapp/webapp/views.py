@@ -126,24 +126,16 @@ def write(request):
         request.session["mode"] = Mode.RNN.value
 
     story = Story.objects.get(id=request.session["story_id"])
-    if request.session.get("mode") != Mode.NONE.value and story.suggesting and story.sentences != "":
-        last = story.sentences.split("\n")[-2]
-        suggestion = generateSuggestion(sess, last, request.session.get("mode"))
-    else:
-        suggestion = ""
+    suggestion = ""
 
     if request.POST:
         if request.POST.get("text"):
             new_sentence = request.POST["text"]
             story.sentences += new_sentence.strip() + "\n"
             story.suggesting = not story.suggesting
-
+            story.save()
             if request.session.get("mode") != Mode.NONE.value and story.suggesting:
                 suggestion = generateSuggestion(sess, new_sentence, request.session.get("mode"))
-            else:
-                suggestion = ""
-
-            story.save()
 
         if request.POST.get("title"):
             story.title = request.POST["title"]
@@ -170,9 +162,12 @@ def write(request):
             request.session["mode"] = Mode.NGRAM.value
         elif request.POST.get('mode') == "none_mode":
             request.session["mode"] = Mode.NONE.value
-
     elif request.GET.get("new"):
         return redirect('/new_story')
+    else:
+        if request.session.get("mode") != Mode.NONE.value and story.suggesting and story.sentences != "":
+            last = story.sentences.split("\n")[-2]
+            suggestion = generateSuggestion(sess, last, request.session.get("mode"))
 
     return render(request, 'webapp/write.html',
                   context={"prompt": story.prompt,

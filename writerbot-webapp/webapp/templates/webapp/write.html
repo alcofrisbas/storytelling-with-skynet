@@ -49,12 +49,16 @@
         <!-- <p id = "para" style="padding:1px" contenteditable="{{ contentEdit }}"> -->
             <p>
             {% for sentence in sentences %}
-                {{ sentence }}<br>
+                {% if forloop.counter|divisibleby:2 %}
+                    <span class="suggestion-sentence">{{ sentence }}</span>
+                {% else %}
+                    {{ sentence }}
+                {% endif %}<br>
             {% endfor %}
             </p>
             <form method="post" id="input-form">
                 {% csrf_token %}
-                <textarea name="text" class="form-control" autofocus>{{ suggestion }}</textarea><br>
+                <textarea name="text" class="form-control {% if suggestion %} suggestion-sentence {% endif %}" autofocus>{{ suggestion }}</textarea><br>
                 <button type="submit" class="btn btn-primary btn-lg">Add Sentence</button>
             </form><br>
         {% else %}
@@ -125,6 +129,7 @@
           </div>
         </div>
     {% load staticfiles %}
-    <script src="{% static 'js/stretchy.min.js' %}" data-filter="#title-form, #title-form *" async></script>
+    <!-- data-filter="#title-form, #title-form *" -->
+    <script src="{% static 'js/stretchy.min.js' %}" async></script>
 {#    https://leaverou.github.io/stretchy/#}
 {% endblock %}
