@@ -2,11 +2,16 @@
 {% block content %}
     <div class="jumbotron">
         {% if not user.username %}
-      <h1 class="display-4">Your doorway to inspiration.</h1>
-      <p class="lead">Say hello to WriterBot, a friendly AI here to help you get over your writer's block!</p>
-      <hr class="my-4">
-      <p>Start writing your AI-assisted story here.</p>
-      <a class="btn btn-primary btn-lg" href="/write" role="button">Get started</a>
+          <h1 class="display-4">Your doorway to inspiration.</h1>
+          <p class="lead">Say hello to WriterBot, a friendly AI here to help you get over your writer's block!</p>
+          <hr class="my-4">
+        {% if stories %}
+              <p>Continue writing your AI-assisted story here.</p>
+              <a class="btn btn-primary btn-lg" href="/write" role="button">Keep writing</a>
+        {% else %}
+              <p>Start writing your AI-assisted story here.</p>
+              <a class="btn btn-primary btn-lg" href="/write" role="button">Get started</a>
+        {% endif %}
       {% else %}
             <h1 class="display-4">Welcome back, {{ user.first_name }}!</h1>
             <p class="lead">Continue your creative journey with WriterBot.</p>
