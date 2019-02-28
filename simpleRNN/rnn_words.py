@@ -186,16 +186,19 @@ class SimpleRNN:
                         symbols_out.append(symbol_out)
                     for batch in range(self.batch_size):
                         print("%s - [%s] vs [%s]" % (symbols_in[batch],symbols_out[batch],predictions[batch]))
+                if step % 5000:
+                    saver = tf.train.Saver()# -*- coding: utf-8 -*-
+
+                    saver.save(session, self.path_to_model+"/"+self.model_name)
+
                 step += 1
                 offset += (self.n_input+1)
+
             print("Optimization Finished!")
             print("Elapsed time: ", self.elapsed(time.time() - self.start_time))
             print("Run on command line.")
             print("\ttensorboard --logdir=%s" % (self.logs_path))
             print("Point your web browser to: http://localhost:6006/")
-            saver = tf.train.Saver()# -*- coding: utf-8 -*-
-
-            saver.save(session, self.path_to_model+"/"+self.model_name)
 
     # generate a suggestion given a session and a string sentence
     def generate_suggestion(self, session, sentence):
