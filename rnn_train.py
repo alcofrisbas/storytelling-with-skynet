@@ -18,17 +18,6 @@ def train(training_file, root_path, model_name, n_hidden, min_count, learning_ra
         path_to_model=root_path,model_name=model_name, train=True, training_file=training_file)
 
 if __name__ == '__main__':
-<<<<<<< HEAD
-    if len(sys.argv) <= 1:
-        training_file="simpleRNN/data/train.txt"
-        model_name="basic_model"
-    else:
-        training_file = sys.argv[1]
-        model_name = sys.argv[2]
-    train(training_file=training_file,root_path="simpleRNN/models/",
-        model_name=model_name,n_hidden=300, min_count=3,learning_rate=0.001,
-        training_iters=100000, n_input=6, batch_size=10,train=False)
-=======
     parser = argparse.ArgumentParser(description="asdf wtf")
     parser.add_argument("--training-file", "-t", action="store")
     parser.add_argument("--model-name", "-m", action="store")
@@ -72,4 +61,3 @@ if __name__ == '__main__':
 
 
     train(training_file,"simpleRNN/models/", model_name, n_hidden, min_count, learning_rate, training_iters, n_input, batch_size)
->>>>>>> d9911da396f18dce8c851f8a3496bb9f15498f82
