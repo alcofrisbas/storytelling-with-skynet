@@ -124,3 +124,7 @@ i {
 .new-file-icon {
     display: inline-block;
 }
+
+.align-self-center {
+    line-height: 37px;
+}
