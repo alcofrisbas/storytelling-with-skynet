@@ -263,7 +263,7 @@ class SimpleRNN:
 
 def run(learning_rate, training_iters, n_input, batch_size, n_hidden, path_to_model, model_name, train):
     d = {"learning_rate": learning_rate, "training_iters" : training_iters,"n_input" : n_input,"batch_size" : batch_size, "n_hidden" : n_hidden}
-    display_step = 100
+    display_step = 1000
     if train:
         rnn = SimpleRNN(d, display_step, path_to_model, model_name)
         rnn.train()
