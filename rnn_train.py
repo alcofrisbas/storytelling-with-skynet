@@ -22,8 +22,8 @@ if __name__ == '__main__':
         training_file="simpleRNN/data/train.txt"
         model_name="basic_model"
     else:
-        sys.argsv[2] = training_file
-        sys.argsv[3] = model_name
+        training_file = sys.argv[1]
+        model_name = sys.argv[2]
     train(training_file=training_file,root_path="simpleRNN/models/",
         model_name=model_name,n_hidden=300, min_count=3,learning_rate=0.001,
-        training_iters=1000, n_input=6, batch_size=10,train=True)
+        training_iters=1000000, n_input=6, batch_size=10,train=True)
