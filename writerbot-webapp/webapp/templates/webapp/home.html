@@ -13,37 +13,14 @@
             {% if stories %}
                 <hr class="my-4">
                 <p>Your current stories:</p>
-{#                {% for story in stories %}#}
-{#                    <div class="card">#}
-{#                        <div class="card-body">#}
-{#                            {% if story.title %}#}
-{#                                <h5 class="card-title">{{ story.title }}</h5>#}
-{#                            {% else %}#}
-{#                                <h5 class="card-title">Untitled</h5>#}
-{#                            {% endif %}#}
-{#                            <a href="/load_story/{{ story.id }}" class="btn btn-primary">Continue this story</a>#}
-{#                            <a href="/delete_story/{{ story.id }}" class="confirm-delete" title= "Delete" data-toggle="modal" data-target= "#confirmDeleteModal" id= "deleteButton{{story.id}}">#}
-{#                                <i class="fa fa-trash fa-2x" style= "float: right; color: red;"></i> </a>#}
-{#                          </div>#}
-{#                    </div>#}
-{#                {% endfor %}#}
                 <div class="list-group">
                 {% for story in stories %}
-{#                  <a href="/load_story/{{ story.id }}" class="list-group-item list-group-item-action">#}
-{#                    <div class="d-flex w-100 justify-content-between">#}
-{#                      <h5 class="mb-1">{{ story.title }}</h5>#}
-{#                      <small>{{ story.created }}</small>#}
-{#                        <button class="btn btn-xs btn-primary" onclick="alert('Action2 -> Play'); event.stopPropagation();">O</button>#}
-{#                    </div>#}
-{#                    <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>#}
-{#                    <small>Donec id elit non mi porta.</small>#}
-{#                  </a>#}
-
                     <a class="list-group-item list-group-item-action" href="/load_story/{{ story.id }}">
                         <div class="d-flex w-100 justify-content-between">
-                            <div class="align-self-center"><h5><i class="fas fa-file new-file-icon"></i>&emsp;{{ story.title }}</h5></div>
+                                <span class="btn-group" style="align-self:center">
+                                    <i class="fas fa-file new-file-icon fa-1.5x" style="color:#007bff"></i>&emsp;{{ story.title }}</span>
                             <span>
-                                <small><span class="text-muted">last edited:</span> {{ story.last_edited }}</small>
+                                <small><span class="text-muted">Last edited:</span> {{ story.last_edited.date }}</small>
                                 <span class="pull-right" onclick="return false;">
                                     <span class="btn-group" role="group" aria-label="...">
                                      <span class="btn btn-xs" data-toggle="modal" data-target= "#confirmDeleteModal{{story.id}}" id= "deleteButton{{story.id}}">
