@@ -12,10 +12,6 @@
             value="true" name="new" id="side-new">
             <i class="fas fa-plus"></i>
         </button>
-        <button class="side-btn" type="submit" data-toggle="tooltip" data-placement="right" title="Export Story"
-            value="true" name="export" id="side-export">
-            <i class="fas fa-file-export"></i>
-        </button>
     {% else %}
         <span data-toggle="modal" data-target="#newStoryModal" data-target="#id">
             <button class="side-btn" type="button" data-toggle="tooltip" data-placement="right" title="New story"
@@ -24,14 +20,10 @@
             </button>
         </span>
     {% endif %}
-    <!-- <button class="side-btn" type="submit" data-toggle="tooltip" data-placement="right" title="AI"
-        value="true" name="side-toggle" id="side-toggle">
-        {% if AI %}
-            <i id="side-toggle-icon" class="fas fa-power-off glow"></i>
-        {% else %}
-            <i id="side-toggle-icon" class="fas fa-power-off"></i>
-        {% endif %}
-        </button> -->
+    <button class="side-btn" type="submit" data-toggle="tooltip" data-placement="right" title="Export Story"
+        value="true" name="export" id="side-export">
+        <i class="fas fa-file-export"></i>
+    </button>
     <span data-toggle="modal" data-target="#settingsModal" data-target="#id">
         <button class="side-btn" type="button" data-toggle="tooltip" data-placement="right" title="Settings"
             value="true" name="side-settings" id="side-settings">
@@ -59,7 +51,7 @@
             <form method="post" id="input-form">
                 {% csrf_token %}
                 <textarea name="text" class="form-control {% if suggestion %} suggestion-sentence {% endif %}" autofocus>{{ suggestion }}</textarea><br>
-                <button type="submit" class="btn btn-primary btn-lg">Add {% if suggestion %} Suggestion {% else %} Sentence {% endif %}</button>
+                <button type="submit" class="btn {% if suggestion %} btn-success {% else %} btn-primary {% endif %} btn-lg">Add {% if suggestion %} Suggestion {% else %} Sentence {% endif %}</button>
             </form><br>
         {% else %}
             <br>
