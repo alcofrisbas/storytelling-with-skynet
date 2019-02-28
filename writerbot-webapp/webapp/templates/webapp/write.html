@@ -108,16 +108,22 @@
                   {% csrf_token %}
                   <div class="modal-body">
                       <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="mode" id="rnn_mode" value="rnn_mode" {% if mode == 1 %} checked {% endif %}>
+                          <input class="form-check-input" type="radio" name="mode" id="rnn_mode" onclick="settingsCard(1)" value="rnn_mode" {% if mode == 1 %} checked {% endif %}>
                           <label class="form-check-label" for="rnn_mode">RNN</label>
                         </div>
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="mode" id="ngram_mode" value="ngram_mode" {% if mode == 2 %} checked {% endif %}>
+                          <input class="form-check-input" type="radio" name="mode" id="ngram_mode" onclick="settingsCard(2)" value="ngram_mode" {% if mode == 2 %} checked {% endif %}>
                           <label class="form-check-label" for="ngram_mode">N-Gram</label>
                         </div>
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="mode" id="none_mode" value="none_mode" {% if mode == 3 %} checked {% endif %}>
+                          <input class="form-check-input" type="radio" name="mode" id="none_mode" onclick="settingsCard(3)" value="none_mode" {% if mode == 3 %} checked {% endif %}>
                           <label class="form-check-label" for="none_mode">No suggestions</label>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 id="save-info-card-title" class="card-title"></h5>
+                                <p class="card-text" id="save-info-card-content" ></p>
+                            </div>
                         </div>
                   </div>
                   <div class="modal-footer">
