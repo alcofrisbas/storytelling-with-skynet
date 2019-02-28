@@ -26,7 +26,7 @@
     </button>
     <span data-toggle="modal" data-target="#settingsModal" data-target="#id">
         <button class="side-btn" type="button" data-toggle="tooltip" data-placement="right" title="Settings"
-            value="true" name="side-settings" id="side-settings">
+            value="true" name="side-settings" id="side-settings" onclick="update_settings({{ mode }});change_setting_text()">
             <i class="fas fa-cog"></i></button>
     </span>
 </div>
@@ -96,25 +96,29 @@
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
-              <form method="post">
+              <form id="settings-form" method="post">
                   {% csrf_token %}
                   <div class="modal-body">
                       <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="mode" id="rnn_mode" onclick="settingsCard(1)" value="rnn_mode" {% if mode == 1 %} checked {% endif %}>
+                          <input class="form-check-input" type="radio" name="mode" id="rnn_mode" value="rnn_mode" {% if mode == 1 %} checked {% endif %}>
                           <label class="form-check-label" for="rnn_mode">RNN</label>
                         </div>
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="mode" id="ngram_mode" onclick="settingsCard(2)" value="ngram_mode" {% if mode == 2 %} checked {% endif %}>
+                          <input class="form-check-input" type="radio" name="mode" id="ngram_mode" value="ngram_mode" {% if mode == 2 %} checked {% endif %}>
                           <label class="form-check-label" for="ngram_mode">N-Gram</label>
                         </div>
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="mode" id="none_mode" onclick="settingsCard(3)" value="none_mode" {% if mode == 3 %} checked {% endif %}>
+                          <input class="form-check-input" type="radio" name="mode" id="none_mode" value="none_mode" {% if mode == 3 %} checked {% endif %}>
                           <label class="form-check-label" for="none_mode">No suggestions</label>
                         </div>
                         <div class="card">
                             <div class="card-body">
-                                <h5 id="save-info-card-title" class="card-title"></h5>
-                                <p class="card-text" id="save-info-card-content" ></p>
+                                <h5 id="rnn-settings-title" class="card-title">RNN</h5>
+                                <h5 id="ngram-settings-title" class="card-title">N-Gram</h5>
+                                <h5 id="none-settings-title" class="card-title">No Suggestions</h5>
+                                <p class="card-text" id="rnn-settings-content" >This is about an RNN</p>
+                                <p class="card-text" id="ngram-settings-content" >This is about N-Grams</p>
+                                <p class="card-text" id="none-settings-content" >This is about nothing</p>
                             </div>
                         </div>
                   </div>
