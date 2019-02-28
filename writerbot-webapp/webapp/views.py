@@ -63,6 +63,9 @@ def home(request):
         stories = user.stories.all()
     else:
         stories = []
+        if request.session.get("story_id"):
+            stories.append(Story.objects.get(id=request.session.get("story_id")))
+
     return render(request, 'webapp/home.html', context={'stories': stories})
 
 

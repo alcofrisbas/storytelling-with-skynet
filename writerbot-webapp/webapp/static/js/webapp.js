@@ -95,6 +95,7 @@ window.onload = load;
 
 $(document).ready(function(){
   $('[data-toggle="tooltip"]').tooltip();
+  document.getElementById('input-form').scrollIntoView(false);
 });
 
 
@@ -118,14 +119,3 @@ $("#title-form").keyup(function(event)
         $("#title-form").submit();
     }
 });
-
-function settingsCard(mode){
-    if (mode == 1){
-        document.getElementById("save-info-card-content").innerText = "RNN filler description";
-    } else if (mode == 2){
-        document.getElementById("save-info-card-content").innerText = "n-gram filler description";
-    } else {
-        document.getElementById("save-info-card-content").innerText = "";
-
-    }
-}
