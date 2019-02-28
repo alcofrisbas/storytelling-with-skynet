@@ -147,7 +147,7 @@ def retrieve_records(lst, output_dir):
     simply a wrapper due to code repetition.
     returns: None
     """
-    if input(("{} records found. Save? ".format(str(len(lst))))) == "y":
+    if input(("{} records found. Save? (y/N) ".format(str(len(lst))))) == "y":
         if not args.output_dir:
             args.output_dir = "saves"
         if not os.path.exists(args.output_dir):
@@ -161,55 +161,56 @@ if __name__ == '__main__':
     """
     CLI stuff... maybe streamline this...
     """
-    parser = argparse.ArgumentParser()
-    parser.add_argument("fname", action="store", help="specify database file")
-    parser.add_argument('--makedb', action="store_true", default=False,
-                            help="intitialize new database")
-    parser.add_argument('--all', '-a', action="store_true", default=False,
-                            help="not yet implemented")
-    parser.add_argument('-q', action="store", dest="query", nargs=2,
-                            help="An sql query to return records and download documents")
-    parser.add_argument('--output-dir','-o', action="store", dest="output_dir",
-                            help="destination to store documents")
-    parser.add_argument('--test', action="store_true", default=False)
-    parser.add_argument('--range', '-r', action="store", nargs=2, dest="scan_range")
-    parser.add_argument('--count', action="store_true", dest="count")
-    parser.add_argument('--random-count', action="store")
-    args = parser.parse_args()
-    if args.test:
-            conn, c = create_db("test.db")
-            for i in range(20):
-                d = get_info(random.randrange(58153))
-                add_to_table(d,c)
-            conn.commit()
-            print(query(c, "select * from books where lang is 'english'"))
-    elif args.makedb:
-        if os.path.exists(args.fname):
-            if input("File {} exists, overwrite(y/n)? ".format(args.fname)) == "y":
-                conn, c = create_db(args.fname)
-            else:
-                sys.exit(0)
-        else:
-            conn, c = create_db(args.fname)
-        if args.scan_range:
-            for i in range(int(args.scan_range[0]), int(args.scan_range[1])):
-                if i%250 == 0 and i != 0:
-                    print("{} records processed".format(str(i)))
-                    conn.commit()
-                d = get_info(i)
-                add_to_table(d, c)
-            conn.commit()
-    elif args.query:
-        conn, c = connect_db(args.fname)
-        col = args.query[0]
-        row = args.query[1]
-        lst = query(c, col, row)
-        retrieve_records(lst, args.output_dir)
-    elif args.count:
-        conn, c = connect_db(args.fname)
-        num = c.execute("SELECT COUNT(*) FROM books").fetchall()[0][0]
-        print("There are {} records in table: books".format(str(num)))
-    elif args.random_count:
-        conn, c = connect_db(args.fname)
-        lst = c.execute("SELECT * FROM books ORDER BY RANDOM() LIMIT {}".format(int(args.random_count))).fetchall()
-        retrieve_records(lst, args.output_dir)
+    print("this is a module. run webscrape.py")
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("fname", action="store", help="specify database file")
+    # parser.add_argument('--makedb', action="store_true", default=False,
+    #                         help="intitialize new database")
+    # parser.add_argument('--all', '-a', action="store_true", default=False,
+    #                         help="not yet implemented")
+    # parser.add_argument('-q', action="store", dest="query", nargs=2,
+    #                         help="An sql query to return records and download documents")
+    # parser.add_argument('--output-dir','-o', action="store", dest="output_dir",
+    #                         help="destination to store documents")
+    # parser.add_argument('--test', action="store_true", default=False)
+    # parser.add_argument('--range', '-r', action="store", nargs=2, dest="scan_range")
+    # parser.add_argument('--count', action="store_true", dest="count")
+    # parser.add_argument('--random-count', action="store")
+    # args = parser.parse_args()
+    # if args.test:
+    #         conn, c = create_db("test.db")
+    #         for i in range(20):
+    #             d = get_info(random.randrange(58153))
+    #             add_to_table(d,c)
+    #         conn.commit()
+    #         print(query(c, "select * from books where lang is 'english'"))
+    # elif args.makedb:
+    #     if os.path.exists(args.fname):
+    #         if input("File {} exists, overwrite(y/n)? ".format(args.fname)) == "y":
+    #             conn, c = create_db(args.fname)
+    #         else:
+    #             sys.exit(0)
+    #     else:
+    #         conn, c = create_db(args.fname)
+    #     if args.scan_range:
+    #         for i in range(int(args.scan_range[0]), int(args.scan_range[1])):
+    #             if i%250 == 0 and i != 0:
+    #                 print("{} records processed".format(str(i)))
+    #                 conn.commit()
+    #             d = get_info(i)
+    #             add_to_table(d, c)
+    #         conn.commit()
+    # elif args.query:
+    #     conn, c = connect_db(args.fname)
+    #     col = args.query[0]
+    #     row = args.query[1]
+    #     lst = query(c, col, row)
+    #     retrieve_records(lst, args.output_dir)
+    # elif args.count:
+    #     conn, c = connect_db(args.fname)
+    #     num = c.execute("SELECT COUNT(*) FROM books").fetchall()[0][0]
+    #     print("There are {} records in table: books".format(str(num)))
+    # elif args.random_count:
+    #     conn, c = connect_db(args.fname)
+    #     lst = c.execute("SELECT * FROM books ORDER BY RANDOM() LIMIT {}".format(int(args.random_count))).fetchall()
+    #     retrieve_records(lst, args.output_dir)
