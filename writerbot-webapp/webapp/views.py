@@ -1,18 +1,47 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout as auth_logout
-import sys
-import os
+
 from django.http import HttpResponse
+from wsgiref.util import FileWrapper
+from io import StringIO
+
 from webapp.models import Story
 from webapp.models import User
 
-#sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'RNN'))
-#from rnn_test import load_model, generate_text
+import sys
+import os
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'simpleRNN'))
-#from rnn_words2 import run
+from rnn_words import SimpleRNN
+import tensorflow as tf
 import random
 from webapp.words import ADJECTIVES, ANIMALS
 
+# little hacky shit to make pickling work for loading the ngram model
+# fastly.
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'./'))
+from ngrams import ngram
+sys.modules["ngram"] = ngram
+
+
+from enum import Enum
+
+class Mode(Enum):
+     RNN = 1
+     NGRAM = 2
+     NONE = 3
+
+args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000}
+display_step = 1000
+path_to_model = "simpleRNN/models/"
+model_name = "basic_model"
+
+rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
+sess = tf.Session()
+saver = tf.train.Saver()
+saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
+
+
+ngram_root = ngram.load_model("./ngrams/models/5max200000.model")
 
 #TODO: when user logs in, redirect to the page they logged in from
 #TODO: figure out how to clear empty stories and expired session data
@@ -22,14 +51,21 @@ def home(request):
     if request.user.is_authenticated:
         user = getOrCreateUser(request)
         if request.session.get("story_id"):
-            cur_story = Story.objects.get(id=request.session.get("story_id"))
-            cur_story.author = user
-            cur_story.save()
-            user.stories.add(cur_story)
-            user.save()
+            try:
+                cur_story = Story.objects.get(id=request.session.get("story_id"))
+                cur_story.author = user
+                cur_story.save()
+                user.stories.add(cur_story)
+                user.save()
+            except Exception as e:
+                print(e)
+                print("id: {}".format(request.session.get("story_id")))
         stories = user.stories.all()
     else:
         stories = []
+        if request.session.get("story_id"):
+            stories.append(Story.objects.get(id=request.session.get("story_id")))
+
     return render(request, 'webapp/home.html', context={'stories': stories})
 
 
@@ -54,7 +90,6 @@ def newStory(request):
         s.save()
         user.stories.add(s)
         user.save()
-    request.session["editing"] = False
     request.session["story_id"] = s.id
     return redirect('/write')
 
@@ -64,8 +99,6 @@ def newStory(request):
 def loadStory(request, id):
     if Story.objects.filter(id=id).exists():
         request.session["story_id"] = id
-        request.session["editing"] = False
-        request.session["prompt"] = ""
         return redirect('/write')
     else:
         return render(request, 'webapp/error.html', context= {'message': "Story not found."})
@@ -74,10 +107,11 @@ def loadStory(request, id):
 def deleteStory(request, id):
     if Story.objects.filter(id=id).exists():
         s = Story.objects.get(id=id)
+        if id == request.session.get("story_id"):
+            print("deleting request.session {}".format(id))
+            request.session.pop("story_id")
         if s.author.email == request.user.email:
             s.delete()
-            if id == request.session.get("story_id"):
-                request.session.pop("story_id")
             return redirect('/')
         else:
             return render(request, 'webapp/error.html',
@@ -90,8 +124,9 @@ def write(request):
     if "story_id" not in request.session.keys() or not Story.objects.filter(id = request.session["story_id"]).exists():
         newStory(request)
 
-    if "AI" not in request.session.keys():
-        request.session["AI"] = True
+    if "mode" not in request.session.keys():
+        # using value instead of enum itself because enum is not JSON serializable so it can't be stored in session
+        request.session["mode"] = Mode.RNN.value
 
     story = Story.objects.get(id=request.session["story_id"])
     suggestion = ""
@@ -100,39 +135,48 @@ def write(request):
         if request.POST.get("text"):
             new_sentence = request.POST["text"]
             story.sentences += new_sentence.strip() + "\n"
+            story.suggesting = not story.suggesting
             story.save()
-
-            if request.session["AI"] and not request.session["editing"]:
-                suggestion = generateSuggestion(new_sentence)
-
-            request.session["editing"] = not request.session["editing"]
+            if request.session.get("mode") != Mode.NONE.value and story.suggesting:
+                suggestion = generateSuggestion(sess, new_sentence, request.session.get("mode"))
 
         if request.POST.get("title"):
             story.title = request.POST["title"]
             story.save()
 
-        # same functionality as "Start a new story button"
+        # same functionality as "Start a new story" button
         if request.POST.get("new"):
             return redirect('/new_story')
 
         if request.POST.get("home"):
             return redirect('/')
 
-        if request.POST.get("side-toggle"):
-            request.session["AI"] = not request.session["AI"]
+        if request.POST.get("export"):
+            print("exporting story...")
+            myfile = StringIO()
+            myfile.write(story.sentences)
+            response = HttpResponse(myfile.getvalue(), content_type='text/plain')
+            response['Content-Disposition'] = 'attachment; filename={}.txt'.format(story.title)
+            return response
 
+        if request.POST.get('mode') == "rnn_mode":
+            request.session["mode"] = Mode.RNN.value
+        elif request.POST.get('mode') == "ngram_mode":
+            request.session["mode"] = Mode.NGRAM.value
+        elif request.POST.get('mode') == "none_mode":
+            request.session["mode"] = Mode.NONE.value
     elif request.GET.get("new"):
         return redirect('/new_story')
-
-    last = ""
-    if story.sentences != "":
-        last = story.sentences.split("\n")[-1]
+    else:
+        if request.session.get("mode") != Mode.NONE.value and story.suggesting and story.sentences != "":
+            last = story.sentences.split("\n")[-2]
+            suggestion = generateSuggestion(sess, last, request.session.get("mode"))
 
     return render(request, 'webapp/write.html',
                   context={"prompt": story.prompt,
                   "sentences": [s.strip() for s in story.sentences.split("\n")[:-1]],
-                  "suggestion": suggestion, "last": last,
-                  "title": story.title, "AI": request.session["AI"]})
+                  "suggestion": suggestion, "title": story.title,
+                  "mode": request.session["mode"]})
 
 
 def about(request):
@@ -145,11 +189,6 @@ def team(request):
 
 def error(request, message):
     return render(request, 'webapp/error.html', context={'message': message})
-
-
-def saves(request):
-    stories = Story.objects.all()
-    return render(request, 'webapp/saves.html', context={'stories': stories})
 
 
 def logout(request):
@@ -170,11 +209,14 @@ def generatePrompt(curPrompt=""):
     return curTopic
 
 
-def generateSuggestion(newSentence):
+def generateSuggestion(session, newSentence, mode):
     try:
-        #suggestion = generate_text(sess, model, word_to_id, id_to_word, seed=newSentence)
-        #suggestion = run(newSentence)
-        suggestion="placeholder"
+        if mode == Mode.RNN.value:
+            suggestion = rnn.generate_suggestion(session, newSentence)
+        elif mode == Mode.NGRAM.value:
+            suggestion = ngram.generate_sentence(ngram_root, newSentence, m=2)
+        else:
+            suggestion="placeholder"
     except Exception as e:
         print("ERROR (suggestion generation)")
         suggestion = e

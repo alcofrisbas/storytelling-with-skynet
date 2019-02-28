@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css" integrity="sha256-BJ/G+e+y7bQdrYkS2RBTyNfBHpA9IuGaPmf9htub5MQ=" crossorigin="anonymous" />
     <link rel="stylesheet" href="{% static 'css/webapp.css' %}">
     <!--<script src="{% static 'js/bootstrap.min.js' %}"></script>-->
-
+    <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Montserrat|Open+Sans|Playfair+Display" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -28,7 +28,6 @@
                     <li><a class="nav-item nav-link" id ="/write/" href="/write">Write</a></li>
                     <li><a class="nav-item nav-link" id="/about/" href="/about">How it Works</a></li>
                     <li><a class="nav-item nav-link" id="/team/" href="/team">The Team</a></li>
-                    <li><a class="nav-item nav-link" id="/saves/" href="/saves">Saves--temp</a></li>
                 </ul>
                 <ul class="navbar-nav ml-auto">
                 {% if user.username %}
@@ -65,5 +64,7 @@
         window.location = $("#".concat(caller)).attr("href");
         });
     </script>
+    {% load tz_detect %}
+    {% tz_detect %}
 </body>
 </html>

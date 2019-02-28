@@ -102,3 +102,40 @@ i {
     border-style: inset;
     border-color: initial;
 }
+
+.list-group-item {
+    padding: 5px;
+    padding-bottom: 3px;
+    padding-left: 8px;
+}
+
+.list-group-item>.pull-right{
+   cursor: default;
+}
+
+/* make this better */
+.suggestion-sentence {
+    color: #007bff;
+    background-color: #f0f0f0;
+    border-radius: 3px;
+    border: 2px solid;
+    border-color: #f0f0f0;
+    width:100%;
+    display: block;
+    /* -moz-box-shadow:    1px 1px 1px 1px #ccc;
+    -webkit-box-shadow: 1px 1px 1px 1px #ccc;
+    box-shadow:         1px 1px 1px 1px #ccc; */
+
+}
+
+.suggestion-sentence:focus {
+    color: #007bff;
+}
+
+.new-file-icon {
+    display: inline-block;
+}
+
+.align-self-center {
+    line-height: 37px;
+}

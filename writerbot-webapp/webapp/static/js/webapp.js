@@ -95,11 +95,12 @@ window.onload = load;
 
 $(document).ready(function(){
   $('[data-toggle="tooltip"]').tooltip();
+  document.getElementById('input-form').scrollIntoView(false);
 });
 
 
 
-$("#input-form").keyup(function(event)
+$("#input-form").keydown(function(event)
 {
     if (event.keyCode == 13)
     {
