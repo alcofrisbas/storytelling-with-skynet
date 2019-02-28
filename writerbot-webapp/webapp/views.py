@@ -94,7 +94,6 @@ def newStory(request):
     return redirect('/write')
 
 
-#TODO: figure out how editing/prompt interact with story loading
 #TODO: error check
 def loadStory(request, id):
     if Story.objects.filter(id=id).exists():

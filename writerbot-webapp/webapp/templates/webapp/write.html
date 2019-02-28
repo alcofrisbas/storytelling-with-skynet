@@ -32,11 +32,11 @@
 </div>
 </form>
 <div class="main">
-    <form method="post" id="title-form">
-            {% csrf_token %}
-        <input id="title-input" type="text" name="title" value="{{ title }}" class="mt-5"></form>
-    <hr class="my-2">
-    <h5>Prompt: {{ prompt }}</h5>
+        <form method="post" id="title-form">
+                {% csrf_token %}
+            <input id="title-input" type="text" name="title" value="{{ title }}" class="mt-5"></form>
+        <hr class="my-2">
+        <h5>Prompt: {{ prompt }}</h5>
         {% if sentences %}
         <!-- <p id = "para" style="padding:1px" contenteditable="{{ contentEdit }}"> -->
             <p>
@@ -44,7 +44,7 @@
                 {% if forloop.counter|divisibleby:2 %}
                     <span class="suggestion-sentence">{{ sentence }}</span>
                 {% else %}
-                    {{ sentence }}
+                    {{ sentence }}<br>
                 {% endif %}
             {% endfor %}
             </p>
