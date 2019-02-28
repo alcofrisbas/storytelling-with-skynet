@@ -68,7 +68,11 @@ class ScrapeArgs:
         #col = args.query[0]
         #row = args.query[1]
         lst = scp.query(c, args.col, args.row)
-        scp.retrieve_records(lst, args.output_dir)
+        if not args.output_dir:
+            output_dir = "saves"
+        else:
+            output_dir = args.output_dir
+        scp.retrieve_records(lst, output_dir)
 
 
     def random(self):
@@ -76,12 +80,18 @@ class ScrapeArgs:
         parser.add_argument('fname', action='store')
         #parser.add_argument('mode', action='store')
         parser.add_argument('number', action='store')
+        parser.add_argument('--output_dir', '-o', action='store')
 
         args = parser.parse_args(sys.argv[2:])
 
+        if not args.output_dir:
+            output_dir = "saves"
+        else:
+            output_dir = args.output_dir
+
         conn, c = scp.connect_db(args.fname)
-        lst = c.execute("SELECT * FROM books ORDER BY RANDOM() LIMIT {}".format(int(args.random_count))).fetchall()
-        scp.retrieve_records(lst, args.output_dir)
+        lst = c.execute("SELECT * FROM books ORDER BY RANDOM() LIMIT {}".format(int(args.number))).fetchall()
+        scp.retrieve_records(lst, output_dir)
 
 
 

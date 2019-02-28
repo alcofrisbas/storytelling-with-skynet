@@ -148,14 +148,12 @@ def retrieve_records(lst, output_dir):
     returns: None
     """
     if input(("{} records found. Save? (y/N) ".format(str(len(lst))))) == "y":
-        if not args.output_dir:
-            args.output_dir = "saves"
-        if not os.path.exists(args.output_dir):
-            os.mkdir(args.output_dir)
+        if not os.path.exists(output_dir):
+            os.mkdir(output_dir)
         for j,i in enumerate(lst):
             if j % 25 == 0 and j > 0:
                 print("{} records retrieved".format(j))
-            get_full_text(i[3], "{}_{}.txt".format(i[1], i[0]), args.output_dir)
+            get_full_text(i[3], "{}_{}.txt".format(i[1], i[0]), output_dir)
 
 if __name__ == '__main__':
     """
