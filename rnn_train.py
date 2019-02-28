@@ -26,4 +26,4 @@ if __name__ == '__main__':
         model_name = sys.argv[2]
     train(training_file=training_file,root_path="simpleRNN/models/",
         model_name=model_name,n_hidden=300, min_count=3,learning_rate=0.001,
-        training_iters=1000, n_input=6, batch_size=10,train=True)
+        training_iters=100000, n_input=6, batch_size=10,train=False)

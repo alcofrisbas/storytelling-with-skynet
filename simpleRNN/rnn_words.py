@@ -186,7 +186,7 @@ class SimpleRNN:
                         symbols_out.append(symbol_out)
                     for batch in range(self.batch_size):
                         print("%s - [%s] vs [%s]" % (symbols_in[batch],symbols_out[batch],predictions[batch]))
-                if step % 5000:
+                if step % 5000 == 0:
                     saver = tf.train.Saver()# -*- coding: utf-8 -*-
 
                     saver.save(session, self.path_to_model+"/"+self.model_name)
@@ -252,13 +252,18 @@ class SimpleRNN:
                         embedded_symbols.append(embedding)
                     # embeded_symbols shape [1, n_input, n_hidden]
                     output_sent = ""
+                    output_word = ""
                     embedded_symbols = [embedded_symbols]
                     for i in range(23):
                         onehot_pred = session.run(self.probas, feed_dict={self.x: embedded_symbols})
+                        #print(onehot_pred)
                         onehot_pred = self.index2word[onehot_pred[0]]
                         output_sent +=  " %s" % (onehot_pred)
                         embedded_symbols = embedded_symbols[0][1:]
-                        embedded_symbols.append(self.embedding_model.wv.vocab[onehot_pred].index)
+                        if onehot_pred == "POS":
+                            embedded_symbols.append(len(self.input_embedding_matrix)-2)
+                        else:
+                            embedded_symbols.append(self.embedding_model.wv.vocab[onehot_pred].index)
                         embedded_symbols = [embedded_symbols]
                     print(output_sent)
                 except Exception as e:
