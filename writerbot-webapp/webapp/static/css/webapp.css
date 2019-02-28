@@ -113,12 +113,23 @@ i {
    cursor: default;
 }
 
+/* make this better */
 .suggestion-sentence {
-    color: blue;
+    color: #007bff;
+    background-color: #f0f0f0;
+    border-radius: 3px;
+    border: 2px solid;
+    border-color: #f0f0f0;
+    width:100%;
+    display: block;
+    /* -moz-box-shadow:    1px 1px 1px 1px #ccc;
+    -webkit-box-shadow: 1px 1px 1px 1px #ccc;
+    box-shadow:         1px 1px 1px 1px #ccc; */
+
 }
 
 .suggestion-sentence:focus {
-    color: blue;
+    color: #007bff;
 }
 
 .new-file-icon {
