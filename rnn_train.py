@@ -15,7 +15,11 @@ def train(training_file, root_path, model_name, n_hidden, min_count, learning_ra
 
     rnn_words.run(learning_rate=learning_rate, training_iters=training_iters,
         n_input=n_input, batch_size=batch_size,n_hidden=n_hidden,
+<<<<<<< HEAD
+        path_to_model=root_path,model_name=model_name, train=train, training_file=training_file)
+=======
         path_to_model=root_path,model_name=model_name, train=train)
+>>>>>>> 9aafdd99119833bb80ec8933a3ae79dfeda7653a
 
 if __name__ == '__main__':
     if len(sys.argv) <= 1:
