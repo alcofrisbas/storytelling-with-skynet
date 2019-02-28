@@ -43,7 +43,7 @@ class SimpleRNN:
         self.writer = tf.summary.FileWriter(self.logs_path)
 
         # Text file containing words for training
-        self.training_file = "RNN/data/train.txt"#
+        self.training_file = d["training_file"]
 
         self.training_data = self.read_data(self.training_file)
         print("Loaded training data...")
@@ -264,8 +264,9 @@ class SimpleRNN:
                 except Exception as e:
                     print(e)
 
-def run(learning_rate, training_iters, n_input, batch_size, n_hidden, path_to_model, model_name, train):
-    d = {"learning_rate": learning_rate, "training_iters" : training_iters,"n_input" : n_input,"batch_size" : batch_size, "n_hidden" : n_hidden}
+
+def run(learning_rate, training_iters, n_input, batch_size, n_hidden, path_to_model, model_name, train, training_file):
+    d = {"learning_rate": learning_rate, "training_iters" : training_iters,"n_input" : n_input,"batch_size" : batch_size, "n_hidden" : n_hidden, "training_file": training_file}
     display_step = 1000
     if train:
         rnn = SimpleRNN(d, display_step, path_to_model, model_name)

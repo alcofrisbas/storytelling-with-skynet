@@ -30,7 +30,7 @@ class Mode(Enum):
      NGRAM = 2
      NONE = 3
 
-args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000}
+args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000, "training_file": "simpleRNN/data/train.txt"}
 display_step = 1000
 path_to_model = "simpleRNN/models/"
 model_name = "basic_model"
@@ -94,7 +94,6 @@ def newStory(request):
     return redirect('/write')
 
 
-#TODO: figure out how editing/prompt interact with story loading
 #TODO: error check
 def loadStory(request, id):
     if Story.objects.filter(id=id).exists():
