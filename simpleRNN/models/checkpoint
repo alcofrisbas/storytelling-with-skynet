@@ -1,2 +1,2 @@
-model_checkpoint_path: "basic_model"
-all_model_checkpoint_paths: "basic_model"
+model_checkpoint_path: "dickens_model"
+all_model_checkpoint_paths: "dickens_model"
