@@ -26,3 +26,5 @@ venv*
 #ignore models
 simpleRNN/models
 saves
+ngrams/models
+
