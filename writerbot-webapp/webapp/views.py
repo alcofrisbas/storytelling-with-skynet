@@ -42,7 +42,10 @@ sess = tf.Session()
 
 
 ngram_root = ngram.load_model("./ngrams/models/5max200000.model")
-prompt_ngram = ngram.load_model("./ngrams/models/lewis_model")
+if not os.path.isfile("./ngrams/models/lewis_model"):
+    prompt_ngram = create_model("./saves/all_of_lewis.txt","./ngrams/models/lewis_model", l=1000000)
+else:
+    prompt_ngram = ngram.load_model("./ngrams/models/lewis_model")
 
 #TODO: when user logs in, redirect to the page they logged in from
 #TODO: figure out how to clear empty stories and expired session data
