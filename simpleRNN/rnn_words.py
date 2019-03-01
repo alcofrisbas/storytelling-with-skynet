@@ -220,16 +220,21 @@ class SimpleRNN:
                 embedded_symbols.append(embedding)
             # embeded_symbols shape [1, n_input, n_hidden]
             embedded_symbols = [embedded_symbols]
+            onehot_pred = 0
             output_sent = ""
-            for i in range(23):
+            while onehot_pred != "." or onehot_pred != "!" or onehot_pred != "?":
                 onehot_pred = session.run(self.probas, feed_dict={self.x: embedded_symbols})
                 onehot_pred = self.index2word[onehot_pred[0]]
                 if onehot_pred == "PAD":
                     continue
-                output_sent += " %s" % (onehot_pred)
+                if onehot_pred == "," or onehot_pred == ";" or onehot_pred == ":":
+                    output_sent += "%s" % (onehot_pred)
+                else:
+                    output_sent += " %s" % (onehot_pred)
                 embedded_symbols = embedded_symbols[0][1:]
                 embedded_symbols.append(self.embedding_model.wv.vocab[onehot_pred.lower()].index)
                 embedded_symbols = [embedded_symbols]
+            output_sent += "%s" % (onehot_pred)
 
             output_sent = output_sent.strip().capitalize()
             if output_sent[-1].isalpha() or output_sent[-1].isdigit():

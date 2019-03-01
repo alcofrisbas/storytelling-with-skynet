@@ -64,7 +64,7 @@ def create_embedding(training_file, root_path, model_name,n_hidden, min_count):
         writer.writerow([word])
     writer.writerow(["GO"])
     writer.writerow(["UNK"])
-    writer.writerow(["POS"])
+    writer.writerow(["PAD"])
 
 
     # convert the wv word vectors into a numpy matrix that is suitable for insertion
