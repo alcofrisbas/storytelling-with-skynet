@@ -43,7 +43,7 @@ saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
 
 ngram_root = ngram.load_model("./ngrams/models/5max200000.model")
 if not os.path.isfile("./ngrams/models/lewis_model"):
-    prompt_ngram = create_model("./saves/all_of_lewis.txt","./ngrams/models/lewis_model", l=1000000)
+    prompt_ngram = ngram.create_model("./saves/all_of_lewis.txt","./ngrams/models/lewis_model", l=1000000)
 else:
     prompt_ngram = ngram.load_model("./ngrams/models/lewis_model")
 
