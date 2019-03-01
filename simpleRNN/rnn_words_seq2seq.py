@@ -58,11 +58,11 @@ class SimpleRNN:
         print("Loaded training data...")
     #    self.dictionary, self.reverse_dictionary = self.build_dataset(self.training_data)
 
-        self.embedding_model = gensim.models.Word2Vec.load(self.path_to_model + "my_embedding_model")
+        self.embedding_model = gensim.models.Word2Vec.load(self.path_to_model + "basic_model_embedding_model")
 
         #file containing the index to vector including the paddings
-        self.input_embedding_matrix = np.load(self.path_to_model + "input_embedding_model.npy")
-        self.output_embedding_matrix = tf.cast(np.load(self.path_to_model + "output_embedding_model.npy"), tf.float32)
+        self.input_embedding_matrix = np.load(self.path_to_model + "basic_model_input_embedding_model.npy")
+        self.output_embedding_matrix = tf.cast(np.load(self.path_to_model + "basic_model_output_embedding_model.npy"), tf.float32)
         self.file = open(self.path_to_model + "vocab.csv")
         self.vocab_size = self.input_embedding_matrix.shape[0]
         self.weights = {'out': self.output_embedding_matrix}
@@ -70,7 +70,7 @@ class SimpleRNN:
         self.x = tf.placeholder(tf.int32, [None, None])
         self.y = tf.placeholder(tf.int32, [None, None])
         self.outputs = tf.placeholder(tf.int32, (None, None), 'output')
-        self.decoder_lengths = tf.placeholder(tf.int32, shape=(self.batch_size), name="decoder_length")
+        self.decoder_lengths = tf.placeholder(tf.int32, shape=(None,), name="decoder_length")
 
         self.logits = self.RNN()
         self.probas = tf.argmax(self.logits, 2)
@@ -231,31 +231,29 @@ class SimpleRNN:
                 symbol = [str(self.training_data[j]) for j in range(offset+i, offset+self.n_input+i)]
                 symbols.append(symbol)
                 """
-                embedded_batch = []
+                onehot_batch = []
                 """
                 for batch in symbols:
                     embedded_symbols = []
                 """
                 for word in symbols:
                     try:
-                        embedding = self.embedding_model.wv.vocab[word].index
+                        one_hot = self.embedding_model.wv.vocab[word].index
                         #itemindex = np.where(self.index2word== word)
                     except KeyError:
                         print(word + " not in vocabulary")
-                        embedding = len(self.input_embedding_matrix)-3
-                    embedded_batch.append(embedding)
-                embedded_batch = [embedded_batch]
-                #embedded_batch.append(embedded_symbols)
+                        one_hot = len(self.input_embedding_matrix)-3
+                    onehot_batch.append(one_hot)
+                # padding
+                while len(onehot_batch) < max_size:
+                    onehot_batch.append(self.input_embedding_matrix)-2
+                onehot_batch = [onehot_batch]
 
-                # embeded_symbols shape [self.batch_size, self.n_input]
-
-                targets = []
+                targets = [len(self.input_embedding_matrix)-4]
+                print(targets)
                 for word in self.training_data[sent_num+1][1:]:
-                    #itemindex = np.where(self.index2word== word)
-                    #ind = itemindex[0][0]
-                    #targets.append(ind)
                     targets.append(self.embedding_model.wv.vocab[word].index)
-                #self.output_seq_length = len(targets) -1
+                # padding
                 while (len(targets) < max_size):
                     targets.append(len(self.input_embedding_matrix)-2)
                 targets = [targets]
@@ -268,23 +266,25 @@ class SimpleRNN:
                     except:
                         symbols_out_onehot[i] = 0
                 #print(embedded_batch)
-                """
+
                 outputs = []
                 for word in self.training_data[sent_num+1][:-1]:
                     #itemindex = np.where(self.index2word== word)
                     #ind = itemindex[0][0]
                     #outputs.append(ind)
                     outputs.append(self.embedding_model.wv.vocab[word].index)
+                # padding
                 while (len(outputs) < max_size):
 
                     outputs.append(len(self.input_embedding_matrix)-2)
                 outputs = [outputs]
+                """
                 #symbols_out_onehot = np.reshape(symbols_out_onehot,[self.batch_size,-1])
 
                 #outputs = np.zeros([self.batch_size, self.n_input], dtype=int)
                 _, acc, loss, embedding_pred = session.run([self.optimizer, self.accuracy, self.cost, self.probas], \
-                                                        feed_dict={self.x: embedded_batch, self.y: targets, self.outputs: outputs,
-                                                                    self.decoder_lengths: [85]})
+                                                        feed_dict={self.x: embedded_batch, self.y: targets,
+                                                            self.decoder_lengths: [max_size]})
 
                 predictions = []
                 for prediction in embedding_pred[0]:
