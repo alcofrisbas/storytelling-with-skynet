@@ -220,6 +220,8 @@ class SimpleRNN:
             for i in range(23):
                 onehot_pred = session.run(self.probas, feed_dict={self.x: embedded_symbols})
                 onehot_pred = self.index2word[onehot_pred[0]]
+                if onehot_pred == "POS":
+                    continue
                 output_sent += " %s" % (onehot_pred)
                 embedded_symbols = embedded_symbols[0][1:]
                 embedded_symbols.append(self.embedding_model.wv.vocab[onehot_pred].index)
@@ -238,7 +240,7 @@ class SimpleRNN:
             saver = tf.train.Saver()
             saver.restore(session, tf.train.latest_checkpoint(self.path_to_model))
             while True:
-                prompt = "words: "
+                prompt = "write a sentence: "
                 input_sent = input(prompt)
                 input_sent = word_tokenize(input_sent)
                 embedded_symbols = []
@@ -258,12 +260,11 @@ class SimpleRNN:
                         onehot_pred = session.run(self.probas, feed_dict={self.x: embedded_symbols})
                         #print(onehot_pred)
                         onehot_pred = self.index2word[onehot_pred[0]]
+                        if onehot_pred == "POS":
+                            continue
                         output_sent +=  " %s" % (onehot_pred)
                         embedded_symbols = embedded_symbols[0][1:]
-                        if onehot_pred == "POS":
-                            embedded_symbols.append(len(self.input_embedding_matrix)-2)
-                        else:
-                            embedded_symbols.append(self.embedding_model.wv.vocab[onehot_pred].index)
+                        embedded_symbols.append(self.embedding_model.wv.vocab[onehot_pred].index)
                         embedded_symbols = [embedded_symbols]
                     print(output_sent)
                 except Exception as e:
