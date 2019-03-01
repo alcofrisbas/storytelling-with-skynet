@@ -35,10 +35,10 @@ display_step = 1000
 path_to_model = "simpleRNN/models/"
 model_name = "basic_model"
 
-# rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
+rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
 sess = tf.Session()
-# saver = tf.train.Saver()
-# saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
+saver = tf.train.Saver()
+saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
 
 
 ngram_root = ngram.load_model("./ngrams/models/5max200000.model")
@@ -211,8 +211,7 @@ def generatePrompt(curPrompt=""):
 def generateSuggestion(session, newSentence, mode):
     try:
         if mode == Mode.RNN.value:
-            #suggestion = rnn.generate_suggestion(session, newSentence)
-            suggestion = "placeholder"
+            suggestion = rnn.generate_suggestion(session, newSentence)
         elif mode == Mode.NGRAM.value:
             suggestion = ngram.generate_sentence(ngram_root, newSentence, m=2)
         else:
