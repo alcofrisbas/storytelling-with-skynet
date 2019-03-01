@@ -115,6 +115,13 @@ def generate_sentence(root:Trie, sent:str, l=200, m=3):
     return outSent
 
 
+def create_model(fname, model_name, depth=5, l=100000):
+    process_data(fname)
+    root = train(fname+".tkn",n=depth,l=50000)
+    save_model(model_name, root)
+    return root
+
+
 if __name__ == '__main__':
     process_data("./ngrams/dickens.txt")
     root = load_model("./ngrams/testRoot")
