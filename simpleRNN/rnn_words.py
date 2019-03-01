@@ -147,7 +147,7 @@ class SimpleRNN:
                     for word in batch:
                         # convert each word from string to one-hot vector
                         try:
-                            embedding = self.embedding_model.wv.vocab[word].index
+                            embedding = self.embedding_model.wv.vocab[word.lower()].index
                         except KeyError:
                             print(word + " not in vocabulary")
                             embedding = len(self.input_embedding_matrix)-3
@@ -209,12 +209,11 @@ class SimpleRNN:
     def generate_suggestion(self, session, sentence):
         sentence = sentence.strip()
         input_sent = word_tokenize(sentence)
-        print(input_sent)
         embedded_symbols = []
         try:
             for word in input_sent:
                 try:
-                    embedding = self.embedding_model.wv.vocab[word].index
+                    embedding = self.embedding_model.wv.vocab[word.lower()].index
                 except KeyError:
                     print(word + " not in vocabulary")
                     embedding = len(self.input_embedding_matrix)-3
@@ -229,7 +228,7 @@ class SimpleRNN:
                     continue
                 output_sent += " %s" % (onehot_pred)
                 embedded_symbols = embedded_symbols[0][1:]
-                embedded_symbols.append(self.embedding_model.wv.vocab[onehot_pred].index)
+                embedded_symbols.append(self.embedding_model.wv.vocab[onehot_pred.lower()].index)
                 embedded_symbols = [embedded_symbols]
 
             output_sent = output_sent.strip().capitalize()
@@ -252,7 +251,7 @@ class SimpleRNN:
                 try:
                     for word in input_sent:
                         try:
-                            embedding = self.embedding_model.wv.vocab[word].index
+                            embedding = self.embedding_model.wv.vocab[word.lower()].index
                         except KeyError:
                             print(word + " not in vocabulary")
                             embedding = len(self.input_embedding_matrix)-3
@@ -269,7 +268,7 @@ class SimpleRNN:
                             continue
                         output_sent +=  " %s" % (onehot_pred)
                         embedded_symbols = embedded_symbols[0][1:]
-                        embedded_symbols.append(self.embedding_model.wv.vocab[onehot_pred].index)
+                        embedded_symbols.append(self.embedding_model.wv.vocab[onehot_pred.lower()].index)
                         embedded_symbols = [embedded_symbols]
                     print(output_sent)
                 except Exception as e:

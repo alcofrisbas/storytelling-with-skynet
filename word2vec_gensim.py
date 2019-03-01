@@ -20,7 +20,14 @@ def create_embedding(training_file, root_path, model_name,n_hidden, min_count):
     file_content = read(training_file)
 
     #get list of sentences
-    sentences = [word_tokenize(t) for t in sent_tokenize(file_content)]
+    temp_sentences = [word_tokenize(t) for t in sent_tokenize(file_content)]
+    sentences = []
+    # set all words to lowercase
+    for sent in temp_sentences:
+        sent_to_append = []
+        for word in sent:
+            sent_to_append.append(word.lower())
+        sentences.append(sent_to_append)
 
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
