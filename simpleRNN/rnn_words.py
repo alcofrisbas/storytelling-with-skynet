@@ -224,7 +224,7 @@ class SimpleRNN:
             for i in range(23):
                 onehot_pred = session.run(self.probas, feed_dict={self.x: embedded_symbols})
                 onehot_pred = self.index2word[onehot_pred[0]]
-                if onehot_pred == "POS":
+                if onehot_pred == "PAD":
                     continue
                 output_sent += " %s" % (onehot_pred)
                 embedded_symbols = embedded_symbols[0][1:]
@@ -264,7 +264,7 @@ class SimpleRNN:
                         onehot_pred = session.run(self.probas, feed_dict={self.x: embedded_symbols})
                         #print(onehot_pred)
                         onehot_pred = self.index2word[onehot_pred[0]]
-                        if onehot_pred == "POS":
+                        if onehot_pred == "PAD":
                             continue
                         output_sent +=  " %s" % (onehot_pred)
                         embedded_symbols = embedded_symbols[0][1:]

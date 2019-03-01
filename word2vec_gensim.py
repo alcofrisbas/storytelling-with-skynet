@@ -62,13 +62,14 @@ def create_embedding(training_file, root_path, model_name,n_hidden, min_count):
     #add special tokens to the vocab
     for word in model.wv.index2word:
         writer.writerow([word])
+    writer.writerow(["GO"])
     writer.writerow(["UNK"])
-    writer.writerow(["POS"])
+    writer.writerow(["PAD"])
 
 
     # convert the wv word vectors into a numpy matrix that is suitable for insertion
     # into our TensorFlow model
-    embedding_matrix = np.zeros((vocab_size + 2, vector_dim))
+    embedding_matrix = np.zeros((vocab_size + 3, vector_dim))
     for i in range(vocab_size):
         embedding_vector = model.wv[model.wv.index2word[i]]
         if embedding_vector is not None:
