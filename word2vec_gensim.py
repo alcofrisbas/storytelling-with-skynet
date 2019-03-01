@@ -81,7 +81,7 @@ def create_embedding(training_file, root_path, model_name,n_hidden, min_count):
     saved_embeddings = tf.constant(embedding_matrix)
     embedding = tf.Variable(initial_value=saved_embeddings, trainable=False)
 
-    output_embedding_matrix = np.zeros((vocab_size +2, vector_dim))
+    output_embedding_matrix = np.zeros((vocab_size +3, vector_dim))
     for i in range(vocab_size):
         output_embedding_vector = model.syn1neg[i]
         output_embedding_matrix[i] = output_embedding_vector
