@@ -60,9 +60,6 @@ if __name__ == '__main__':
     if args.batch_size:
         batch_size = int(args.batch_size)
     if args.to_train:
-        if args.to_train == "True":
-            to_train = True
-        else:
-            to_train = False
+        to_train = True
 
     train(training_file,"simpleRNN/models/", model_name, n_hidden, min_count, learning_rate, training_iters, n_input, batch_size, to_train)
