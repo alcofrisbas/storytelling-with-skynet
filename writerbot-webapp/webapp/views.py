@@ -35,13 +35,17 @@ display_step = 1000
 path_to_model = "simpleRNN/models/"
 model_name = "basic_model"
 
-# rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
+rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
 sess = tf.Session()
-# saver = tf.train.Saver()
-# saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
+saver = tf.train.Saver()
+saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
 
 
 ngram_root = ngram.load_model("./ngrams/models/5max200000.model")
+if not os.path.isfile("./ngrams/models/lewis_model"):
+    prompt_ngram = create_model("./saves/all_of_lewis.txt","./ngrams/models/lewis_model", l=1000000)
+else:
+    prompt_ngram = ngram.load_model("./ngrams/models/lewis_model")
 
 #TODO: when user logs in, redirect to the page they logged in from
 #TODO: figure out how to clear empty stories and expired session data
@@ -143,6 +147,10 @@ def write(request):
             story.title = request.POST["title"]
             story.save()
 
+        if request.POST.get("re-prompt"):
+            story.prompt = generatePrompt()
+            story.save()
+
         # same functionality as "Start a new story" button
         if request.POST.get("new"):
             return redirect('/new_story')
@@ -197,22 +205,22 @@ def logout(request):
 
 
 def generatePrompt(curPrompt=""):
-    adj = ADJECTIVES[random.randrange(0, len(ADJECTIVES))]
-    noun = ANIMALS[random.randrange(0, len(ANIMALS))].lower()
-    curTopic = curPrompt
-    while curTopic == curPrompt:
-        if adj[0] in 'aeiou':
-            curTopic = "Write about an {} {}".format(adj, noun)
-        else:
-            curTopic = "Write about a {} {}".format(adj, noun)
+    # adj = ADJECTIVES[random.randrange(0, len(ADJECTIVES))]
+    # noun = ANIMALS[random.randrange(0, len(ANIMALS))].lower()
+    # curTopic = curPrompt
+    # while curTopic == curPrompt:
+    #     if adj[0] in 'aeiou':
+    #         curTopic = "Write about an {} {}".format(adj, noun)
+    #     else:
+    #         curTopic = "Write about a {} {}".format(adj, noun)
+    curTopic = ngram.generate_sentence(prompt_ngram, "STOP")
     return curTopic
 
 
 def generateSuggestion(session, newSentence, mode):
     try:
         if mode == Mode.RNN.value:
-            #suggestion = rnn.generate_suggestion(session, newSentence)
-            suggestion = "placeholder"
+            suggestion = rnn.generate_suggestion(session, newSentence)
         elif mode == Mode.NGRAM.value:
             suggestion = ngram.generate_sentence(ngram_root, newSentence, m=2)
         else:

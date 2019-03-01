@@ -116,12 +116,13 @@ i {
 /* make this better */
 .suggestion-sentence {
     color: #007bff;
-    background-color: #f0f0f0;
+    /* background-color: #f0f0f0;
     border-radius: 3px;
     border: 2px solid;
-    border-color: #f0f0f0;
-    width:100%;
+    border-color: #f0f0f0; */
+    width: 100%;
     display: block;
+    /* text-align: right; */
     /* -moz-box-shadow:    1px 1px 1px 1px #ccc;
     -webkit-box-shadow: 1px 1px 1px 1px #ccc;
     box-shadow:         1px 1px 1px 1px #ccc; */
