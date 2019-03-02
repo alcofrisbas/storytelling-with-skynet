@@ -33,7 +33,7 @@ class Mode(Enum):
 args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000, "training_file": "simpleRNN/data/train.txt"}
 display_step = 1000
 path_to_model = "simpleRNN/models/"
-model_name = "dickens_model"
+model_name = "great_expectations.model"
 
 print("instantiating RNN")
 rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
@@ -44,8 +44,10 @@ print("loading saved RNN from " + rnn.path_to_model)
 saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
 
 print("loading saved ngram")
-ngram_model = ngram.NGRAM_model("./simpleRNN/data/all_of_dickens.txt", "dickens_model", "./ngrams/models")
-prompt_model = ngram.NGRAM_model("./simpleRNN/data/all_of_dickens.txt", "dickens_model", "./ngrams/models")
+
+ngram_model = ngram.NGRAM_model("./saves/all_of_lewis.txt", "lewis_model2", "./ngrams/models")
+prompt_model = ngram.NGRAM_model("./saves/all_of_lewis.txt", "lewis_model2", "./ngrams/models")
+
 
 ngram_model.m = 2
 ngram_model.high = 100
