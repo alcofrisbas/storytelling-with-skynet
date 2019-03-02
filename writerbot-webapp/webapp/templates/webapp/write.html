@@ -35,11 +35,11 @@
         <form method="post" id="title-form">
                 {% csrf_token %}
             <input id="title-input" type="text" name="title" value="{{ title }}" class="mt-5">
-            <hr class="my-2">
-            {% if prompt %}
-            <h5> Prompt: {{ prompt }} <button type="submit" class="btn btn-sm btn-outline-primary" name="re-prompt" id="re-prompt" value="true"><i class="fas fa-redo fa-xs"></i></button></h5>
-            {% endif %}
-        </form>
+
+        <hr class="my-2">
+        {% if prompt %}
+        <h5> Prompt: {{ prompt }} <button type="submit" class="btn btn-sm btn-outline-primary" name="re-prompt" id="re-prompt" value="true"><i class="fas fa-redo fa-xs"></i></button></h5>
+        {% endif %}
         {% if sentences %}
         <!-- <p id = "para" style="padding:1px" contenteditable="{{ contentEdit }}"> -->
             <p>
