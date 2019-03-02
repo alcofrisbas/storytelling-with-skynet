@@ -69,6 +69,7 @@ if __name__ == '__main__':
     if args.batch_size:
         batch_size = int(args.batch_size)
     if args.to_train:
+        print("training")
         to_train = True
     if args.seq2seq:
         use_seq2seq = True
