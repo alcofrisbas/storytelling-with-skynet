@@ -137,15 +137,16 @@ function update_settings(mode){
 
 $("#settingsModal").on('show.bs.modal', function(){
     var m = $(this).closest(".modal").attr("mode");
+    $("#"+m+"_mode").prop('checked', true);
     $('.to-hide').hide();
-    $("#"+m+"-settings-content").show();
-    $("#"+m+"-settings-title").show();
+    $("#"+m+"-settings-content").show('slow');
+    $("#"+m+"-settings-title").show('slow');
 });
 
 $(function() {
     $("[name=mode]").click(function(){
         $('.to-hide').hide();
-        $("#"+$(this).val()+"-settings-content").show();
-        $("#"+$(this).val()+"-settings-title").show();
+        $("#"+$(this).val()+"-settings-content").show('slow');
+        $("#"+$(this).val()+"-settings-title").show('slow');
     });
  });

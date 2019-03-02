@@ -42,7 +42,7 @@ args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.
 display_step = 1000
 path_to_model = "simpleRNN/models/"
 path_to_seq2seq_model = "simpleRNN/seq2seq_models/"
-model_name = "basic_model"
+model_name = "great_expectations.model"
 
 print("instantiating RNN")
 rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
@@ -52,11 +52,11 @@ saver = tf.train.Saver()
 print("loading saved RNN from " + rnn.path_to_model)
 saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
 
-seq2seq_rnn = seq2seqRNN(args_dict, display_step, path_to_seq2seq_model, model_name, False)
-print("loading saved seq2seqRNN from " + seq2seq_rnn.path_to_model)
-seq2seq_sess = tf.Session()
-seq2seq_saver = tf.train.Saver()
-saver.restore(seq2seq_sess, tf.train.latest_checkpoint(seq2seq_rnn.path_to_model))
+# seq2seq_rnn = seq2seqRNN(args_dict, display_step, path_to_seq2seq_model, model_name, False)
+# print("loading saved seq2seqRNN from " + seq2seq_rnn.path_to_model)
+# seq2seq_sess = tf.Session()
+# seq2seq_saver = tf.train.Saver()
+# saver.restore(seq2seq_sess, tf.train.latest_checkpoint(seq2seq_rnn.path_to_model))
 
 print("loading saved ngram")
 ngram_model = ngram.NGRAM_model("./ngrams/models")
