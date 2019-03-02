@@ -52,10 +52,18 @@ ngram_model.high = 100
 prompt_model.m = 2
 
 if not os.path.isfile(ngram_model.model_path+"/"+ngram_model.model_name):
+<<<<<<< HEAD
     prompt_model.create_model()
     prompt_model.create_model()
+=======
+    ngram_model.create_model()
+>>>>>>> 5189a7665e182fcea0ff33a9758c65175d47de3f
 else:
     ngram_model.load_model()
+
+if not os.path.isfile(prompt_model.model_path+"/"+prompt_model.model_name):
+    prompt_model.create_model()
+else:
     prompt_model.load_model()
 
 #TODO: when user logs in, redirect to the page they logged in from
