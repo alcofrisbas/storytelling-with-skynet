@@ -197,17 +197,24 @@ class NGRAM_model:
             outSent = outSent[:-1]
         ind = 0
         s = ""
+        cap = False
         while ind < len(outSent):
             if outSent[ind] == " ":
                 if ind < len(outSent)-1 and outSent[ind+1].isalnum():
                     s += " "
             else:
-                s += outSent[ind]
+                if outSent[ind].isalpha() and not cap:
+                    s += outSent[ind].upper()
+                    cap = True
+                else:
+                    s += outSent[ind]
             ind += 1
         s = '"'.join(s.split('""'))
         s = "n't".join(s.split(" n't"))
         if s[-1] not in "?!":
             s += "."
+        if s[0] == "'":
+            s = s[1:]
         return s
 
     def generate_with_constraints(self, sent:str):
