@@ -27,17 +27,20 @@ from enum import Enum
 
 class Mode(Enum):
      RNN = 0
-     NGRAM = 1
-     NONE = 2
+     SEQ2SEQ = 1
+     NGRAM = 2
+     NONE = 3
 
 class PromptMode(Enum):
-    LEWIS = 0
-    NONE = 1
+    SIMPLE = 0
+    LEWIS = 1
+    DICKENS = 2
+    NONE = 3
 
 args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000, "training_file": "simpleRNN/data/train.txt"}
 display_step = 1000
 path_to_model = "simpleRNN/models/"
-model_name = "great_expectations.model"
+model_name = "basic_model"
 
 print("instantiating RNN")
 rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
@@ -226,16 +229,18 @@ def logout(request):
 
 
 def generatePrompt(prompt_mode):
-    # adj = ADJECTIVES[random.randrange(0, len(ADJECTIVES))]
-    # noun = ANIMALS[random.randrange(0, len(ANIMALS))].lower()
-    # curTopic = curPrompt
-    # while curTopic == curPrompt:
-    #     if adj[0] in 'aeiou':
-    #         curTopic = "Write about an {} {}".format(adj, noun)
-    #     else:
-    #         curTopic = "Write about a {} {}".format(adj, noun)
-    if int(prompt_mode) == PromptMode.LEWIS.value:
+    if int(prompt_mode) == PromptMode.SIMPLE.value:
+        adj = ADJECTIVES[random.randrange(0, len(ADJECTIVES))]
+        noun = ANIMALS[random.randrange(0, len(ANIMALS))].lower()
+        if adj[0] in 'aeiou':
+            prompt = "Write about an {} {}".format(adj, noun)
+        else:
+            prompt = "Write about a {} {}".format(adj, noun)
+    elif int(prompt_mode) == PromptMode.LEWIS.value:
         prompt_model.set_model("lewis_model2")
+        prompt = prompt_model.generate_with_constraints("STOP")
+    elif int(prompt_mode) == PromptMode.DICKENS.value:
+        prompt_model.set_model("dickens_model")
         prompt = prompt_model.generate_with_constraints("STOP")
     elif int(prompt_mode) == PromptMode.NONE.value:
         prompt = ""
@@ -249,6 +254,8 @@ def generateSuggestion(session, newSentence, mode):
     try:
         if int(mode) == Mode.RNN.value:
             suggestion = rnn.generate_suggestion(session, newSentence)
+        elif int(mode) == Mode.SEQ2SEQ.value:
+            suggestion = "Seq2Seq model not integrated yet."
         elif int(mode) == Mode.NGRAM.value:
             suggestion = ngram_model.generate_with_constraints(newSentence)
         elif int(mode) == Mode.NONE.value:
