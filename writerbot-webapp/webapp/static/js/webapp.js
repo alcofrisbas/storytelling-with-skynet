@@ -96,7 +96,7 @@ window.onload = load;
 
 $(document).ready(function(){
   $('[data-toggle="tooltip"]').tooltip();
-  document.getElementById('input-form').scrollIntoView(false);
+  document.getElementById('input-button').scrollIntoView(false);
 });
 
 
@@ -108,6 +108,14 @@ $("#input-form").keydown(function(event)
         event.preventDefault();
         $("#input-form").submit();
         document.getElementById('input-form').focus();
+    }
+});
+
+$("#input-textarea").keydown(function(event)
+{
+    if (event.keyCode == 13)
+    {
+        event.preventDefault();
     }
 });
 

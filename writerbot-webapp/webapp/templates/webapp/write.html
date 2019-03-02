@@ -51,15 +51,15 @@
             </p>
             <form method="post" id="input-form">
                 {% csrf_token %}
-                <textarea name="text" class="form-control {% if suggestion %} suggestion-sentence {% endif %}" autofocus>{{ suggestion }}</textarea><br>
-                <button type="submit" class="btn {% if suggestion %} btn-success {% else %} btn-primary {% endif %} btn-lg">Add {% if suggestion %} Suggestion {% else %} Sentence {% endif %}</button>
+                <textarea name="text" id="input-textarea" class="form-control {% if suggestion %} suggestion-sentence {% endif %}" autofocus>{{ suggestion }}</textarea><br>
+                <button type="submit" id="input-button" class="btn {% if suggestion %} btn-success {% else %} btn-primary {% endif %} btn-lg">Add {% if suggestion %} Suggestion {% else %} Sentence {% endif %}</button>
             </form><br>
         {% else %}
             <br>
             <form method="post" id="input-form">
                 {% csrf_token %}
-                <textarea name="text" class="form-control" placeholder="Start writing here"></textarea><br>
-                <button type="submit" class="btn btn-primary btn-lg">Add Sentence</button>
+                <textarea name="text" id="input-textarea" class="form-control" placeholder="Start writing here"></textarea><br>
+                <button type="submit" id="input-button" class="btn btn-primary btn-lg">Add Sentence</button>
             </form><br>
         {% endif %}
 
