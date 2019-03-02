@@ -33,8 +33,9 @@ if __name__ == '__main__':
     parser.add_argument("--training-iters", "-i", action="store")
     parser.add_argument("--n_input", "-p", action="store")
     parser.add_argument("--batch-size", "-b", action="store")
-    parser.add_argument("--to-train", "-r", action="store")
-    parser.add_argument("--seq2seq", "-s", action="store")
+    parser.add_argument("--to-train", "-r", action="store_true")
+    parser.add_argument("--seq2seq", "-s", action="store_true")
+    parser.add_argument("--directory", "-d", action="store")
 
 
     training_file="simpleRNN/data/all_of_dickens1.txt"
@@ -72,6 +73,8 @@ if __name__ == '__main__':
     if args.seq2seq:
         use_seq2seq = True
         model_loc = "simpleRNN/seq2seq_models/"
+    if args.directory:
+        model_loc = args.directory
 
 
     train(training_file, model_loc, model_name, n_hidden, min_count, learning_rate, training_iters, n_input, batch_size, to_train, use_seq2seq)
