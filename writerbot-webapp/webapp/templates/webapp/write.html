@@ -37,7 +37,9 @@
             <input id="title-input" type="text" name="title" value="{{ title }}" class="mt-5">
 
         <hr class="my-2">
+        {% if prompt %}
         <h5> Prompt: {{ prompt }} <button type="submit" class="btn btn-sm btn-outline-primary" name="re-prompt" id="re-prompt" value="true"><i class="fas fa-redo fa-xs"></i></button></h5>
+        {% endif %}
         {% if sentences %}
         <!-- <p id = "para" style="padding:1px" contenteditable="{{ contentEdit }}"> -->
             <p>
@@ -135,9 +137,9 @@
                                     <label for="prompt_mode">Prompts:</label>
                                 </div>
                                 <div class="col-sm">
-                                        <select id="prompt_mode">
-                                          <option>Lewis Carroll</option>
-                                          <option>No prompt</option>
+                                        <select id="prompt_mode" name="prompt_mode">
+                                          <option value="lewis_carroll_prompt" {% if prompt %} selected {% endif %}>Lewis Carroll</option>
+                                          <option value="no_prompt" {% if not prompt %} selected {% endif %}>No prompt</option>
                                         </select>
                                 </div>
                                 <div class="col-sm">

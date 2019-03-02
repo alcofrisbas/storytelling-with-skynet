@@ -183,6 +183,14 @@ def write(request):
             request.session["mode"] = Mode.NGRAM.value
         elif request.POST.get('mode') == "none_mode":
             request.session["mode"] = Mode.NONE.value
+
+        if request.POST.get('prompt_mode') == "no_prompt":
+            story.prompt = ""
+            story.save()
+        elif story.prompt == "":
+            story.prompt = generatePrompt()
+            story.save()
+
     elif request.GET.get("new"):
         return redirect('/new_story')
     else:
