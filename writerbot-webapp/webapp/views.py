@@ -42,7 +42,7 @@ args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.
 display_step = 1000
 path_to_model = "simpleRNN/models/"
 path_to_seq2seq_model = "simpleRNN/seq2seq_models/"
-model_name = "basic_model"
+model_name = "great_expectations.model"
 
 print("instantiating RNN")
 rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)

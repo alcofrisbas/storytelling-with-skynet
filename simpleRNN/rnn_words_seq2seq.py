@@ -42,7 +42,6 @@ class SimpleRNN:
         # Text file containing words for training
         self.training_file = d["training_file"]
         # training .txt file
-
         self.training_data = self.read_data(self.training_file)
         self.output_seq_length = len(self.training_data[1]) - 1
         print("Loaded training data...")

@@ -25,8 +25,6 @@ def create_embedding(training_file, root_path, model_name,n_hidden, min_count):
     # set all words to lowercase
     max = 0
     for sent in temp_sentences:
-        if max < len(sent):
-            max = len(sent)
         sent_to_append = []
         for word in sent:
             sent_to_append.append(word.lower())

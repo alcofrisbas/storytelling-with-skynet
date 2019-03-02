@@ -24,7 +24,7 @@
         value="true" name="export" id="side-export">
         <i class="fas fa-file-export"></i>
     </button>
-    <span data-toggle="modal" data-target="#settingsModal" data-target="#id" onclick="update_settings({{ story.mode }});change_setting_text()">
+    <span data-toggle="modal" data-target="#settingsModal" data-target="#id" >
         <button class="side-btn" type="button" data-toggle="tooltip" data-placement="right" title="Settings"
             value="true" name="side-settings" id="side-settings">
             <i class="fas fa-cog"></i></button>
@@ -94,7 +94,7 @@
           </div>
         </div>
 
-        <div class="modal fade" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="settingsModalLabel" aria-hidden="true">
+        <div class="modal fade" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="settingsModalLabel" aria-hidden="true" mode="{{story.mode}}">
           <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -107,54 +107,54 @@
                   {% csrf_token %}
                   <div class="modal-body">
                       <div class="container-fluid">
-                            <div class="row">
-                                 <div class="col-sm">
-                                     <label for="prompt_mode">Suggestion algorithm:</label>
-                                  </div>
-                                  <div class="col-sm">
-                                      <div class="form-group">
-                                          <!-- <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="mode" id="rnn_mode" value=0 {% if story.mode == "0" %} checked {% endif %}>
-                                            <label class="form-check-label" for="rnn_mode">RNN</label>
-                                          </div>
-                                          <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="mode" id="ngram_mode" value=1 {% if story.mode == "1" %} checked {% endif %}>
-                                            <label class="form-check-label" for="ngram_mode">N-Gram</label>
-                                          </div>
-                                          <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="mode" id="none_mode" value=2 {% if story.mode == "2" %} checked {% endif %}>
-                                            <label class="form-check-label" for="none_mode">No suggestions</label>
-                                          </div> -->
-                                          {% for name, val in modes %}
-                                              <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="mode" id="{{ name }}_mode" value="{{ val }}" {% if story.mode == val|stringformat:"i" %} checked {% endif %}>
-                                                <label class="form-check-label" for="{{ name }}_mode">{{name}}</label>
-                                              </div>
-                                          {% endfor %}
-                                      </div>
-                                  </div>
-                                  <div class="col-sm">
-                                      <h5 id="rnn-settings-title" class="card-title">RNN</h5>
-                                      <h5 id="ngram-settings-title" class="card-title">N-Gram</h5>
-                                      <h5 id="none-settings-title" class="card-title">No Suggestions</h5>
-                                      <p class="card-text" id="rnn-settings-content" >This is about an RNN</p>
-                                      <p class="card-text" id="ngram-settings-content" >This is about N-Grams</p>
-                                      <p class="card-text" id="none-settings-content" >This is about nothing</p>
-                                  </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm">
-                                    <label for="prompt_mode">Prompts:</label>
+                          <div class="row">
+                                <div class="col-md-8">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label for="prompt_mode">Suggestion algorithm:</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                {% for name, val in modes %}
+                                                    <div class="form-check">
+                                                      <input class="form-check-input" type="radio" name="mode" id="{{ val }}_mode" value="{{ val }}" {% if story.mode == val|stringformat:"i" %} checked {% endif %}>
+                                                      <label class="form-check-label" for="{{ val }}_mode">{{name}}</label>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label for="prompt_mode">Prompts:</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <select id="prompt_mode" name="prompt_mode" datatoggle="tooltip" title="source for intital story prompt">
+                                                {% for name, val in prompt_modes %}
+                                                  <option value="{{ val }}" {% if story.prompt_mode == val|stringformat:"i" %} selected {% endif %}>{{ name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-sm">
-                                        <select id="prompt_mode" name="prompt_mode">
-                                            {% for name, val in prompt_modes %}
-                                              <option value="{{ val }}" {% if story.prompt_mode == val|stringformat:"i" %} selected {% endif %}>{{ name }}</option>
-                                            {% endfor %}
-                                        </select>
-                                </div>
-                                <div class="col-sm">
-                                    Which author do you want prompts to be drawn from?
+                                <div class="col-md-4">
+                                    <div>
+                                        {% for name, val in modes %}
+                                            {%if val == 0 %}
+                                                <h5 id="{{ val }}-settings-title" class="card-title to-hide">RNN</h5>
+                                                <p class="card-text to-hide" id="{{val}}-settings-content" >This is about an RNN</p>
+                                            {% elif val == 1 %}
+                                                <h5 id="{{val}}-settings-title" class="card-title to-hide">Seq2Seq</h5>
+                                                <p class="card-text to-hide" id="{{val}}-settings-content" >This is about seq2seq</p>
+                                            {% elif val == 2 %}
+                                                <h5 id="{{val}}-settings-title" class="card-title to-hide">N-Gram</h5>
+                                                <p class="card-text to-hide" id="{{val}}-settings-content" >This is about N-Grams</p>
+                                            {% elif val == 3 %}
+                                                <h5 id="{{val}}-settings-title" class="card-title to-hide">No Suggestions</h5>
+                                                <p class="card-text to-hide" id="{{val}}-settings-content" >This is about nothing</p>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
                                 </div>
                             </div>
                   </div>
