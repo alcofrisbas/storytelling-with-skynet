@@ -86,122 +86,139 @@ def process_data(fname):
     with open(fname+".tkn" , 'w') as w:
         w.write(" ".join(sList))
 
+class NGRAM_model:
+    def __init__(self, training_file, model_name, model_path):
+        self.root = Trie("*")
+        self.training_file = training_file
+        self.model_name = model_name
+        self.model_path = model_path
+        self.depth = 5
+        self.l = 200000
+        self.display_step = 2000
+        self.checkpoints = False
+        self.chkpt_step = 100000
+        self.m = 2
+        self.sent_length = 200
+        self.low = 10
+        self.high = 75
 
-def train(fname, n=5, l=200000,display_step=2000):
-    """
-    trains a ngram trie
-    l: max iters
-    n: depth
-    display_step: change freq of print statements
-    """
-    with open(fname) as r:
-        s = r.read(1000000)
-    print("done reading files")
-    words = s.split()
-    words = [w.lower() if w != 'STOP' else w for w in words ]
-    root = Trie("*")
-    print("starting trie construction")
-    start = time.time()
-    for i in range(len(words)-n):
-        add(root,words[i:i+n])
-        if i%display_step == 0:
-            now = time.time()-start
-            rate = float(i)/now
-            print("{} substrings processed at {}".format(str(i), str(rate)))
+    def train(self):
+        """
+        trains a ngram trie
+        l: max iters
+        n: depth
+        display_step: change freq of print statements
+        """
+        with open(self.training_file) as r:
+            s = r.read(5000000)
+        print("done reading files")
+        words = s.split()
+        words = [w.lower() if w != 'STOP' else w for w in words ]
+        root = Trie("*")
+        print("starting trie construction")
+        start = time.time()
+        for i in range(len(words)-n):
+            add(root,words[i:i+n])
+            if i%self.display_step == 0:
+                now = time.time()-start
+                rate = float(i)/now
+                print("{} substrings processed at {}".format(str(i), str(rate)))
+            if self.checkpoints and i % self.chkpt_step == 0:
+                pass#save_model()
+            if i > l:
+                break
 
-        if i > l:
-            break
-    return root
+        return root
 
-def save_model(fname, model):
-    """
-    pickles a model to a file
-    """
-    with open(fname,'wb') as p:
-        pickle.dump(model, p)
+    def save_model(self):
+        """
+        pickles a model to a file
+        """
+        with open(self.model_path+"/"+self.model_name,'wb') as p:
+            pickle.dump(self.root, p)
 
-def load_model(fname):
-    """
-    loads a pickled model;
-    way faster than retraining
-    """
-    with open(fname, 'rb') as r:
-        root = pickle.load(r, fix_imports=True, encoding='bytes')
-    return root
+    def load_model(self):
+        """
+        loads a pickled model;
+        way faster than retraining
+        """
+        with open(self.model_path+"/"+self.model_name, 'rb') as r:
+            self.root = pickle.load(r, fix_imports=True, encoding='bytes')
 
-def generate_sentence(root:Trie, sent:str, l=200, m=3):
-    """
-    Generates a whole sentence
-    l: max length of sentence
-    m: gram depth
-    """
-    if sent[-1] == ".":
-        sent = sent[:-1]+ " STOP"
-    sentence = word_tokenize(sent)
-    cut = len(sentence)
-    for i in range(l):
-        next = predict_next(root, sentence[-m:])
-        sentence.append(next)
-        if sentence[-1] == "STOP":
-            break
-    for i in range(len(sentence)):
-        if sentence[i] == "i":
-            sentence[i] = "I"
-    outSent = " ".join([str(word) for word in sentence[cut:-1]])+"."
-    outSent = outSent[0].upper()+outSent[1:]
-    outSent = outSent.strip().replace('“','').replace('”','').replace('`',"'").replace('"','')
-    # ensure there's only one period at the end of the sentence
-    if len(outSent) <= 1:
-        outSent = generate_sentence(root, sent, l=l, m=3)
-    return format_sent(outSent)
+    def generate_sentence(self, sent:str):
+        """
+        Generates a whole sentence
+        l: max length of sentence
+        m: gram depth
+        """
+        if sent[-1] == ".":
+            sent = sent[:-1]+ " STOP"
+        sentence = word_tokenize(sent)
+        cut = len(sentence)
+        for i in range(self.sent_length):
+            next = predict_next(self.root, sentence[-self.m:])
+            sentence.append(next)
+            if sentence[-1] == "STOP":
+                break
+        for i in range(len(sentence)):
+            if sentence[i] == "i":
+                sentence[i] = "I"
+        outSent = " ".join([str(word) for word in sentence[cut:-1]])+"."
+        outSent = outSent[0].upper()+outSent[1:]
+        outSent = outSent.strip().replace('“','').replace('”','').replace('`',"'").replace('"','')
+        # ensure there's only one period at the end of the sentence
+        if len(outSent) <= 1:
+            outSent = self.generate_sentence(sent)
+        return self.format_sent(outSent)
 
-def format_sent(outSent):
-    while outSent[-1] == ".":
-        outSent = outSent[:-1]
-    ind = 0
-    s = ""
-    while ind < len(outSent):
-        if outSent[ind] == " ":
-            if ind < len(outSent)-1 and outSent[ind+1].isalnum():
-                s += " "
-        else:
-            s += outSent[ind]
-        ind += 1
-    s = '"'.join(s.split('""'))
-    s = "n't".join(s.split(" n't"))
+    def format_sent(self, outSent):
+        while outSent[-1] == ".":
+            outSent = outSent[:-1]
+        ind = 0
+        s = ""
+        while ind < len(outSent):
+            if outSent[ind] == " ":
+                if ind < len(outSent)-1 and outSent[ind+1].isalnum():
+                    s += " "
+            else:
+                s += outSent[ind]
+            ind += 1
+        s = '"'.join(s.split('""'))
+        s = "n't".join(s.split(" n't"))
 
-    return s+"."
+        return s+"."
 
-def generate_with_constraints(root:Trie, sent:str, l=200, m=3, low=10, high=75):
-    s = ""
-    while len(s)< low or len(s) > high:
-        s = generate_sentence(root, "STOP",m=m)
-    return s
+    def generate_with_constraints(self, sent:str):
+        s = ""
+        while len(s)< self.low or len(s) > self.high:
+            s = self.generate_sentence(sent)
+        return s
 
 
-def create_model(fname, model_name, depth=5, l=100000):
-    """
-    slams a whole bunch of methods together so
-    you can call one function to create, save, and
-    return a model.
-    """
-    process_data(fname)
-    root = train(fname+".tkn",n=depth,l=l)
-    save_model(model_name, root)
-    return root
+    def create_model(self):
+        """
+        slams a whole bunch of methods together so
+        you can call one function to create, save, and
+        return a model.
+        """
+        process_data(self.training_file)
+        self.train(self.training_file+".tkn")
+        self.save_model()
+        return root
 
 
 if __name__ == '__main__':
-    process_data("./ngrams/dickens.txt")
-    root = load_model("./ngrams/testRoot")
-    #root = train("./ngrams/dickens.txt.tkn",l=50000)
-    save_model("./ngrams/testRoot",root)
-
-    sent = input("enter a sentence: ").lower()
-    # cap length of sentence
-    l = 200
-    # n-gram... after 3, it parrots
-    m = 3
-    while sent != "quit":
-        print (generate_sentence(root, sent,m=3))
-        sent = input("enter a sentence: ").lower()
+    # process_data("./ngrams/dickens.txt")
+    # root = load_model("./ngrams/testRoot")
+    # #root = train("./ngrams/dickens.txt.tkn",l=50000)
+    # save_model("./ngrams/testRoot",root)
+    #
+    # sent = input("enter a sentence: ").lower()
+    # # cap length of sentence
+    # l = 200
+    # # n-gram... after 3, it parrots
+    # m = 3
+    # while sent != "quit":
+    #     print (generate_sentence(root, sent,m=3))
+    #     sent = input("enter a sentence: ").lower()
+    pass

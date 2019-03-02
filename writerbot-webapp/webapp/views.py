@@ -44,11 +44,19 @@ print("loading saved RNN from " + rnn.path_to_model)
 saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
 
 print("loading saved ngram")
-ngram_root = ngram.load_model("./ngrams/models/5max200000.model")
+ngram_model = ngram.NGRAM_model("./saves/all_of_lewis.txt", "lewis_model", "./ngrams/models")
+prompt_model = ngram.NGRAM_model("./saves/all_of_lewis.txt", "lewis_model", "./ngrams/models")
+
+ngram_model.m = 2
+ngram_model.high = 100
+prompt_model.m = 2
+
 if not os.path.isfile("./ngrams/models/lewis_model"):
-    prompt_ngram = ngram.create_model("./saves/all_of_lewis.txt","./ngrams/models/lewis_model", l=1000000)
+    prompt_model.create_model("./saves/all_of_lewis.txt","./ngrams/models/lewis_model")
+    prompt_model.create_model("./saves/all_of_lewis.txt","./ngrams/models/lewis_model")
 else:
-    prompt_ngram = ngram.load_model("./ngrams/models/lewis_model")
+    ngram_model.load_model()
+    prompt_model.load_model()
 
 #TODO: when user logs in, redirect to the page they logged in from
 #TODO: figure out how to clear empty stories and expired session data
@@ -216,7 +224,7 @@ def generatePrompt(curPrompt=""):
     #         curTopic = "Write about an {} {}".format(adj, noun)
     #     else:
     #         curTopic = "Write about a {} {}".format(adj, noun)
-    curTopic = ngram.generate_with_constraints(prompt_ngram, "STOP")
+    curTopic = prompt_model.generate_with_constraints("STOP")
     return curTopic
 
 
@@ -225,7 +233,7 @@ def generateSuggestion(session, newSentence, mode):
         if mode == Mode.RNN.value:
             suggestion = rnn.generate_suggestion(session, newSentence)
         elif mode == Mode.NGRAM.value:
-            suggestion = ngram.generate_with_constraints(ngram_root, newSentence, m=2)
+            suggestion = ngram_model.generate_with_constraints(newSentence)
         else:
             suggestion="placeholder"
     except Exception as e:
