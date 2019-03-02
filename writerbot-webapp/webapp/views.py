@@ -158,7 +158,7 @@ def write(request):
             story.title = request.POST["title"]
             story.save()
 
-        if request.POST.get("re-prompt") == True:
+        if request.POST.get("re-prompt"):
             story.prompt = generatePrompt()
             story.save()
 
