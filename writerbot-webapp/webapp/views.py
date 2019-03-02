@@ -51,16 +51,15 @@ print("loading saved ngram")
 ngram_model = ngram.NGRAM_model("./ngrams/models")
 prompt_model = ngram.NGRAM_model("./ngrams/models")
 ngram_model.create_model("lewis_model2")
-ngram_model.create_model("dickens_model")
+ngram_model.create_model("dickens_model", "./simpleRNN/data/all_of_dickens.txt")
 ngram_model.set_model("lewis_model2")
+
 prompt_model.create_model("lewis_model2")
+ngram_model.create_model("dickens_model", "./simpleRNN/data/all_of_dickens.txt")
 prompt_model.set_model("lewis_model2")
 ngram_model.m = 2
 ngram_model.high = 100
-
 prompt_model.m = 2
-
-
 
 
 #TODO: when user logs in, redirect to the page they logged in from
@@ -188,9 +187,10 @@ def write(request):
             story.save()
 
         if request.POST.get('prompt_mode'):
-            story.prompt_mode = request.POST['prompt_mode']
-            story.prompt = generatePrompt(story.prompt_mode)
-            story.save()
+            if int(request.POST['prompt_mode']) != int(story.prompt_mode):
+                story.prompt_mode = request.POST['prompt_mode']
+                story.prompt = generatePrompt(story.prompt_mode)
+                story.save()
 
     elif request.GET.get("new"):
         return redirect('/new_story')
@@ -235,8 +235,7 @@ def generatePrompt(prompt_mode):
     #     else:
     #         curTopic = "Write about a {} {}".format(adj, noun)
     if int(prompt_mode) == PromptMode.LEWIS.value:
-        if prompt_model.model_name != "lewis_model2":
-            prompt_model.load_model("lewis_model2")
+        prompt_model.set_model("lewis_model2")
         prompt = prompt_model.generate_with_constraints("STOP")
     elif int(prompt_mode) == PromptMode.NONE.value:
         prompt = ""
