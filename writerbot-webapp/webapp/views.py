@@ -44,15 +44,18 @@ print("loading saved RNN from " + rnn.path_to_model)
 saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
 
 print("loading saved ngram")
+
 ngram_model = ngram.NGRAM_model("./saves/all_of_lewis.txt", "lewis_model2", "./ngrams/models")
 prompt_model = ngram.NGRAM_model("./saves/all_of_lewis.txt", "lewis_model2", "./ngrams/models")
+
 
 ngram_model.m = 2
 ngram_model.high = 100
 prompt_model.m = 2
 
 if not os.path.isfile(ngram_model.model_path+"/"+ngram_model.model_name):
-    ngram_model.create_model()
+    prompt_model.create_model()
+    prompt_model.create_model()
 else:
     ngram_model.load_model()
 
