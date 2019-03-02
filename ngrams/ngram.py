@@ -1,5 +1,5 @@
 import numpy as np
-from nltk.tokenize import sent_tokenize
+from nltk.tokenize import sent_tokenize, word_tokenize
 import pickle
 import time
 
@@ -81,6 +81,7 @@ def process_data(fname):
         text = r.read()
     sList = sent_tokenize(text)
     sList = [i[:-1]+" STOP" for i in sList]
+    sList = [" ".join(word_tokenize(i)) for i in sList]
 
     with open(fname+".tkn" , 'w') as w:
         w.write(" ".join(sList))
@@ -136,20 +137,46 @@ def generate_sentence(root:Trie, sent:str, l=200, m=3):
     """
     if sent[-1] == ".":
         sent = sent[:-1]+ " STOP"
-    sentence = sent.split()
+    sentence = word_tokenize(sent)
     cut = len(sentence)
     for i in range(l):
         next = predict_next(root, sentence[-m:])
         sentence.append(next)
         if sentence[-1] == "STOP":
             break
-
+    for i in range(len(sentence)):
+        if sentence[i] == "i":
+            sentence[i] = "I"
     outSent = " ".join([str(word) for word in sentence[cut:-1]])+"."
     outSent = outSent[0].upper()+outSent[1:]
+    outSent = outSent.strip().replace('“','').replace('”','').replace('`',"'").replace('"','')
     # ensure there's only one period at the end of the sentence
+    if len(outSent) <= 1:
+        outSent = generate_sentence(root, sent, l=l, m=3)
+    return format_sent(outSent)
+
+def format_sent(outSent):
     while outSent[-1] == ".":
         outSent = outSent[:-1]
-    return outSent.strip()+"."
+    ind = 0
+    s = ""
+    while ind < len(outSent):
+        if outSent[ind] == " ":
+            if ind < len(outSent)-1 and outSent[ind+1].isalnum():
+                s += " "
+        else:
+            s += outSent[ind]
+        ind += 1
+    s = '"'.join(s.split('""'))
+    s = "n't".join(s.split(" n't"))
+
+    return s+"."
+
+def generate_with_constraints(root:Trie, sent:str, l=200, m=3, low=10, high=75):
+    s = ""
+    while len(s)< low or len(s) > high:
+        s = generate_sentence(root, "STOP",m=m)
+    return s
 
 
 def create_model(fname, model_name, depth=5, l=100000):

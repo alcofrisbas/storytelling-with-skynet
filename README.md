@@ -20,7 +20,7 @@ chmod +x init_setup.sh
 
 Now, to train our neural network:
 ```
-venv/bin/python ./RNN/run.py
+venv/bin/python rnn_train.py -r True
 ```
 
 To start the webapp:

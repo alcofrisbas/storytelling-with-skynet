@@ -11,9 +11,13 @@ def main():
         prompt_ngram = ngram.create_model("./saves/all_of_lewis.txt","./ngrams/models/lewis_model", l=1000000)
     else:
         prompt_ngram = ngram.load_model("./ngrams/models/lewis_model")
-
+    print("done loading")
+    low = 10
+    high = 75
     for i in range(10):
-        curTopic = ngram.generate_sentence(prompt_ngram, "STOP")
+        curTopic = ""
+        while len(curTopic)< low or len(curTopic) > high:
+            curTopic = ngram.generate_sentence(prompt_ngram, "STOP",m=2)
         print("-"*20)
         print(curTopic)
 
