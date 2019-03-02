@@ -12,6 +12,7 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'simpleRNN'))
 from rnn_words import SimpleRNN
+from rnn_words_seq2seq import SimpleRN as seq2seqRNN
 import tensorflow as tf
 import random
 from webapp.words import ADJECTIVES, ANIMALS
@@ -26,37 +27,51 @@ sys.modules["ngram"] = ngram
 from enum import Enum
 
 class Mode(Enum):
-     RNN = 1
+     RNN = 0
+     SEQ2SEQ = 1
      NGRAM = 2
      NONE = 3
+
+class PromptMode(Enum):
+    SIMPLE = 0
+    LEWIS = 1
+    DICKENS = 2
+    NONE = 3
 
 args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000, "training_file": "simpleRNN/data/train.txt"}
 display_step = 1000
 path_to_model = "simpleRNN/models/"
-model_name = "great_expectations.model"
+path_to_seq2seq_model = "simpleRNN/seq2seq_models"
+model_name = "basic_model"
 
 print("instantiating RNN")
 rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
+seq2seq_rnn = seq2seqRNN(args_dict, display_step, path_to_seq2seq_model, model_name)
 print("instantiating saver")
 sess = tf.Session()
+seq2seq_sess = tf.Session()
 saver = tf.train.Saver()
+seq2seq_saver = tf.train.Saver()
 print("loading saved RNN from " + rnn.path_to_model)
 saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
+print("loading saved seq2seqRNN from " + seq2seq_rnn.path_to_model)
+saver.restore(seq2seq2seq_sess, tf.train.latest_checkpoint(seq2seq_rnn.path_to_model))
 
 print("loading saved ngram")
-ngram_model = ngram.NGRAM_model("./saves/all_of_lewis.txt", "lewis_model2", "./ngrams/models")
-prompt_model = ngram.NGRAM_model("./saves/all_of_lewis.txt", "lewis_model2", "./ngrams/models")
-
+ngram_model = ngram.NGRAM_model("./ngrams/models")
+prompt_model = ngram.NGRAM_model("./ngrams/models")
+ngram_model.create_model("lewis_model2")
+ngram_model.create_model("dickens_model")
+ngram_model.set_model("lewis_model2")
+prompt_model.create_model("lewis_model2")
+prompt_model.set_model("lewis_model2")
 ngram_model.m = 2
 ngram_model.high = 100
+
 prompt_model.m = 2
 
-if not os.path.isfile("./ngrams/models/lewis_model"):
-    prompt_model.create_model("./saves/all_of_lewis.txt","./ngrams/models/lewis_model")
-    prompt_model.create_model("./saves/all_of_lewis.txt","./ngrams/models/lewis_model")
-else:
-    ngram_model.load_model()
-    prompt_model.load_model()
+
+
 
 #TODO: when user logs in, redirect to the page they logged in from
 #TODO: figure out how to clear empty stories and expired session data
@@ -98,7 +113,8 @@ def newStory(request):
         old_story = Story.objects.get(id=request.session.get("story_id"))
         old_story.delete()
 
-    s = Story.objects.create(sentences="", title="Untitled", prompt=generatePrompt())
+    s = Story.objects.create(sentences="", title="Untitled",
+        prompt=generatePrompt(PromptMode.LEWIS.value))
     if request.user.is_authenticated:
         user = getOrCreateUser(request)
         s.author = user
@@ -138,9 +154,9 @@ def write(request):
     if "story_id" not in request.session.keys() or not Story.objects.filter(id = request.session["story_id"]).exists():
         newStory(request)
 
-    if "mode" not in request.session.keys():
-        # using value instead of enum itself because enum is not JSON serializable so it can't be stored in session
-        request.session["mode"] = Mode.RNN.value
+    # if "mode" not in request.session.keys():
+    #     # using value instead of enum itself because enum is not JSON serializable so it can't be stored in session
+    #     request.session["mode"] = Mode.RNN.value
 
     story = Story.objects.get(id=request.session["story_id"])
     suggestion = ""
@@ -151,15 +167,15 @@ def write(request):
             story.sentences += new_sentence.strip().replace("\n", "") + "\n"
             story.suggesting = not story.suggesting
             story.save()
-            if request.session.get("mode") != Mode.NONE.value and story.suggesting:
-                suggestion = generateSuggestion(sess, new_sentence, request.session.get("mode"))
+            if story.mode != Mode.NONE.value and story.suggesting:
+                suggestion = generateSuggestion(sess, new_sentence, story.mode)
 
         if request.POST.get("title"):
             story.title = request.POST["title"]
             story.save()
 
-        if request.POST.get("re-prompt") == True:
-            story.prompt = generatePrompt()
+        if request.POST.get("re-prompt"):
+            story.prompt = generatePrompt(story.prompt_mode)
             story.save()
 
         # same functionality as "Start a new story" button
@@ -177,32 +193,28 @@ def write(request):
             response['Content-Disposition'] = 'attachment; filename={}.txt'.format(story.title)
             return response
 
-        if request.POST.get('mode') == "rnn_mode":
-            request.session["mode"] = Mode.RNN.value
-        elif request.POST.get('mode') == "ngram_mode":
-            request.session["mode"] = Mode.NGRAM.value
-        elif request.POST.get('mode') == "none_mode":
-            request.session["mode"] = Mode.NONE.value
-
-        if request.POST.get('prompt_mode') == "no_prompt":
-            story.prompt = ""
+        if request.POST.get('mode'):
+            story.mode = request.POST['mode']
             story.save()
-        elif story.prompt == "":
-            story.prompt = generatePrompt()
+
+        if request.POST.get('prompt_mode'):
+            story.prompt_mode = request.POST['prompt_mode']
+            story.prompt = generatePrompt(story.prompt_mode)
             story.save()
 
     elif request.GET.get("new"):
         return redirect('/new_story')
     else:
-        if request.session.get("mode") != Mode.NONE.value and story.suggesting and story.sentences != "":
+        if story.mode != Mode.NONE.value and story.suggesting and story.sentences != "":
             last = story.sentences.split("\n")[-2]
-            suggestion = generateSuggestion(sess, last, request.session.get("mode"))
+            suggestion = generateSuggestion(sess, last, story.mode)
 
     return render(request, 'webapp/write.html',
-                  context={"prompt": story.prompt,
+                  context={"story": story,
                   "sentences": [s.strip() for s in story.sentences.split("\n")[:-1]],
-                  "suggestion": suggestion, "title": story.title,
-                  "mode": request.session["mode"]})
+                  "suggestion": suggestion,
+                  "modes": [(mode.name, mode.value) for mode in Mode],
+                  "prompt_modes": [(mode.name, mode.value) for mode in PromptMode]})
 
 
 def about(request):
@@ -223,27 +235,41 @@ def logout(request):
     return redirect('/')
 
 
-def generatePrompt(curPrompt=""):
-    # adj = ADJECTIVES[random.randrange(0, len(ADJECTIVES))]
-    # noun = ANIMALS[random.randrange(0, len(ANIMALS))].lower()
-    # curTopic = curPrompt
-    # while curTopic == curPrompt:
-    #     if adj[0] in 'aeiou':
-    #         curTopic = "Write about an {} {}".format(adj, noun)
-    #     else:
-    #         curTopic = "Write about a {} {}".format(adj, noun)
-    curTopic = prompt_model.generate_with_constraints("STOP")
-    return curTopic
+def generatePrompt(prompt_mode):
+    if int(prompt_mode) == PromptMode.SIMPLE.value:
+        adj = ADJECTIVES[random.randrange(0, len(ADJECTIVES))]
+        noun = ANIMALS[random.randrange(0, len(ANIMALS))].lower()
+        if adj[0] in 'aeiou':
+            prompt = "Write about an {} {}".format(adj, noun)
+        else:
+            prompt = "Write about a {} {}".format(adj, noun)
+    elif int(prompt_mode) == PromptMode.LEWIS.value:
+        prompt_model.set_model("lewis_model2")
+        prompt = prompt_model.generate_with_constraints("STOP")
+    elif int(prompt_mode) == PromptMode.DICKENS.value:
+        prompt_model.set_model("dickens_model")
+        prompt = prompt_model.generate_with_constraints("STOP")
+    elif int(prompt_mode) == PromptMode.NONE.value:
+        prompt = ""
+    else:
+        print("unknown prompt mode {}".format(prompt_mode))
+        prompt = ""
+    return prompt
 
 
 def generateSuggestion(session, newSentence, mode):
     try:
-        if mode == Mode.RNN.value:
+        if int(mode) == Mode.RNN.value:
             suggestion = rnn.generate_suggestion(session, newSentence)
-        elif mode == Mode.NGRAM.value:
+        elif int(mode) == Mode.SEQ2SEQ.value:
+            suggestion = "Seq2Seq model not integrated yet."
+        elif int(mode) == Mode.NGRAM.value:
             suggestion = ngram_model.generate_with_constraints(newSentence)
+        elif int(mode) == Mode.NONE.value:
+            suggestion = ""
         else:
-            suggestion="placeholder"
+            print("unknown mode {}".format(mode))
+            suggestion = ""
     except Exception as e:
         print("ERROR (suggestion generation)")
         suggestion = e

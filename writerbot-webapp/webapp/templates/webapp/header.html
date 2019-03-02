@@ -56,12 +56,22 @@
     <script src="{% static 'js/webapp.js' %}"></script>
     <script>
         $(document).on('click', '.confirm-delete', function () {
-        $("#confirmDeleteModal").attr("caller-id", $(this).attr("id"));
+            $("#confirmDeleteModal").attr("caller-id", $(this).attr("id"));
+        });
+        $(".delete-modal").on('shown.bs.modal', function(){
+            var ID = "#"+$(this).attr("id");
+            $( ID ).keyup(function() {
+                var n = $(ID).attr("modalNum");
+                window.location.href = "/delete_story/"+n;
+            });
+
+
         });
 
         $(document).on('click', '#confirmDeleteButtonModal', function () {
         var caller = $("#confirmDeleteButtonModal").closest(".modal").attr("caller-id");
         window.location = $("#".concat(caller)).attr("href");
+
         });
     </script>
     {% load tz_detect %}

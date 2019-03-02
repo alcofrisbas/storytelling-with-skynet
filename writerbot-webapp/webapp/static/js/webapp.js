@@ -1,4 +1,4 @@
-var generation_mode = 1;
+var generation_mode = 0;
 // JS for highlighting menu items
 // a bit hacky, but effective.
 // will patch with jquery as needed.
@@ -138,7 +138,7 @@ function update_settings(mode){
 function change_setting_text(){
     console.log(generation_mode);
 
-    if (generation_mode == 1){
+    if (generation_mode == 0){
         document.getElementById("rnn-settings-title").style.display = "block";
         document.getElementById("ngram-settings-title").style.display = "none";
         document.getElementById("none-settings-title").style.display = "none";
@@ -147,7 +147,7 @@ function change_setting_text(){
         document.getElementById("ngram-settings-content").style.display = "none";
         document.getElementById("none-settings-content").style.display = "none";
     }
-    if (generation_mode == 2){
+    if (generation_mode == 1){
         document.getElementById("rnn-settings-title").style.display = "none";
         document.getElementById("ngram-settings-title").style.display = "block";
         document.getElementById("none-settings-title").style.display = "none";
@@ -156,7 +156,7 @@ function change_setting_text(){
         document.getElementById("ngram-settings-content").style.display = "block";
         document.getElementById("none-settings-content").style.display = "none";
     }
-    if (generation_mode == 3){
+    if (generation_mode == 2){
         document.getElementById("rnn-settings-title").style.display = "none";
         document.getElementById("ngram-settings-title").style.display = "none";
         document.getElementById("none-settings-title").style.display = "block";
@@ -171,15 +171,15 @@ $('input[name=mode]').change(function(){
     console.log("submitting settings");
     if (document.getElementById('rnn_mode').checked) {
         //console.log("rnn_mode checked");
-        generation_mode = 1;
+        generation_mode = 0;
     }
     if (document.getElementById('ngram_mode').checked) {
         //console.log("rnn_mode checked");
-        generation_mode = 2;
+        generation_mode = 1;
     }
     if (document.getElementById('none_mode').checked) {
         //console.log("rnn_mode checked");
-        generation_mode = 3;
+        generation_mode = 2;
     }
     console.log(generation_mode);
 
