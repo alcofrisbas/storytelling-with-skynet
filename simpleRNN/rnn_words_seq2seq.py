@@ -356,7 +356,7 @@ class SimpleRNN:
                             print("%s - [%s] vs [%s]" % (self.training_data[i],self.training_data[i+1], all_pred[j]))
                             i = i + 2
                             j = j + 1
-                
+
                 step += 1
             print("Optimization Finished!")
             print("Elapsed time: ", self.elapsed(time.time() - self.start_time))
@@ -404,13 +404,26 @@ class SimpleRNN:
                     predict_sent = []
                     for word in onehot_pred[0]:
                         predict_sent.append(self.index2word[word])
-                        #predict_sent.append(self.embedding_model.wv.index2word[word])
-                    #onehot_pred = self.embedding_model.wv.index2word[onehot_pred[0]]
+
+                    # remove GO character and stop when period appears
+                    full_pred = []
                     for word in predict_sent:
-                        output_sent +=  " %s" % (word)
-                    #input_sent = input_sent[0][1:]
-                    #input_sent.append(self.embedding_model.vocab[onehot_pred].index)
-                    #input_sent = [input_sent]
+                        if word == "." or word == "!" or word == "?":
+                            break
+                        if word != "GO":
+                            print(word)
+                            full_pred.append(word)
+
+                    full_pred.append(".")
+                    # capitalize first word
+                    full_pred[0] = full_pred[0].capitalize()
+                    for word in full_pred:
+                        if word == "\",\"":
+                            word = ","
+                        if word == "." or word == "!" or word == "," or word == "?" or word == ";" or word == ":":
+                            output_sent += "%s" % (word)
+                        else:
+                            output_sent +=  " %s" % (word)
                     print(output_sent)
                 except Exception as e:
                     print(e)
