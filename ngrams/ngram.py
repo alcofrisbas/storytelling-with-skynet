@@ -106,6 +106,9 @@ class NGRAM_model:
         self.low = 10
         self.high = 75
 
+    def get_full_path(self):
+        return self.model_path+"/"+self.model_name
+
     def train(self):
         """
         trains a ngram trie

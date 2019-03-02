@@ -38,7 +38,7 @@
                         </div>
                     </a>
 
-                    <div class="modal fade" id="confirmDeleteModal{{story.id}}" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel{{story.id}}" aria-hidden="true">
+                    <div class="modal fade delete-modal" id="confirmDeleteModal{{story.id}}" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel{{story.id}}" aria-hidden="true">
                       <div class="modal-dialog" role="document">
                         <div class="modal-content">
                           <div class="modal-body confirm-delete">
@@ -46,7 +46,7 @@
                           </div>
                           <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                            <a href="/delete_story/{{ story.id }}" class="confirm-delete btn btn-danger" title= "Delete">Delete</a>
+                            <a href="/delete_story/{{ story.id }}" class="confirm-delete btn btn-danger" id="delete-modal-button" title= "Delete">Delete</a>
                           </div>
                         </div>
                       </div>
