@@ -140,19 +140,19 @@
                                 <div class="col-md-4">
                                     <div>
                                         {% for name, val in modes %}
-                                            {%if val == 0 %}
-                                                <h5 id="{{ val }}-settings-title" class="card-title to-hide">RNN</h5>
-                                                <p class="card-text to-hide" id="{{val}}-settings-content" >This is about an RNN</p>
-                                            {% elif val == 1 %}
-                                                <h5 id="{{val}}-settings-title" class="card-title to-hide">Seq2Seq</h5>
-                                                <p class="card-text to-hide" id="{{val}}-settings-content" >This is about seq2seq</p>
-                                            {% elif val == 2 %}
-                                                <h5 id="{{val}}-settings-title" class="card-title to-hide">N-Gram</h5>
-                                                <p class="card-text to-hide" id="{{val}}-settings-content" >This is about N-Grams</p>
-                                            {% elif val == 3 %}
-                                                <h5 id="{{val}}-settings-title" class="card-title to-hide">No Suggestions</h5>
-                                                <p class="card-text to-hide" id="{{val}}-settings-content" >This is about nothing</p>
-                                            {% endif %}
+                                            <h5 id="{{ val }}-settings-title" class="card-title to-hide">{{ name }}</h5>
+                                            <p class="card-text to-hide" id="{{val}}-settings-content">
+                                            {% if name == "RNN" %}
+                                                This is about an RNN
+                                            {% elif name == "SEQ2SEQ" %}
+                                                This is about seq2seq
+                                            {% elif name == "NGRAM" %}
+                                                This is about N-Grams
+                                            {% elif name == "NONE" %}
+                                                This is about nothing
+                                            {% else %}
+                                                What is this even about?
+                                            {% endif %}</p>
                                         {% endfor %}
                                     </div>
                                 </div>
