@@ -137,10 +137,13 @@ function update_settings(mode){
 
 $("#settingsModal").on('show.bs.modal', function(){
     var m = $(this).closest(".modal").attr("mode");
+    var n = $(this).closest(".modal").attr("prompt-mode");
     $("#"+m+"_mode").prop('checked', true);
     $('.to-hide').hide();
     $("#"+m+"-settings-content").show('slow');
     $("#"+m+"-settings-title").show('slow');
+
+    $('#prompt_mode option[value='+n+']').prop('selected', true);
 });
 
 $(function() {
