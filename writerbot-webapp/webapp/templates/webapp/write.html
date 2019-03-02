@@ -24,9 +24,9 @@
         value="true" name="export" id="side-export">
         <i class="fas fa-file-export"></i>
     </button>
-    <span data-toggle="modal" data-target="#settingsModal" data-target="#id">
+    <span data-toggle="modal" data-target="#settingsModal" data-target="#id" onclick="update_settings({{ story.mode }});change_setting_text()">
         <button class="side-btn" type="button" data-toggle="tooltip" data-placement="right" title="Settings"
-            value="true" name="side-settings" id="side-settings" onclick="update_settings({{ mode }});change_setting_text()">
+            value="true" name="side-settings" id="side-settings">
             <i class="fas fa-cog"></i></button>
     </span>
 </div>
@@ -34,12 +34,16 @@
 <div class="main">
         <form method="post" id="title-form">
                 {% csrf_token %}
-            <input id="title-input" type="text" name="title" value="{{ title }}" class="mt-5 story-title">
-
-        <hr class="my-2">
-        {% if prompt %}
-        <h5> Prompt: {{ prompt }} <button type="submit" class="btn btn-sm btn-outline-primary" name="re-prompt" id="re-prompt" value="true"><i class="fas fa-redo fa-xs"></i></button></h5>
+            <input id="title-input" type="text" name="title" value="{{ story.title }}" class="mt-5 story-title">
+        </form>
+            <hr class="my-2">
+        {% if story.prompt %}
+        <form method="post">
+            {% csrf_token %}
+            <h5> Prompt: {{ story.prompt }} <button type="submit" class="btn btn-sm btn-outline-primary" name="re-prompt" id="re-prompt" value="true"><i class="fas fa-redo fa-xs"></i></button></h5>
+        </form>
         {% endif %}
+
         {% if sentences %}
         <!-- <p id = "para" style="padding:1px" contenteditable="{{ contentEdit }}"> -->
             <p>
@@ -109,18 +113,24 @@
                                   </div>
                                   <div class="col-sm">
                                       <div class="form-group">
-                                          <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="mode" id="rnn_mode" value="rnn_mode" {% if mode == 1 %} checked {% endif %}>
+                                          <!-- <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="mode" id="rnn_mode" value=0 {% if story.mode == "0" %} checked {% endif %}>
                                             <label class="form-check-label" for="rnn_mode">RNN</label>
                                           </div>
                                           <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="mode" id="ngram_mode" value="ngram_mode" {% if mode == 2 %} checked {% endif %}>
+                                            <input class="form-check-input" type="radio" name="mode" id="ngram_mode" value=1 {% if story.mode == "1" %} checked {% endif %}>
                                             <label class="form-check-label" for="ngram_mode">N-Gram</label>
                                           </div>
                                           <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="mode" id="none_mode" value="none_mode" {% if mode == 3 %} checked {% endif %}>
+                                            <input class="form-check-input" type="radio" name="mode" id="none_mode" value=2 {% if story.mode == "2" %} checked {% endif %}>
                                             <label class="form-check-label" for="none_mode">No suggestions</label>
-                                          </div>
+                                          </div> -->
+                                          {% for name, val in modes %}
+                                              <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="mode" id="{{ name }}_mode" value="{{ val }}" {% if story.mode == val|stringformat:"i" %} checked {% endif %}>
+                                                <label class="form-check-label" for="{{ name }}_mode">{{name}}</label>
+                                              </div>
+                                          {% endfor %}
                                       </div>
                                   </div>
                                   <div class="col-sm">
@@ -138,8 +148,9 @@
                                 </div>
                                 <div class="col-sm">
                                         <select id="prompt_mode" name="prompt_mode">
-                                          <option value="lewis_carroll_prompt" {% if prompt %} selected {% endif %}>Lewis Carroll</option>
-                                          <option value="no_prompt" {% if not prompt %} selected {% endif %}>No prompt</option>
+                                            {% for name, val in prompt_modes %}
+                                              <option value="{{ val }}" {% if story.prompt_mode == val|stringformat:"i" %} selected {% endif %}>{{ name }}</option>
+                                            {% endfor %}
                                         </select>
                                 </div>
                                 <div class="col-sm">
