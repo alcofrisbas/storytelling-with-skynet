@@ -76,14 +76,22 @@ class SimpleRNN:
         self.end_token = len(self.input_embedding_matrix) - 1  # PAD
 
         self.logits, self.batch_loss, self.valid_predictions  = self.RNN()
-        self.probas = tf.argmax(self.logits, 2)
+        try:
+            self.probas = tf.argmax(self.logits, 2)
+        except:
+            self.probas = tf.argmax(self.logits, 1)
         # Loss and optimizer
         with tf.name_scope("optimization"):
             # optimizer
-            self.cost = tf.reduce_mean(self.batch_loss)
-            self.optimizer = tf.train.RMSPropOptimizer(learning_rate=self.learning_rate).minimize(self.batch_loss)
+            try:
+                self.cost = tf.reduce_mean(self.batch_loss)
+                self.optimizer = tf.train.RMSPropOptimizer(learning_rate=self.learning_rate).minimize(self.batch_loss)
+                self.accuracy = tf.reduce_mean(tf.cast(self.valid_predictions, tf.float32))
+            except:
+                self.cost = 0
+                self.optimizer = 0
 
-        self.accuracy = tf.reduce_mean(tf.cast(self.valid_predictions, tf.float32))
+
 
         # Initializing the variables
         self.init = tf.global_variables_initializer()
@@ -117,7 +125,7 @@ class SimpleRNN:
         targets = self.y
         # seq2seq embedding layers
         embedded_input = tf.cast(tf.nn.embedding_lookup(self.input_embedding_matrix, inputs), tf.float32)
-        embedded_output = tf.cast(tf.nn.embedding_lookup(self.input_embedding_matrix, targets), tf.float32)
+
 
         # consider using GRU cells
         with tf.variable_scope("encoding") as encoding_scope:
@@ -127,15 +135,15 @@ class SimpleRNN:
 
         with tf.variable_scope("decoding") as decoding_scope:
             self.batch_size = tf.shape(inputs)[0]
-            lstm_decoding = rnn.MultiRNNCell([rnn.BasicLSTMCell(self.n_hidden), rnn.BasicLSTMCell(self.n_hidden)])
+            lstm_decoding = rnn.BasicLSTMCell(self.n_hidden)#rnn.MultiRNNCell([rnn.BasicLSTMCell(self.n_hidden), rnn.BasicLSTMCell(self.n_hidden)])
             # Attention mechanism and wrapper
-
             attention_mechanism = tf.contrib.seq2seq.LuongAttention(num_units=self.n_hidden, memory=encoder_outputs,
                 memory_sequence_length=self.encoder_lengths)
             decoder_cell = tf.contrib.seq2seq.AttentionWrapper(lstm_decoding, attention_mechanism, attention_layer_size=self.n_hidden)
             initial_state = decoder_cell.zero_state(self.batch_size, tf.float32)
             output_layer = tf.layers.Dense(len(self.input_embedding_matrix), name="output_projection")
             if self.to_train:
+                embedded_output = tf.cast(tf.nn.embedding_lookup(self.input_embedding_matrix, targets), tf.float32)
                 max_dec_length = tf.reduce_max(self.decoder_lengths+1, name="max_dec_length")
                 helper = tf.contrib.seq2seq.TrainingHelper(inputs=embedded_output, sequence_length=self.decoder_lengths,
                     name="training_helper")
@@ -152,24 +160,23 @@ class SimpleRNN:
                     name="batch_loss")
 
                 valid_predictions = tf.identity(final_outputs.sample_id, name="valid_preds")
+
             else:
                 start_tokens = tf.tile(tf.constant([self.start_token], dtype=tf.int32), [self.batch_size],
                     name = "start_tokens")
-                print(initial_state)
                 inference_helper = tf.contrib.seq2seq.GreedyEmbeddingHelper(embedding=self.output_embedding_matrix,
                     start_tokens=start_tokens, end_token=self.end_token)
 
-                inference_decoder = tf.contrib.seq2seq.BasicDecoder(cell=lstm_decoding,
+                inference_decoder = tf.contrib.seq2seq.BasicDecoder(cell=decoder_cell,
                     helper=inference_helper, initial_state=initial_state, output_layer=output_layer)
 
-                final_outputs, _final_state, = tf.contrib.seq2seq.dynamic_decode(
+                final_outputs, _final_state,_ = tf.contrib.seq2seq.dynamic_decode(
                     inference_decoder, output_time_major=False, impute_finished=True,
-                    maximum_iterations=self.padded_lengths+1)
+                    maximum_iterations=self.padded_lengths)
 
-                logits = tf.identity(final_outputs.sample_id, name="predictions")
+                logits = tf.identity(final_outputs.rnn_output, name="predictions")
                 batch_loss = None
-                valid_predictions = None
-
+                valid_predictions = tf.identity(final_outputs.sample_id, name="valid_preds")
 
             return logits, batch_loss, valid_predictions
         """
@@ -350,7 +357,7 @@ class SimpleRNN:
             saver = tf.train.Saver()
             saver.restore(session, tf.train.latest_checkpoint(self.path_to_model))
             while True:
-                prompt = "Write a sentence: " % self.n_input
+                prompt = "Write a sentence: "
                 input_sent = input(prompt)
                 input_sent = word_tokenize(input_sent)
                 len_inputs = len(input_sent)
@@ -374,17 +381,11 @@ class SimpleRNN:
                             input_sent_one_hot.append(self.embedding_model.wv.vocab[word.lower()].index)
                         except KeyError:
                             input_sent_one_hot.append(len(self.input_embedding_matrix)-2)
-                    while len(input_sent) < self.padded_lengths:
-                        input_sent.append(len(self.input_embedding_matrix)-3)
+                    while len(input_sent_one_hot) < self.padded_lengths:
+                        input_sent_one_hot.append(len(self.input_embedding_matrix)-3)
                     input_sent = [input_sent_one_hot]
-
-                    target_sent = [len(self.input_embedding_matrix)-3]
-                    for i in range(self.padded_lengths):
-                        target_sent.append(len(self.input_embedding_matrix)-1)
-                    target_sent = [target_sent]
                    # for i in range(23):
-                    onehot_pred = session.run(self.probas, feed_dict={self.x: input_sent, self.outputs: target_sent,
-                                                                        self.encoder_lengths: [len_inputs]})
+                    onehot_pred = session.run(self.probas, feed_dict={self.x: input_sent, self.encoder_lengths: [len_inputs]})
                     predict_sent = []
                     for word in onehot_pred[0]:
                         predict_sent.append(self.index2word[word])

@@ -148,7 +148,7 @@ def write(request):
     if request.POST:
         if request.POST.get("text"):
             new_sentence = request.POST["text"]
-            story.sentences += new_sentence.strip() + "\n"
+            story.sentences += new_sentence.strip().replace("\n", "") + "\n"
             story.suggesting = not story.suggesting
             story.save()
             if request.session.get("mode") != Mode.NONE.value and story.suggesting:
@@ -158,7 +158,7 @@ def write(request):
             story.title = request.POST["title"]
             story.save()
 
-        if request.POST.get("re-prompt"):
+        if request.POST.get("re-prompt") == True:
             story.prompt = generatePrompt()
             story.save()
 
@@ -183,6 +183,14 @@ def write(request):
             request.session["mode"] = Mode.NGRAM.value
         elif request.POST.get('mode') == "none_mode":
             request.session["mode"] = Mode.NONE.value
+
+        if request.POST.get('prompt_mode') == "no_prompt":
+            story.prompt = ""
+            story.save()
+        elif story.prompt == "":
+            story.prompt = generatePrompt()
+            story.save()
+
     elif request.GET.get("new"):
         return redirect('/new_story')
     else:
