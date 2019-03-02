@@ -11,6 +11,8 @@ class Story(models.Model):
     last_edited = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
     suggesting = models.BooleanField(default=False)
+    mode = models.IntegerField(default=0)
+    prompt_mode = models.IntegerField(default=0)
 
     def __str__(self):
         return self.sentences

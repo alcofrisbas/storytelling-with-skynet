@@ -26,14 +26,18 @@ sys.modules["ngram"] = ngram
 from enum import Enum
 
 class Mode(Enum):
-     RNN = 1
-     NGRAM = 2
-     NONE = 3
+     RNN = 0
+     NGRAM = 1
+     NONE = 2
+
+class PromptMode(Enum):
+    LEWIS = 0
+    NONE = 1
 
 args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000, "training_file": "simpleRNN/data/train.txt"}
 display_step = 1000
 path_to_model = "simpleRNN/models/"
-model_name = "great_expectations.model"
+model_name = "basic_model"
 
 print("instantiating RNN")
 rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
@@ -102,7 +106,8 @@ def newStory(request):
         old_story = Story.objects.get(id=request.session.get("story_id"))
         old_story.delete()
 
-    s = Story.objects.create(sentences="", title="Untitled", prompt=generatePrompt())
+    s = Story.objects.create(sentences="", title="Untitled",
+        prompt=generatePrompt(PromptMode.LEWIS.value))
     if request.user.is_authenticated:
         user = getOrCreateUser(request)
         s.author = user
@@ -142,9 +147,9 @@ def write(request):
     if "story_id" not in request.session.keys() or not Story.objects.filter(id = request.session["story_id"]).exists():
         newStory(request)
 
-    if "mode" not in request.session.keys():
-        # using value instead of enum itself because enum is not JSON serializable so it can't be stored in session
-        request.session["mode"] = Mode.RNN.value
+    # if "mode" not in request.session.keys():
+    #     # using value instead of enum itself because enum is not JSON serializable so it can't be stored in session
+    #     request.session["mode"] = Mode.RNN.value
 
     story = Story.objects.get(id=request.session["story_id"])
     suggestion = ""
@@ -155,15 +160,15 @@ def write(request):
             story.sentences += new_sentence.strip().replace("\n", "") + "\n"
             story.suggesting = not story.suggesting
             story.save()
-            if request.session.get("mode") != Mode.NONE.value and story.suggesting:
-                suggestion = generateSuggestion(sess, new_sentence, request.session.get("mode"))
+            if story.mode != Mode.NONE.value and story.suggesting:
+                suggestion = generateSuggestion(sess, new_sentence, story.mode)
 
         if request.POST.get("title"):
             story.title = request.POST["title"]
             story.save()
 
-        if request.POST.get("re-prompt") == True:
-            story.prompt = generatePrompt()
+        if request.POST.get("re-prompt"):
+            story.prompt = generatePrompt(story.prompt_mode)
             story.save()
 
         # same functionality as "Start a new story" button
@@ -181,32 +186,27 @@ def write(request):
             response['Content-Disposition'] = 'attachment; filename={}.txt'.format(story.title)
             return response
 
-        if request.POST.get('mode') == "rnn_mode":
-            request.session["mode"] = Mode.RNN.value
-        elif request.POST.get('mode') == "ngram_mode":
-            request.session["mode"] = Mode.NGRAM.value
-        elif request.POST.get('mode') == "none_mode":
-            request.session["mode"] = Mode.NONE.value
-
-        if request.POST.get('prompt_mode') == "no_prompt":
-            story.prompt = ""
+        if request.POST.get('mode'):
+            story.mode = request.POST['mode']
             story.save()
-        elif story.prompt == "":
-            story.prompt = generatePrompt()
+
+        if request.POST.get('prompt_mode'):
+            story.prompt_mode = request.POST['prompt_mode']
+            story.prompt = generatePrompt(story.prompt_mode)
             story.save()
 
     elif request.GET.get("new"):
         return redirect('/new_story')
     else:
-        if request.session.get("mode") != Mode.NONE.value and story.suggesting and story.sentences != "":
+        if story.mode != Mode.NONE.value and story.suggesting and story.sentences != "":
             last = story.sentences.split("\n")[-2]
-            suggestion = generateSuggestion(sess, last, request.session.get("mode"))
+            suggestion = generateSuggestion(sess, last, story.mode)
 
     return render(request, 'webapp/write.html',
                   context={"prompt": story.prompt,
                   "sentences": [s.strip() for s in story.sentences.split("\n")[:-1]],
                   "suggestion": suggestion, "title": story.title,
-                  "mode": request.session["mode"]})
+                  "mode": story.mode})
 
 
 def about(request):
@@ -227,7 +227,7 @@ def logout(request):
     return redirect('/')
 
 
-def generatePrompt(curPrompt=""):
+def generatePrompt(prompt_mode):
     # adj = ADJECTIVES[random.randrange(0, len(ADJECTIVES))]
     # noun = ANIMALS[random.randrange(0, len(ANIMALS))].lower()
     # curTopic = curPrompt
@@ -236,18 +236,29 @@ def generatePrompt(curPrompt=""):
     #         curTopic = "Write about an {} {}".format(adj, noun)
     #     else:
     #         curTopic = "Write about a {} {}".format(adj, noun)
-    curTopic = prompt_model.generate_with_constraints("STOP")
-    return curTopic
+    if int(prompt_mode) == PromptMode.LEWIS.value:
+        if prompt_model.model_name != "lewis_model2":
+            prompt_model.load_model("lewis_model2")
+        prompt = prompt_model.generate_with_constraints("STOP")
+    elif int(prompt_mode) == PromptMode.NONE.value:
+        prompt = ""
+    else:
+        print("unknown prompt mode {}".format(prompt_mode))
+        prompt = ""
+    return prompt
 
 
 def generateSuggestion(session, newSentence, mode):
     try:
-        if mode == Mode.RNN.value:
+        if int(mode) == Mode.RNN.value:
             suggestion = rnn.generate_suggestion(session, newSentence)
-        elif mode == Mode.NGRAM.value:
+        elif int(mode) == Mode.NGRAM.value:
             suggestion = ngram_model.generate_with_constraints(newSentence)
+        elif int(mode) == Mode.NONE.value:
+            suggestion = ""
         else:
-            suggestion="placeholder"
+            print("unknown mode {}".format(mode))
+            suggestion = ""
     except Exception as e:
         print("ERROR (suggestion generation)")
         suggestion = e
