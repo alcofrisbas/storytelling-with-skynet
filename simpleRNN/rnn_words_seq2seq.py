@@ -40,12 +40,8 @@ class SimpleRNN:
         self.writer = tf.summary.FileWriter(self.logs_path)
 
         # Text file containing words for training
-<<<<<<< HEAD
-        self.training_file = "simpleRNN/data/all_of_dickens1.txt"   #'simpleRNN/belling_the_cat.txt'
-=======
         self.training_file = d["training_file"]
         # training .txt file
->>>>>>> a213051cbe39a94856aae9c1569b281f739500c5
         self.training_data = self.read_data(self.training_file)
         self.output_seq_length = len(self.training_data[1]) - 1
         print("Loaded training data...")
