@@ -221,7 +221,7 @@ class NGRAM_model:
         """
         slams a whole bunch of methods together so
         you can call one function to create, save, and
-        return a model.
+        return a model. including data is safe!
         """
         start = time.time()
         print("creating model: {}".format(model_name))
