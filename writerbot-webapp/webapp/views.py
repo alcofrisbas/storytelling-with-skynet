@@ -42,7 +42,7 @@ args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.
 display_step = 1000
 path_to_model = "simpleRNN/models/"
 path_to_seq2seq_model = "simpleRNN/seq2seq_models/"
-model_name = "great_expectations.model"
+model_name = "basic_model"
 
 print("instantiating RNN")
 rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
@@ -152,10 +152,6 @@ def write(request):
     if "story_id" not in request.session.keys() or not Story.objects.filter(id = request.session["story_id"]).exists():
         newStory(request)
 
-    # if "mode" not in request.session.keys():
-    #     # using value instead of enum itself because enum is not JSON serializable so it can't be stored in session
-    #     request.session["mode"] = Mode.RNN.value
-
     story = Story.objects.get(id=request.session["story_id"])
     suggestion = ""
 
@@ -195,7 +191,7 @@ def write(request):
             story.mode = request.POST['mode']
             story.save()
 
-        if request.POST.get('prompt_mode'):
+        if request.POST.get('prompt_mode') and int(story.prompt_mode) != int(request.POST['prompt_mode']):
             story.prompt_mode = request.POST['prompt_mode']
             story.prompt = generatePrompt(story.prompt_mode)
             story.save()
