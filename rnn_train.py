@@ -9,7 +9,6 @@ import simpleRNN.rnn_words_seq2seq as seq2seq
 
 def train(training_file, root_path, model_name, n_hidden, min_count, learning_rate, training_iters, n_input, batch_size, to_train, use_seq2seq):
     my_file = Path(root_path + model_name + "_vocab.csv")
-    print(my_file)
     if not my_file.is_file():
         word2vec.create_embedding(training_file=training_file,
             root_path=root_path, model_name=model_name,

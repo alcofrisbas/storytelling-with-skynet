@@ -53,7 +53,7 @@ class SimpleRNN:
         self.vocab_size = self.input_embedding_matrix.shape[0]
         self.weights = {'out': self.output_embedding_matrix}
         # tf Graph input
-        self.padded_lengths = 83 # dependent on dataset
+        self.padded_lengths = 100 # dependent on dataset
         self.x = tf.placeholder(tf.int32, [self.batch_size, self.padded_lengths])
         self.y = tf.placeholder(tf.int32, [self.batch_size, self.padded_lengths+1])
         # encoder and decoder lengths
@@ -113,8 +113,9 @@ class SimpleRNN:
         with open(fname) as f:
             content = f.readlines()
         for sent in content:
-            sent = word_tokenize(sent)
-            sentences.append(sent)
+            if len(sent) <= 99:
+                sent = word_tokenize(sent)
+                sentences.append(sent)
         return sentences
 
     # core rnn calculations
@@ -191,10 +192,14 @@ class SimpleRNN:
             loss_total = 0
 
             self.writer.add_graph(session.graph)
+            """
             max_size = 0
             for sent in self.training_data:
                 if max_size < len(sent):
+                    print(sent)
+                    print(max_size)
                     max_size = len(sent)
+            """
             while step < self.training_iters:
                 all_pred = []
                 # Generate a minibatch. Add some randomness on selection process.
@@ -202,9 +207,9 @@ class SimpleRNN:
                     sent_num = 0
                 symbols = self.training_data[sent_num]
                 if len(symbols) == 0:
-                    print(1)
                     symbols = ["PAD"]
                 onehot_batch = []
+                print(step)
                 for word in symbols:
                     try:
                         one_hot = self.embedding_model.wv.vocab[word.lower()].index
