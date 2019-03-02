@@ -222,10 +222,10 @@ class SimpleRNN:
             embedded_symbols = [embedded_symbols]
             onehot_pred = 0
             output_sent = ""
-            while onehot_pred != "." or onehot_pred != "!" or onehot_pred != "?":
+            while onehot_pred != "." and onehot_pred != "!" and onehot_pred != "?":
                 onehot_pred = session.run(self.probas, feed_dict={self.x: embedded_symbols})
                 onehot_pred = self.index2word[onehot_pred[0]]
-                if onehot_pred == "PAD":
+                if onehot_pred == "PAD" or onehot_pred == "UNK" or onehot_pred == "GO":
                     continue
                 if onehot_pred == "," or onehot_pred == ";" or onehot_pred == ":":
                     output_sent += "%s" % (onehot_pred)
@@ -234,6 +234,7 @@ class SimpleRNN:
                 embedded_symbols = embedded_symbols[0][1:]
                 embedded_symbols.append(self.embedding_model.wv.vocab[onehot_pred.lower()].index)
                 embedded_symbols = [embedded_symbols]
+                print(onehot_pred)
             output_sent += "%s" % (onehot_pred)
 
             output_sent = output_sent.strip().capitalize()
@@ -269,7 +270,7 @@ class SimpleRNN:
                         onehot_pred = session.run(self.probas, feed_dict={self.x: embedded_symbols})
                         #print(onehot_pred)
                         onehot_pred = self.index2word[onehot_pred[0]]
-                        if onehot_pred == "PAD":
+                        if onehot_pred == "PAD" or onehot_pred == "UNK" or onehot_pred == "GO":
                             continue
                         output_sent +=  " %s" % (onehot_pred)
                         embedded_symbols = embedded_symbols[0][1:]

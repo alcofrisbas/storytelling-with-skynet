@@ -30,10 +30,10 @@ class Mode(Enum):
      NGRAM = 2
      NONE = 3
 
-args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000, "training_file": "simpleRNN/data/train.txt"}
+args_dict = {"n_input": 6, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000, "training_file": "simpleRNN/data/all_of_dickens.txt"}
 display_step = 1000
 path_to_model = "simpleRNN/models/"
-model_name = "basic_model"
+model_name = "dickens_model"
 
 rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
 sess = tf.Session()

@@ -35,9 +35,9 @@
         <form method="post" id="title-form">
                 {% csrf_token %}
             <input id="title-input" type="text" name="title" value="{{ title }}" class="mt-5">
+
+        <div ><button type="submit" class="btn btn-sm btn-primary " name="re-prompt" value="true">Prompt</button><h5 style="display:inline; color:gray;"> {{ prompt }}</h5></div>
         <hr class="my-2">
-        <div style="display:inline;"><button type="submit" class="btn btn-sm btn-primary " name="re-prompt" value="true" >Prompt</button></div>
-        <div><h5 style="display:inline;">Prompt: {{ prompt }}</h5></div>
         {% if sentences %}
         <!-- <p id = "para" style="padding:1px" contenteditable="{{ contentEdit }}"> -->
             <p>
