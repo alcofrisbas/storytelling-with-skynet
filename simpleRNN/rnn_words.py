@@ -216,7 +216,7 @@ class SimpleRNN:
                     embedding = self.embedding_model.wv.vocab[word.lower()].index
                 except KeyError:
                     print(word + " not in vocabulary")
-                    embedding = len(self.input_embedding_matrix)-3
+                    embedding = len(self.input_embedding_matrix)-2
                 embedded_symbols.append(embedding)
             # embeded_symbols shape [1, n_input, n_hidden]
             embedded_symbols = [embedded_symbols]

@@ -1,0 +1,16 @@
+Hi What is your name?
+Hi this is Jaemin.
+Nice to meet you!
+Nice to meet you too!
+Which programming language do you use?
+I like Python.
+See you later.
+Bye Bye.
+Where do you live?
+I live in Seoul, South Korea.
+What is your major?
+I study industrial engineering.
+What do you want to drink?
+Beer please!
+What is your favorite beer?
+Leffe brown!
