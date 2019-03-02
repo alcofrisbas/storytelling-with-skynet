@@ -23,6 +23,7 @@ def create_embedding(training_file, root_path, model_name,n_hidden, min_count):
     temp_sentences = [word_tokenize(t) for t in sent_tokenize(file_content)]
     sentences = []
     # set all words to lowercase
+    max = 0
     for sent in temp_sentences:
         sent_to_append = []
         for word in sent:

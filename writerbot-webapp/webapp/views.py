@@ -12,6 +12,7 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'simpleRNN'))
 from rnn_words import SimpleRNN
+from rnn_words_seq2seq import SimpleRNN as seq2seqRNN
 import tensorflow as tf
 import random
 from webapp.words import ADJECTIVES, ANIMALS
@@ -27,17 +28,21 @@ from enum import Enum
 
 class Mode(Enum):
      RNN = 0
-     NGRAM = 1
-     NONE = 2
+     SEQ2SEQ = 1
+     NGRAM = 2
+     NONE = 3
 
 class PromptMode(Enum):
-    LEWIS = 0
-    NONE = 1
+    SIMPLE = 0
+    LEWIS = 1
+    DICKENS = 2
+    NONE = 3
 
 args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000, "training_file": "simpleRNN/data/train.txt"}
 display_step = 1000
 path_to_model = "simpleRNN/models/"
-model_name = "great_expectations.model"
+path_to_seq2seq_model = "simpleRNN/seq2seq_models/"
+model_name = "basic_model"
 
 print("instantiating RNN")
 rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
@@ -47,19 +52,26 @@ saver = tf.train.Saver()
 print("loading saved RNN from " + rnn.path_to_model)
 saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
 
+seq2seq_rnn = seq2seqRNN(args_dict, display_step, path_to_seq2seq_model, model_name, False)
+print("loading saved seq2seqRNN from " + seq2seq_rnn.path_to_model)
+seq2seq_sess = tf.Session()
+seq2seq_saver = tf.train.Saver()
+saver.restore(seq2seq_sess, tf.train.latest_checkpoint(seq2seq_rnn.path_to_model))
+
 print("loading saved ngram")
 ngram_model = ngram.NGRAM_model("./ngrams/models")
 prompt_model = ngram.NGRAM_model("./ngrams/models")
 ngram_model.create_model("lewis_model2")
-ngram_model.create_model("dickens_model", "./simpleRNN/data/all_of_dickens.txt")
+ngram_model.create_model("dickens_model")
 ngram_model.set_model("lewis_model2")
-
 prompt_model.create_model("lewis_model2")
-ngram_model.create_model("dickens_model", "./simpleRNN/data/all_of_dickens.txt")
 prompt_model.set_model("lewis_model2")
 ngram_model.m = 2
 ngram_model.high = 100
+
 prompt_model.m = 2
+
+
 
 
 #TODO: when user logs in, redirect to the page they logged in from
@@ -187,10 +199,9 @@ def write(request):
             story.save()
 
         if request.POST.get('prompt_mode'):
-            if int(request.POST['prompt_mode']) != int(story.prompt_mode):
-                story.prompt_mode = request.POST['prompt_mode']
-                story.prompt = generatePrompt(story.prompt_mode)
-                story.save()
+            story.prompt_mode = request.POST['prompt_mode']
+            story.prompt = generatePrompt(story.prompt_mode)
+            story.save()
 
     elif request.GET.get("new"):
         return redirect('/new_story')
@@ -226,16 +237,18 @@ def logout(request):
 
 
 def generatePrompt(prompt_mode):
-    # adj = ADJECTIVES[random.randrange(0, len(ADJECTIVES))]
-    # noun = ANIMALS[random.randrange(0, len(ANIMALS))].lower()
-    # curTopic = curPrompt
-    # while curTopic == curPrompt:
-    #     if adj[0] in 'aeiou':
-    #         curTopic = "Write about an {} {}".format(adj, noun)
-    #     else:
-    #         curTopic = "Write about a {} {}".format(adj, noun)
-    if int(prompt_mode) == PromptMode.LEWIS.value:
+    if int(prompt_mode) == PromptMode.SIMPLE.value:
+        adj = ADJECTIVES[random.randrange(0, len(ADJECTIVES))]
+        noun = ANIMALS[random.randrange(0, len(ANIMALS))].lower()
+        if adj[0] in 'aeiou':
+            prompt = "Write about an {} {}".format(adj, noun)
+        else:
+            prompt = "Write about a {} {}".format(adj, noun)
+    elif int(prompt_mode) == PromptMode.LEWIS.value:
         prompt_model.set_model("lewis_model2")
+        prompt = prompt_model.generate_with_constraints("STOP")
+    elif int(prompt_mode) == PromptMode.DICKENS.value:
+        prompt_model.set_model("dickens_model")
         prompt = prompt_model.generate_with_constraints("STOP")
     elif int(prompt_mode) == PromptMode.NONE.value:
         prompt = ""
@@ -249,6 +262,8 @@ def generateSuggestion(session, newSentence, mode):
     try:
         if int(mode) == Mode.RNN.value:
             suggestion = rnn.generate_suggestion(session, newSentence)
+        elif int(mode) == Mode.SEQ2SEQ.value:
+            suggestion = "Seq2Seq model not integrated yet."
         elif int(mode) == Mode.NGRAM.value:
             suggestion = ngram_model.generate_with_constraints(newSentence)
         elif int(mode) == Mode.NONE.value:

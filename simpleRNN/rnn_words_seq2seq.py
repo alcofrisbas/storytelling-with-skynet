@@ -128,7 +128,6 @@ class SimpleRNN:
         # seq2seq embedding layers
         embedded_input = tf.cast(tf.nn.embedding_lookup(self.input_embedding_matrix, inputs), tf.float32)
 
-
         # consider using GRU cells
         with tf.variable_scope("encoding") as encoding_scope:
             lstm_encoding = rnn.MultiRNNCell([rnn.BasicLSTMCell(self.n_hidden),rnn.BasicLSTMCell(self.n_hidden)])
@@ -180,7 +179,6 @@ class SimpleRNN:
                 logits = tf.identity(final_outputs.rnn_output, name="predictions")
                 batch_loss = None
                 valid_predictions = tf.identity(final_outputs.sample_id, name="valid_preds")
-
             return logits, batch_loss, valid_predictions
 
     def train(self):
@@ -200,46 +198,48 @@ class SimpleRNN:
             while step < self.training_iters:
                 all_pred = []
                 # Generate a minibatch. Add some randomness on selection process.
-                sent_num = 0
-                while sent_num < len(self.training_data):
-                #sent_num = 0
-                    symbols = self.training_data[sent_num]
-                    onehot_batch = []
-                    for word in symbols:
-                        try:
-                            one_hot = self.embedding_model.wv.vocab[word.lower()].index
-                            #itemindex = np.where(self.index2word== word)
-                        except KeyError:
-                            one_hot = len(self.input_embedding_matrix)-2
-                        onehot_batch.append(one_hot)
-                    len_inputs = len(onehot_batch)
-                    # padding
-                    while len(onehot_batch) < self.padded_lengths:
-                        onehot_batch.append(len(self.input_embedding_matrix)-1)
+                if sent_num >= len(self.training_data):
+                    sent_num = 0
+                symbols = self.training_data[sent_num]
+                if len(symbols) == 0:
+                    print(1)
+                    symbols = ["PAD"]
+                onehot_batch = []
+                for word in symbols:
+                    try:
+                        one_hot = self.embedding_model.wv.vocab[word.lower()].index
+                        #itemindex = np.where(self.index2word== word)
+                    except KeyError:
+                        one_hot = len(self.input_embedding_matrix)-2
+                    onehot_batch.append(one_hot)
+                len_inputs = len(onehot_batch)
+                # padding
+                while len(onehot_batch) < self.padded_lengths:
+                    onehot_batch.append(len(self.input_embedding_matrix)-1)
 
-                    onehot_batch = [onehot_batch]
+                onehot_batch = [onehot_batch]
 
-                    targets = [len(self.input_embedding_matrix)-3]
-                    for word in self.training_data[sent_num+1]:
-                        try:
-                            targets.append(self.embedding_model.wv.vocab[word.lower()].index)
-                        except KeyError:
-                            targets.append(len(self.input_embedding_matrix)-2)
-                    len_targets = len(targets)-1
-                    # padding
-                    while (len(targets) < self.padded_lengths+1):
-                        targets.append(len(self.input_embedding_matrix)-1)
-                    targets = [targets]
-                    _, acc, loss, embedding_pred = session.run([self.optimizer, self.accuracy, self.cost, self.probas], \
-                                                            feed_dict={self.x: onehot_batch, self.y: targets,
-                                                                self.decoder_lengths: [len_targets], self.encoder_lengths: [len_inputs]})
-                    predictions = []
-                    for prediction in embedding_pred[0]:
-                        predictions.append(self.index2word[prediction])
-                    all_pred.append(predictions)
-                    loss_total += loss
-                    acc_total += acc
-                    sent_num += 2
+                targets = [len(self.input_embedding_matrix)-3]
+                for word in self.training_data[sent_num+1]:
+                    try:
+                        targets.append(self.embedding_model.wv.vocab[word.lower()].index)
+                    except KeyError:
+                        targets.append(len(self.input_embedding_matrix)-2)
+                len_targets = len(targets)-1
+                # padding
+                while (len(targets) < self.padded_lengths+1):
+                    targets.append(len(self.input_embedding_matrix)-1)
+                targets = [targets]
+                _, acc, loss, embedding_pred = session.run([self.optimizer, self.accuracy, self.cost, self.probas], \
+                                                        feed_dict={self.x: onehot_batch, self.y: targets,
+                                                            self.decoder_lengths: [len_targets], self.encoder_lengths: [len_inputs]})
+                predictions = []
+                for prediction in embedding_pred[0]:
+                    predictions.append(self.index2word[prediction])
+                all_pred.append(predictions)
+                loss_total += loss
+                acc_total += acc
+                sent_num += 1
                 if (step+1) % self.display_step == 0:
                     print("Iter= " + str(step+1) + ", Average Loss= " + \
                         "{:.6f}".format(loss_total/self.display_step) + ", Average Accuracy= " + \
@@ -327,3 +327,4 @@ def run(learning_rate, training_iters, n_input, batch_size, n_hidden, path_to_mo
     else:
         d["batch_size"] = 1
         rnn = SimpleRNN(d, display_step, path_to_model, model_name, train)
+        rnn.run()
