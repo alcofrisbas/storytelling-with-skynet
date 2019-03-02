@@ -140,3 +140,8 @@ i {
 .align-self-center {
     line-height: 37px;
 }
+
+#re-prompt {
+    padding-top: 1px;
+    margin: 3px;
+}

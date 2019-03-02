@@ -216,18 +216,21 @@ class SimpleRNN:
                     embedding = self.embedding_model.wv.vocab[word.lower()].index
                 except KeyError:
                     print(word + " not in vocabulary")
-                    embedding = len(self.input_embedding_matrix)-3
+                    embedding = len(self.input_embedding_matrix)-2
                 embedded_symbols.append(embedding)
             # embeded_symbols shape [1, n_input, n_hidden]
             embedded_symbols = [embedded_symbols]
             onehot_pred = 0
             output_sent = ""
-            while onehot_pred != "." and onehot_pred != "!" and onehot_pred != "?":
+            length = 0
+            while onehot_pred != "." and onehot_pred != "!" and onehot_pred != "?" and length < 23:
+                length += 1
                 onehot_pred = session.run(self.probas, feed_dict={self.x: embedded_symbols})
                 onehot_pred = self.index2word[onehot_pred[0]]
                 if onehot_pred == "PAD" or onehot_pred == "UNK" or onehot_pred == "GO":
+                    print(onehot_pred)
                     continue
-                if onehot_pred == "," or onehot_pred == ";" or onehot_pred == ":":
+                elif onehot_pred == "," or onehot_pred == ";" or onehot_pred == ":":
                     output_sent += "%s" % (onehot_pred)
                 else:
                     output_sent += " %s" % (onehot_pred)
@@ -235,11 +238,16 @@ class SimpleRNN:
                 embedded_symbols.append(self.embedding_model.wv.vocab[onehot_pred.lower()].index)
                 embedded_symbols = [embedded_symbols]
                 print(onehot_pred)
-            output_sent += "%s" % (onehot_pred)
 
-            output_sent = output_sent.strip().capitalize()
-            if output_sent[-1].isalpha() or output_sent[-1].isdigit():
-                output_sent += "."
+            if output_sent != "":
+                output_sent = output_sent.strip().capitalize()
+                if onehot_pred in (".", "!", "?"):
+                    output_sent += "%s" % (onehot_pred)
+                else:
+                    output_sent += "."
+            else:
+                output_sent = "Sorry, I don't have any suggestions for that one."
+
             return output_sent
         except Exception as e:
             print(e)

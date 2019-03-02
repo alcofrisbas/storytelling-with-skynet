@@ -30,17 +30,20 @@ class Mode(Enum):
      NGRAM = 2
      NONE = 3
 
-args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000, "training_file": "simpleRNN/data/all_of_dickens.txt"}
+args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000, "training_file": "simpleRNN/data/train.txt"}
 display_step = 1000
 path_to_model = "simpleRNN/models/"
 model_name = "basic_model"
 
+print("instantiating RNN")
 rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
+print("instantiating saver")
 sess = tf.Session()
 saver = tf.train.Saver()
+print("loading saved RNN from " + rnn.path_to_model)
 saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
 
-
+print("loading saved ngram")
 ngram_root = ngram.load_model("./ngrams/models/5max200000.model")
 if not os.path.isfile("./ngrams/models/lewis_model"):
     prompt_ngram = ngram.create_model("./saves/all_of_lewis.txt","./ngrams/models/lewis_model", l=1000000)
