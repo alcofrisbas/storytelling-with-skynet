@@ -203,9 +203,11 @@ def write(request):
             suggestion = generateSuggestion(sess, last, story.mode)
 
     return render(request, 'webapp/write.html',
-                  context={"story": story, 
+                  context={"story": story,
                   "sentences": [s.strip() for s in story.sentences.split("\n")[:-1]],
-                  "suggestion": suggestion})
+                  "suggestion": suggestion,
+                  "modes": [(mode.name, mode.value) for mode in Mode],
+                  "prompt_modes": [(mode.name, mode.value) for mode in PromptMode]})
 
 
 def about(request):
