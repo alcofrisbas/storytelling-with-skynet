@@ -160,10 +160,24 @@ i {
 
 .long-and-truncated-with-child {
   flex: 1;
-  min-width: 0; 
+  min-width: 0;
   input {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
+} */
+input.story-title {
+    overflow: hidden;
+    white-space: nowrap;
+    width: 100%;
+    text-overflow: ellipsis;
+    justify-content: right;
+    /* border-left:1em solid transparent;
+    border-right:1em solid transparent; */
+}
+/* .story-title:after {
+    content: "\0000a0";
+    display: inline-block;
+    width: 0;
 } */

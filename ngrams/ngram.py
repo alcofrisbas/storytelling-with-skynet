@@ -106,6 +106,9 @@ class NGRAM_model:
         self.low = 10
         self.high = 75
 
+    def get_full_path(self):
+        return self.model_path+"/"+self.model_name
+
     def train(self):
         """
         trains a ngram trie
@@ -140,11 +143,13 @@ class NGRAM_model:
             pickle.dump(self.root, p)
         print("done saving")
 
-    def load_model(self):
+    def load_model(self, model_name=None):
         """
         loads a pickled model;
         way faster than retraining
         """
+        if model_name:
+            self.model_name = model_name
         with open(self.model_path+"/"+self.model_name, 'rb') as r:
             self.root = pickle.load(r, fix_imports=True, encoding='bytes')
 
