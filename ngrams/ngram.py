@@ -137,7 +137,7 @@ def generate_sentence(root:Trie, sent:str, l=200, m=3):
     """
     if sent[-1] == ".":
         sent = sent[:-1]+ " STOP"
-    sentence = sent.split()
+    sentence = word_tokenize(sent)
     cut = len(sentence)
     for i in range(l):
         next = predict_next(root, sentence[-m:])
@@ -171,6 +171,12 @@ def format_sent(outSent):
     s = "n't".join(s.split(" n't"))
 
     return s+"."
+
+def generate_with_constraints(root:Trie, sent:str, l=200, m=3, low=10, high=75):
+    s = ""
+    while len(s)< low or len(s) > high:
+        s = generate_sentence(root, "STOP",m=m)
+    return s
 
 
 def create_model(fname, model_name, depth=5, l=100000):

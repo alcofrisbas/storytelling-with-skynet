@@ -216,7 +216,7 @@ def generatePrompt(curPrompt=""):
     #         curTopic = "Write about an {} {}".format(adj, noun)
     #     else:
     #         curTopic = "Write about a {} {}".format(adj, noun)
-    curTopic = ngram.generate_sentence(prompt_ngram, "STOP")
+    curTopic = ngram.generate_with_constraints(prompt_ngram, "STOP")
     return curTopic
 
 
@@ -225,7 +225,7 @@ def generateSuggestion(session, newSentence, mode):
         if mode == Mode.RNN.value:
             suggestion = rnn.generate_suggestion(session, newSentence)
         elif mode == Mode.NGRAM.value:
-            suggestion = ngram.generate_sentence(ngram_root, newSentence, m=2)
+            suggestion = ngram.generate_with_constraints(ngram_root, newSentence, m=2)
         else:
             suggestion="placeholder"
     except Exception as e:

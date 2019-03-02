@@ -14,7 +14,7 @@ def main():
     print("done loading")
     low = 10
     high = 75
-    for i in range(1000):
+    for i in range(10):
         curTopic = ""
         while len(curTopic)< low or len(curTopic) > high:
             curTopic = ngram.generate_sentence(prompt_ngram, "STOP",m=2)
