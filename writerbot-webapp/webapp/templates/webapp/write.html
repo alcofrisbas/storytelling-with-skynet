@@ -36,8 +36,8 @@
                 {% csrf_token %}
             <input id="title-input" type="text" name="title" value="{{ title }}" class="mt-5">
 
-        <div ><button type="submit" class="btn btn-sm btn-primary " name="re-prompt" value="true">Prompt</button><h5 style="display:inline; color:gray;"> {{ prompt }}</h5></div>
         <hr class="my-2">
+        <h5> Prompt: {{ prompt }} <button type="submit" class="btn btn-sm btn-outline-primary" name="re-prompt" id="re-prompt" value="true"><i class="fas fa-redo fa-xs"></i></button></h5>
         {% if sentences %}
         <!-- <p id = "para" style="padding:1px" contenteditable="{{ contentEdit }}"> -->
             <p>
