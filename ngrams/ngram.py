@@ -146,7 +146,10 @@ def generate_sentence(root:Trie, sent:str, l=200, m=3):
 
     outSent = " ".join([str(word) for word in sentence[cut:-1]])+"."
     outSent = outSent[0].upper()+outSent[1:]
-    return outSent
+    # ensure there's only one period at the end of the sentence
+    while outSent[-1] == ".":
+        outSent = outSent[:-1]
+    return outSent.strip()+"."
 
 
 def create_model(fname, model_name, depth=5, l=100000):
