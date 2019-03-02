@@ -51,11 +51,14 @@ ngram_model.m = 2
 ngram_model.high = 100
 prompt_model.m = 2
 
-if not os.path.isfile("./ngrams/models/lewis_model"):
-    prompt_model.create_model()
-    prompt_model.create_model()
+if not os.path.isfile(ngram_model.model_path+"/"+ngram_model.model_name):
+    ngram_model.create_model()
 else:
     ngram_model.load_model()
+
+if not os.path.isfile(prompt_model.model_path+"/"+prompt_model.model_name):
+    prompt_model.create_model()
+else:
     prompt_model.load_model()
 
 #TODO: when user logs in, redirect to the page they logged in from
