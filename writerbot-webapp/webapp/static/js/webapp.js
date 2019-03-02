@@ -1,4 +1,4 @@
-var generation_mode = 1;
+var generation_mode = 0;
 // JS for highlighting menu items
 // a bit hacky, but effective.
 // will patch with jquery as needed.
