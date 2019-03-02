@@ -10,10 +10,11 @@ def main():
     model = ngram.NGRAM_model("./ngrams/models")
 
     model.create_model("lewis_model2")
-    model.create_model("5max200000.model")
-    model.create_model("dickens_model", data="./simpleRNN/data/all_of_dickens.txt")
+    #model.create_model("5max200000.model")
+    #model.create_model("dickens_model", data="./simpleRNN/data/all_of_dickens.txt")
+    #model.create_model("shakespeare_model", data="./saves/all_of_shakespeare.txt")
 
-    model.set_model("5max200000.model")
+    model.set_model("lewis_model2")
     model.m = 2
 
     for i in range(10):
