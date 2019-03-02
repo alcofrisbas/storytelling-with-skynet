@@ -190,14 +190,15 @@ class SimpleRNN:
                         symbols_out.append(symbol_out)
                     for batch in range(self.batch_size):
                         print("%s - [%s] vs [%s]" % (symbols_in[batch],symbols_out[batch],predictions[batch]))
-                # save a new model every 5000 iters
-                if step % 5000 == 0:
-                    saver = tf.train.Saver()# -*- coding: utf-8 -*-
 
-                    saver.save(session, self.path_to_model+"/"+self.model_name)
 
                 step += 1
                 offset += (self.n_input+1)
+                # save a new model every 5000 iters
+                if step % 1000 == 0:
+                    saver = tf.train.Saver()# -*- coding: utf-8 -*-
+
+                    saver.save(session, self.path_to_model+"/"+self.model_name)
 
             print("Optimization Finished!")
             print("Elapsed time: ", self.elapsed(time.time() - self.start_time))
