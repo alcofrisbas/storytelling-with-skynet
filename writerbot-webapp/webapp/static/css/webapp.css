@@ -96,6 +96,7 @@ i {
     font-size: 30px;
     border-style: solid;
     border-color: white;
+    max-width: 100%;
 }
 
 #title-input:hover {

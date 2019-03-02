@@ -33,7 +33,7 @@ class Mode(Enum):
 args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000, "training_file": "simpleRNN/data/train.txt"}
 display_step = 1000
 path_to_model = "simpleRNN/models/"
-model_name = "basic_model"
+model_name = "dickens_model"
 
 print("instantiating RNN")
 rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
@@ -150,7 +150,7 @@ def write(request):
             story.title = request.POST["title"]
             story.save()
 
-        if request.POST.get("re-prompt"):
+        if request.POST.get("re-prompt") == True:
             story.prompt = generatePrompt()
             story.save()
 
