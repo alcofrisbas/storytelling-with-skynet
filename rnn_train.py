@@ -37,7 +37,7 @@ if __name__ == '__main__':
     parser.add_argument("--seq2seq", "-s", action="store")
 
 
-    training_file="simpleRNN/data/train.txt"
+    training_file="simpleRNN/data/all_of_dickens1.txt"
     model_name="basic_model"
 
     n_hidden=300

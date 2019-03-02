@@ -40,8 +40,12 @@ class SimpleRNN:
         self.writer = tf.summary.FileWriter(self.logs_path)
 
         # Text file containing words for training
+<<<<<<< HEAD
+        self.training_file = "simpleRNN/data/all_of_dickens1.txt"   #'simpleRNN/belling_the_cat.txt'
+=======
         self.training_file = d["training_file"]
         # training .txt file
+>>>>>>> a213051cbe39a94856aae9c1569b281f739500c5
         self.training_data = self.read_data(self.training_file)
         self.output_seq_length = len(self.training_data[1]) - 1
         print("Loaded training data...")
@@ -128,7 +132,6 @@ class SimpleRNN:
         # seq2seq embedding layers
         embedded_input = tf.cast(tf.nn.embedding_lookup(self.input_embedding_matrix, inputs), tf.float32)
 
-
         # consider using GRU cells
         with tf.variable_scope("encoding") as encoding_scope:
             lstm_encoding = rnn.MultiRNNCell([rnn.BasicLSTMCell(self.n_hidden),rnn.BasicLSTMCell(self.n_hidden)])
@@ -180,7 +183,6 @@ class SimpleRNN:
                 logits = tf.identity(final_outputs.rnn_output, name="predictions")
                 batch_loss = None
                 valid_predictions = tf.identity(final_outputs.sample_id, name="valid_preds")
-
             return logits, batch_loss, valid_predictions
 
     def train(self):
