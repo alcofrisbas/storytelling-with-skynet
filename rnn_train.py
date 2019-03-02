@@ -34,7 +34,7 @@ if __name__ == '__main__':
     model_name="basic_model"
 
     n_hidden=300
-    min_count=3
+    min_count=1
     learning_rate=0.001
     training_iters=1000
     n_input=6

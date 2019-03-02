@@ -146,3 +146,24 @@ i {
     padding-top: 1px;
     margin: 3px;
 }
+
+/* .flex-child > input {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.flex-parent {
+  display: flex;
+  align-items: center;
+}
+
+.long-and-truncated-with-child {
+  flex: 1;
+  min-width: 0; 
+  input {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+} */

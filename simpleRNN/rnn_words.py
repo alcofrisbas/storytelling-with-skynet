@@ -225,7 +225,25 @@ class SimpleRNN:
             length = 0
             while onehot_pred != "." and onehot_pred != "!" and onehot_pred != "?" and length < 23:
                 length += 1
-                onehot_pred = session.run(self.probas, feed_dict={self.x: embedded_symbols})
+                onehot_pred = session.run(self.pred, feed_dict={self.x: embedded_symbols})
+                if tf.argmax(onehot_pred, 1) == len(self.input_embedding_matrix)-2:
+                    largest = 0
+                    largest_index = 0
+                    for i in range(len(onehot_pred[0])):
+                        if onehot_pred[0][i] > largest:
+                            largest = onehot_pred[0][i]
+                            largest_index = i
+                    onehot_pred[0][i] = 0
+                    second_largest = 0
+                    second_largest_index = 0
+                    for i in range(len(onehot_pred[0])):
+                        if onehot_pred[0][i] > second_largest:
+                            second_largest = onehot_pred[0][i]
+                            second_largest_index = i
+                    onehot_pred = second_largest_index
+                else:
+                    onehot_pred = tf.argmax(onehot_pred, 1)
+
                 onehot_pred = self.index2word[onehot_pred[0]]
                 if onehot_pred == "PAD" or onehot_pred == "UNK" or onehot_pred == "GO":
                     print(onehot_pred)

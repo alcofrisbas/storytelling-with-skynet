@@ -92,13 +92,17 @@ class NGRAM_model:
         self.training_file = training_file
         self.model_name = model_name
         self.model_path = model_path
+        # how many generations on trie
         self.depth = 5
-        self.l = 200000
+        # how many data-points
+        self.l = 100000
         self.display_step = 2000
         self.checkpoints = False
         self.chkpt_step = 100000
+        # m-gram on sentence gen
         self.m = 2
         self.sent_length = 200
+        # better refine sentences...
         self.low = 10
         self.high = 75
 
@@ -109,33 +113,32 @@ class NGRAM_model:
         n: depth
         display_step: change freq of print statements
         """
-        with open(self.training_file) as r:
+        with open(self.training_file+".tkn") as r:
             s = r.read(5000000)
         print("done reading files")
         words = s.split()
         words = [w.lower() if w != 'STOP' else w for w in words ]
-        root = Trie("*")
         print("starting trie construction")
         start = time.time()
-        for i in range(len(words)-n):
-            add(root,words[i:i+n])
+        for i in range(len(words)-self.depth):
+            add(self.root,words[i:i+self.depth])
             if i%self.display_step == 0:
                 now = time.time()-start
                 rate = float(i)/now
                 print("{} substrings processed at {}".format(str(i), str(rate)))
-            if self.checkpoints and i % self.chkpt_step == 0:
-                pass#save_model()
-            if i > l:
+            # if self.checkpoints and i % self.chkpt_step == 0:
+            #     self.save_model()
+            #     self.load_model()
+            if i > self.l:
                 break
-
-        return root
-
     def save_model(self):
         """
         pickles a model to a file
         """
+        print("saving model: {}".format(self.model_path+"/"+self.model_name))
         with open(self.model_path+"/"+self.model_name,'wb') as p:
             pickle.dump(self.root, p)
+        print("done saving")
 
     def load_model(self):
         """
@@ -202,9 +205,8 @@ class NGRAM_model:
         return a model.
         """
         process_data(self.training_file)
-        self.train(self.training_file+".tkn")
+        self.train()
         self.save_model()
-        return root
 
 
 if __name__ == '__main__':
