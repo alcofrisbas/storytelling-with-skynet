@@ -67,9 +67,9 @@ class SimpleRNN:
         self.vocab_size = self.input_embedding_matrix.shape[0]
         self.weights = {'out': self.output_embedding_matrix}
         # tf Graph input
-        self.padded_lengths = 9
+        self.padded_lengths = 10
         self.x = tf.placeholder(tf.int32, [None, self.padded_lengths])
-        self.y = tf.placeholder(tf.int32, [None, self.padded_lengths])
+        self.y = tf.placeholder(tf.int32, [None, self.padded_lengths+1])
         self.encoder_lengths = tf.placeholder(tf.int32, shape=(None,), name="encoder_length")
         self.decoder_lengths = tf.placeholder(tf.int32, shape=(None,), name="decoder_length")
         self.start_token = len(self.input_embedding_matrix) - 3 # GO
@@ -131,31 +131,32 @@ class SimpleRNN:
         with tf.variable_scope("encoding") as encoding_scope:
             lstm_encoding = rnn.MultiRNNCell([rnn.BasicLSTMCell(self.n_hidden),rnn.BasicLSTMCell(self.n_hidden)])
             encoder_outputs, last_state = tf.nn.dynamic_rnn(lstm_encoding, inputs=embedded_input,
-                sequence_length=self.encoder_lengths, dtype=tf.float32)
+                sequence_length=self.encoder_lengths,time_major= False, dtype=tf.float32)
 
         with tf.variable_scope("decoding") as decoding_scope:
             self.batch_size = tf.shape(inputs)[0]
-            lstm_decoding = rnn.BasicLSTMCell(self.n_hidden)#rnn.MultiRNNCell([rnn.BasicLSTMCell(self.n_hidden), rnn.BasicLSTMCell(self.n_hidden)])
+            lstm_decoding = rnn.MultiRNNCell([rnn.BasicLSTMCell(self.n_hidden), rnn.BasicLSTMCell(self.n_hidden)])
+            #rnn.BasicLSTMCell(self.n_hidden)#
             # Attention mechanism and wrapper
             attention_mechanism = tf.contrib.seq2seq.LuongAttention(num_units=self.n_hidden, memory=encoder_outputs,
                 memory_sequence_length=self.encoder_lengths)
-            decoder_cell = tf.contrib.seq2seq.AttentionWrapper(lstm_decoding, attention_mechanism, attention_layer_size=self.n_hidden)
-            initial_state = decoder_cell.zero_state(self.batch_size, tf.float32)
+            decoder_cell = tf.contrib.seq2seq.AttentionWrapper(cell=lstm_decoding, attention_mechanism=attention_mechanism, attention_layer_size=self.n_hidden)
+            initial_state = decoder_cell.zero_state(batch_size=self.batch_size, dtype=tf.float32)
             output_layer = tf.layers.Dense(len(self.input_embedding_matrix), name="output_projection")
             if self.to_train:
                 embedded_output = tf.cast(tf.nn.embedding_lookup(self.input_embedding_matrix, targets), tf.float32)
                 max_dec_length = tf.reduce_max(self.decoder_lengths+1, name="max_dec_length")
-                helper = tf.contrib.seq2seq.TrainingHelper(inputs=embedded_output, sequence_length=self.decoder_lengths,
-                    name="training_helper")
+                helper = tf.contrib.seq2seq.TrainingHelper(inputs=embedded_output, sequence_length=self.decoder_lengths + 1,
+                    time_major= False, name="training_helper")
                 decoder = tf.contrib.seq2seq.BasicDecoder(cell=decoder_cell, helper=helper, initial_state=initial_state, output_layer=output_layer)
 
                 final_outputs, _final_state, _ = tf.contrib.seq2seq.dynamic_decode(decoder, output_time_major=False, impute_finished=True,
                     maximum_iterations=max_dec_length)
                 logits = tf.identity(final_outputs.rnn_output, name="logits")
 
-                targets = tf.slice(self.y, [0,0], [-1, max_dec_length-1], 'targets')
+                targets = tf.slice(targets, [0,0], [-1, max_dec_length], 'targets')
 
-                masks = tf.sequence_mask(self.decoder_lengths+1, max_dec_length-1, dtype=tf.float32, name="masks")
+                masks = tf.sequence_mask(self.decoder_lengths+1, max_dec_length, dtype=tf.float32, name="masks")
                 batch_loss = tf.contrib.seq2seq.sequence_loss(logits=logits, targets=targets, weights=masks,
                     name="batch_loss")
 
@@ -247,102 +248,116 @@ class SimpleRNN:
                 if max_size < len(sent):
                     max_size = len(sent)
             while step < self.training_iters:
+                all_pred = []
                 # Generate a minibatch. Add some randomness on selection process.
                 """
                 if offset > (len(self.training_data)-end_offset):
                     offset = random.randint(0, self.n_input+1)
                 """
-                if sent_num >= len(self.training_data):
-                    sent_num = 0
-                symbols = self.training_data[sent_num]
-                """
-                with open("RNN/data/train.txt") as file:
+                sent_num = 0
+                while sent_num < len(self.training_data):
+                #sent_num = 0
+                    symbols = self.training_data[sent_num]
+                    """
+                    with open("RNN/data/train.txt") as file:
 
-                for i in range(self.batch_size):
-                symbol = [str(self.training_data[j]) for j in range(offset+i, offset+self.n_input+i)]
-                symbols.append(symbol)
-                """
-                onehot_batch = []
-                """
-                for batch in symbols:
-                    embedded_symbols = []
-                """
-                for word in symbols:
-                    try:
-                        one_hot = self.embedding_model.wv.vocab[word.lower()].index
+                    for i in range(self.batch_size):
+                    symbol = [str(self.training_data[j]) for j in range(offset+i, offset+self.n_input+i)]
+                    symbols.append(symbol)
+                    """
+                    onehot_batch = []
+                    """
+                    for batch in symbols:
+                        embedded_symbols = []
+                    """
+                    for word in symbols:
+                        try:
+                            one_hot = self.embedding_model.wv.vocab[word.lower()].index
+                            #itemindex = np.where(self.index2word== word)
+                        except KeyError:
+                            one_hot = len(self.input_embedding_matrix)-2
+                        onehot_batch.append(one_hot)
+                    len_inputs = len(onehot_batch)
+                    # padding
+                    while len(onehot_batch) < self.padded_lengths:
+                        onehot_batch.append(len(self.input_embedding_matrix)-1)
+                    # print("onehot_batch")
+                    # print(onehot_batch)
+                    onehot_batch = [onehot_batch]
+
+                    targets = [len(self.input_embedding_matrix)-3]
+                    for word in self.training_data[sent_num+1]:
+                        try:
+                            targets.append(self.embedding_model.wv.vocab[word.lower()].index)
+                        except KeyError:
+                            targets.append(len(self.input_embedding_matrix)-2)
+                    len_targets = len(targets)-1
+                    # padding
+                    while (len(targets) < self.padded_lengths+1):
+                        targets.append(len(self.input_embedding_matrix)-1)
+                    # print("taget")
+                    # print(targets)
+                    targets = [targets]
+
+                    """
+
+                    for i in range(self.batch_size):
+                        try:
+                            symbols_out_onehot[i] = self.embedding_model.wv.vocab[self.training_data[offset+self.n_input+i]].index
+                        except:
+                            symbols_out_onehot[i] = 0
+                    #print(embedded_batch)
+
+                    outputs = []
+                    for word in self.training_data[sent_num+1][:-1]:
                         #itemindex = np.where(self.index2word== word)
-                    except KeyError:
-                        one_hot = len(self.input_embedding_matrix)-2
-                    onehot_batch.append(one_hot)
-                len_inputs = len(onehot_batch)
-                # padding
-                while len(onehot_batch) < max_size+1:
-                    onehot_batch.append(len(self.input_embedding_matrix)-1)
-                onehot_batch = [onehot_batch]
-                targets = [len(self.input_embedding_matrix)-3]
-                for word in self.training_data[sent_num+1]:
-                    try:
-                        targets.append(self.embedding_model.wv.vocab[word.lower()].index)
-                    except KeyError:
-                        targets.append(len(self.input_embedding_matrix)-2)
-                len_targets = len(targets)-1
-                # padding
-                while (len(targets) < max_size+1):
-                    targets.append(len(self.input_embedding_matrix)-1)
-                targets = [targets]
+                        #ind = itemindex[0][0]
+                        #outputs.append(ind)
+                        outputs.append(self.embedding_model.wv.vocab[word].index)
+                    # padding
+                    while (len(outputs) < max_size):
 
-                """
-
-                for i in range(self.batch_size):
-                    try:
-                        symbols_out_onehot[i] = self.embedding_model.wv.vocab[self.training_data[offset+self.n_input+i]].index
-                    except:
-                        symbols_out_onehot[i] = 0
-                #print(embedded_batch)
-
-                outputs = []
-                for word in self.training_data[sent_num+1][:-1]:
-                    #itemindex = np.where(self.index2word== word)
-                    #ind = itemindex[0][0]
-                    #outputs.append(ind)
-                    outputs.append(self.embedding_model.wv.vocab[word].index)
-                # padding
-                while (len(outputs) < max_size):
-
-                    outputs.append(len(self.input_embedding_matrix)-2)
-                outputs = [outputs]
-                """
-                #symbols_out_onehot = np.reshape(symbols_out_onehot,[self.batch_size,-1])
-
-                #outputs = np.zeros([self.batch_size, self.n_input], dtype=int)
-                _, acc, loss, embedding_pred = session.run([self.optimizer, self.accuracy, self.cost, self.probas], \
-                                                        feed_dict={self.x: onehot_batch, self.y: targets,
-                                                            self.decoder_lengths: [len_targets], self.encoder_lengths: [len_inputs]})
-                predictions = []
-                for prediction in embedding_pred[0]:
-                    predictions.append(self.index2word[prediction])
-                    #predictions.append(self.embedding_model.wv.index2word[prediction])
-                loss_total += loss
-                acc_total += acc
+                        outputs.append(len(self.input_embedding_matrix)-2)
+                    outputs = [outputs]
+                    """
+                    #symbols_out_onehot = np.reshape(symbols_out_onehot,[self.batch_size,-1])
+                    #outputs = np.zeros([self.batch_size, self.n_input], dtype=int)
+                    _, acc, loss, embedding_pred = session.run([self.optimizer, self.accuracy, self.cost, self.probas], \
+                                                            feed_dict={self.x: onehot_batch, self.y: targets,
+                                                                self.decoder_lengths: [len_targets], self.encoder_lengths: [len_inputs]})
+                    predictions = []
+                    #print(self.index2word[embedding_pred[0])
+                    for prediction in embedding_pred[0]:
+                        predictions.append(self.index2word[prediction])
+                        #predictions.append(self.embedding_model.wv.index2word[prediction])
+                    all_pred.append(predictions)
+                    loss_total += loss
+                    acc_total += acc
+                    sent_num += 2
                 if (step+1) % self.display_step == 0:
                     print("Iter= " + str(step+1) + ", Average Loss= " + \
-                          "{:.6f}".format(loss_total/self.display_step) + ", Average Accuracy= " + \
-                          "{:.2f}%".format(100*acc_total/self.display_step))
+                        "{:.6f}".format(loss_total/self.display_step) + ", Average Accuracy= " + \
+                        "{:.2f}%".format(100*acc_total/self.display_step))
                     print("Elapsed time: ", self.elapsed(time.time() - self.start_time))
                     acc_total = 0
                     loss_total = 0
                     symbols_in = []
                     symbols_out = []
+                    # for batch in range(1):
+                    #     symbol_in = self.training_data[sent_num]#[self.training_data[i] for i in range(offset+batch, offset + self.n_input + batch)]
+                    #     symbols_in.append(symbol_in)
+                    #     symbol_out = self.training_data[sent_num+1]#self.training_data[offset + self.n_input+batch]
+                    #     symbols_out.append(symbol_out)
+                        #symbols_out_pred = reverse_dictionary[int(tf.argmax(onehot_pred, 1).eval())]
                     for batch in range(1):
-                        symbol_in = self.training_data[sent_num]#[self.training_data[i] for i in range(offset+batch, offset + self.n_input + batch)]
-                        symbols_in.append(symbol_in)
-                        symbol_out = self.training_data[sent_num+1]#self.training_data[offset + self.n_input+batch]
-                        symbols_out.append(symbol_out)
-                    #symbols_out_pred = reverse_dictionary[int(tf.argmax(onehot_pred, 1).eval())]
-                    for batch in range(1):
-                        print("%s - [%s] vs [%s]" % (symbols_in[batch],symbols_out[batch],predictions))
+                        i = 0
+                        j = 0
+                        while i < len(self.training_data) and j < len(all_pred):
+                            print("%s - [%s] vs [%s]" % (self.training_data[i],self.training_data[i+1], all_pred[j]))
+                            i = i + 2
+                            j = j + 1
+                
                 step += 1
-                sent_num += 2
             print("Optimization Finished!")
             print("Elapsed time: ", self.elapsed(time.time() - self.start_time))
             print("Run on command line.")
