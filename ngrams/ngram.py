@@ -1,7 +1,11 @@
-import numpy as np
-from nltk.tokenize import sent_tokenize, word_tokenize
+import os
 import pickle
 import time
+
+import numpy as np
+
+from nltk.tokenize import sent_tokenize, word_tokenize
+
 
 class Trie:
     """
@@ -87,10 +91,11 @@ def process_data(fname):
         w.write(" ".join(sList))
 
 class NGRAM_model:
-    def __init__(self, training_file, model_name, model_path):
+    def __init__(self, model_path):
+        self.models = {}
         self.root = Trie("*")
-        self.training_file = training_file
-        self.model_name = model_name
+        self.training_file = ""
+        self.model_name = ""
         self.model_path = model_path
         # how many generations on trie
         self.depth = 5
@@ -109,7 +114,13 @@ class NGRAM_model:
     def get_full_path(self):
         return self.model_path+"/"+self.model_name
 
-    def train(self):
+    def set_model(self, model_name):
+        # fail silently!
+        self.model_name = model_name
+        if self.models.get(model_name):
+            self.root = self.models[model_name]
+
+    def train(self,root):
         """
         trains a ngram trie
         l: max iters
@@ -124,7 +135,7 @@ class NGRAM_model:
         print("starting trie construction")
         start = time.time()
         for i in range(len(words)-self.depth):
-            add(self.root,words[i:i+self.depth])
+            add(root,words[i:i+self.depth])
             if i%self.display_step == 0:
                 now = time.time()-start
                 rate = float(i)/now
@@ -134,24 +145,26 @@ class NGRAM_model:
             #     self.load_model()
             if i > self.l:
                 break
-    def save_model(self):
+        return root
+    def save_model(self,root):
         """
         pickles a model to a file
         """
         print("saving model: {}".format(self.model_path+"/"+self.model_name))
         with open(self.model_path+"/"+self.model_name,'wb') as p:
-            pickle.dump(self.root, p)
+            pickle.dump(root, p)
         print("done saving")
 
-    def load_model(self, model_name=None):
+    def load_model(self, model_name):
         """
         loads a pickled model;
         way faster than retraining
         """
-        if model_name:
-            self.model_name = model_name
+        start = time.time()
+        self.model_name = model_name
         with open(self.model_path+"/"+self.model_name, 'rb') as r:
-            self.root = pickle.load(r, fix_imports=True, encoding='bytes')
+            self.models[model_name] = pickle.load(r, fix_imports=True, encoding='bytes')
+        print("done loading model: {}, elapsed: {}s".format(model_name, str(int(time.time()-start))))
 
     def generate_sentence(self, sent:str):
         """
@@ -193,8 +206,9 @@ class NGRAM_model:
             ind += 1
         s = '"'.join(s.split('""'))
         s = "n't".join(s.split(" n't"))
-
-        return s+"."
+        if s[-1] not in "?!":
+            s += "."
+        return s
 
     def generate_with_constraints(self, sent:str):
         s = ""
@@ -203,29 +217,29 @@ class NGRAM_model:
         return s
 
 
-    def create_model(self):
+    def create_model(self, model_name, data=None):
         """
         slams a whole bunch of methods together so
         you can call one function to create, save, and
         return a model.
         """
+        start = time.time()
+        print("creating model: {}".format(model_name))
+        self.model_name = model_name
+        if os.path.exists(self.get_full_path()):
+            self.load_model(self.model_name)
+
+            return
+        if not data:
+            raise Exception("missing arg: data")
+        self.training_file = data
+        root = Trie("*")
         process_data(self.training_file)
-        self.train()
-        self.save_model()
+        root = self.train(root)
+        self.save_model(root)
+        self.models[self.model_name] = root
+        print("done creating model: {}, elapsed: {}s".format(model_name, str(int(time.time()-start))))
 
 
 if __name__ == '__main__':
-    # process_data("./ngrams/dickens.txt")
-    # root = load_model("./ngrams/testRoot")
-    # #root = train("./ngrams/dickens.txt.tkn",l=50000)
-    # save_model("./ngrams/testRoot",root)
-    #
-    # sent = input("enter a sentence: ").lower()
-    # # cap length of sentence
-    # l = 200
-    # # n-gram... after 3, it parrots
-    # m = 3
-    # while sent != "quit":
-    #     print (generate_sentence(root, sent,m=3))
-    #     sent = input("enter a sentence: ").lower()
     pass
