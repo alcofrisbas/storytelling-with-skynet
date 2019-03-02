@@ -48,23 +48,20 @@ print("loading saved RNN from " + rnn.path_to_model)
 saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
 
 print("loading saved ngram")
-ngram_model = ngram.NGRAM_model("./saves/all_of_lewis.txt", "lewis_model2", "./ngrams/models")
-prompt_model = ngram.NGRAM_model("./saves/all_of_lewis.txt", "lewis_model2", "./ngrams/models")
-
+ngram_model = ngram.NGRAM_model("./ngrams/models")
+prompt_model = ngram.NGRAM_model("./ngrams/models")
+ngram_model.create_model("lewis_model2")
+ngram_model.create_model("dickens_model")
+ngram_model.set_model("lewis_model2")
+prompt_model.create_model("lewis_model2")
+prompt_model.set_model("lewis_model2")
 ngram_model.m = 2
 ngram_model.high = 100
+
 prompt_model.m = 2
 
-if not os.path.isfile(ngram_model.get_full_path()):
-    ngram_model.create_model()
-else:
-    ngram_model.load_model()
 
 
-if not os.path.isfile(ngram_model.get_full_path()):
-    prompt_model.create_model()
-else:
-    prompt_model.load_model()
 
 #TODO: when user logs in, redirect to the page they logged in from
 #TODO: figure out how to clear empty stories and expired session data

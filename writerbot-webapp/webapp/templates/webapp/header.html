@@ -56,11 +56,15 @@
     <script src="{% static 'js/webapp.js' %}"></script>
     <script>
         $(document).on('click', '.confirm-delete', function () {
-            alert("something happedn");
             $("#confirmDeleteModal").attr("caller-id", $(this).attr("id"));
         });
         $(".delete-modal").on('shown.bs.modal', function(){
-            console.log($(this).attr("id"));
+            var ID = "#"+$(this).attr("id");
+            $( ID ).keyup(function() {
+                var n = $(ID).attr("modalNum");
+                window.location.href = "/delete_story/"+n;
+            });
+
 
         });
 
