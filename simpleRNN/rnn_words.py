@@ -150,7 +150,7 @@ class SimpleRNN:
                             embedding = self.embedding_model.wv.vocab[word.lower()].index
                         except KeyError:
                             print(word + " not in vocabulary")
-                            embedding = len(self.input_embedding_matrix)-3
+                            embedding = len(self.input_embedding_matrix)-2
                         embedded_symbols.append(embedding)
                     embedded_batch.append(embedded_symbols)
 
@@ -268,14 +268,32 @@ class SimpleRNN:
                             embedding = self.embedding_model.wv.vocab[word.lower()].index
                         except KeyError:
                             print(word + " not in vocabulary")
-                            embedding = len(self.input_embedding_matrix)-3
+                            embedding = len(self.input_embedding_matrix)-2
                         embedded_symbols.append(embedding)
                     # embeded_symbols shape [1, n_input, n_hidden]
                     output_sent = ""
                     output_word = ""
                     embedded_symbols = [embedded_symbols]
                     for i in range(23):
-                        onehot_pred = session.run(self.probas, feed_dict={self.x: embedded_symbols})
+                        onehot_pred = session.run(self.pred, feed_dict={self.x: embedded_symbols})
+                        if tf.argmax(onehot_pred, 1) == len(self.input_embedding_matrix)-2:
+                            largest = 0
+                            largest_index = 0
+                            for i in range(len(onehot_pred[0])):
+                                if onehot_pred[0][i] > largest:
+                                    largest = onehot_pred[0][i]
+                                    largest_index = i
+                            onehot_pred[0][i] = 0
+                            second_largest = 0
+                            second_largest_index = 0
+                            for i in range(len(onehot_pred[0])):
+                                if onehot_pred[0][i] > second_largest:
+                                    second_largest = onehot_pred[0][i]
+                                    second_largest_index = i
+                            onehot_pred = second_largest_index
+                        else:
+                            onehot_pred = tf.argmax(onehot_pred, 1)
+
                         #print(onehot_pred)
                         onehot_pred = self.index2word[onehot_pred[0]]
                         if onehot_pred == "PAD" or onehot_pred == "UNK" or onehot_pred == "GO":
