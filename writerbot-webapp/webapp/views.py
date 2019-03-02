@@ -12,6 +12,7 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'simpleRNN'))
 from rnn_words import SimpleRNN
+from rnn_words_seq2seq import SimpleRN as seq2seqRNN
 import tensorflow as tf
 import random
 from webapp.words import ADJECTIVES, ANIMALS
@@ -40,29 +41,36 @@ class PromptMode(Enum):
 args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000, "training_file": "simpleRNN/data/train.txt"}
 display_step = 1000
 path_to_model = "simpleRNN/models/"
+path_to_seq2seq_model = "simpleRNN/seq2seq_models"
 model_name = "basic_model"
 
 print("instantiating RNN")
 rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
+seq2seq_rnn = seq2seqRNN(args_dict, display_step, path_to_seq2seq_model, model_name)
 print("instantiating saver")
 sess = tf.Session()
+seq2seq_sess = tf.Session()
 saver = tf.train.Saver()
+seq2seq_saver = tf.train.Saver()
 print("loading saved RNN from " + rnn.path_to_model)
 saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
+print("loading saved seq2seqRNN from " + seq2seq_rnn.path_to_model)
+saver.restore(seq2seq2seq_sess, tf.train.latest_checkpoint(seq2seq_rnn.path_to_model))
 
 print("loading saved ngram")
 ngram_model = ngram.NGRAM_model("./ngrams/models")
 prompt_model = ngram.NGRAM_model("./ngrams/models")
 ngram_model.create_model("lewis_model2")
-ngram_model.create_model("dickens_model", "./simpleRNN/data/all_of_dickens.txt")
+ngram_model.create_model("dickens_model")
 ngram_model.set_model("lewis_model2")
-
 prompt_model.create_model("lewis_model2")
-ngram_model.create_model("dickens_model", "./simpleRNN/data/all_of_dickens.txt")
 prompt_model.set_model("lewis_model2")
 ngram_model.m = 2
 ngram_model.high = 100
+
 prompt_model.m = 2
+
+
 
 
 #TODO: when user logs in, redirect to the page they logged in from
@@ -190,10 +198,9 @@ def write(request):
             story.save()
 
         if request.POST.get('prompt_mode'):
-            if int(request.POST['prompt_mode']) != int(story.prompt_mode):
-                story.prompt_mode = request.POST['prompt_mode']
-                story.prompt = generatePrompt(story.prompt_mode)
-                story.save()
+            story.prompt_mode = request.POST['prompt_mode']
+            story.prompt = generatePrompt(story.prompt_mode)
+            story.save()
 
     elif request.GET.get("new"):
         return redirect('/new_story')
