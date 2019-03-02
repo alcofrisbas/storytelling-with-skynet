@@ -135,53 +135,21 @@ function update_settings(mode){
     console.log(generation_mode);
 }
 
-function change_setting_text(){
-    console.log(generation_mode);
+$("#settingsModal").on('show.bs.modal', function(){
+    var m = $(this).closest(".modal").attr("mode");
+    var n = $(this).closest(".modal").attr("prompt-mode");
+    $("#"+m+"_mode").prop('checked', true);
+    $('.to-hide').hide();
+    $("#"+m+"-settings-content").show('slow');
+    $("#"+m+"-settings-title").show('slow');
 
-    if (generation_mode == 0){
-        document.getElementById("rnn-settings-title").style.display = "block";
-        document.getElementById("ngram-settings-title").style.display = "none";
-        document.getElementById("none-settings-title").style.display = "none";
-
-        document.getElementById("rnn-settings-content").style.display = "block";
-        document.getElementById("ngram-settings-content").style.display = "none";
-        document.getElementById("none-settings-content").style.display = "none";
-    }
-    if (generation_mode == 1){
-        document.getElementById("rnn-settings-title").style.display = "none";
-        document.getElementById("ngram-settings-title").style.display = "block";
-        document.getElementById("none-settings-title").style.display = "none";
-
-        document.getElementById("rnn-settings-content").style.display = "none";
-        document.getElementById("ngram-settings-content").style.display = "block";
-        document.getElementById("none-settings-content").style.display = "none";
-    }
-    if (generation_mode == 2){
-        document.getElementById("rnn-settings-title").style.display = "none";
-        document.getElementById("ngram-settings-title").style.display = "none";
-        document.getElementById("none-settings-title").style.display = "block";
-
-        document.getElementById("rnn-settings-content").style.display = "none";
-        document.getElementById("ngram-settings-content").style.display = "none";
-        document.getElementById("none-settings-content").style.display = "block";
-    }
-}
-
-$('input[name=mode]').change(function(){
-    console.log("submitting settings");
-    if (document.getElementById('rnn_mode').checked) {
-        //console.log("rnn_mode checked");
-        generation_mode = 0;
-    }
-    if (document.getElementById('ngram_mode').checked) {
-        //console.log("rnn_mode checked");
-        generation_mode = 1;
-    }
-    if (document.getElementById('none_mode').checked) {
-        //console.log("rnn_mode checked");
-        generation_mode = 2;
-    }
-    console.log(generation_mode);
-
-    change_setting_text();
+    $('#prompt_mode option[value='+n+']').prop('selected', true);
 });
+
+$(function() {
+    $("[name=mode]").click(function(){
+        $('.to-hide').hide();
+        $("#"+$(this).val()+"-settings-content").show('slow');
+        $("#"+$(this).val()+"-settings-title").show('slow');
+    });
+ });

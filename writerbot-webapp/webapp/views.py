@@ -52,11 +52,11 @@ saver = tf.train.Saver()
 print("loading saved RNN from " + rnn.path_to_model)
 saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
 
-seq2seq_rnn = seq2seqRNN(args_dict, display_step, path_to_seq2seq_model, model_name, False)
-print("loading saved seq2seqRNN from " + seq2seq_rnn.path_to_model)
-seq2seq_sess = tf.Session()
-seq2seq_saver = tf.train.Saver()
-saver.restore(seq2seq_sess, tf.train.latest_checkpoint(seq2seq_rnn.path_to_model))
+# seq2seq_rnn = seq2seqRNN(args_dict, display_step, path_to_seq2seq_model, model_name, False)
+# print("loading saved seq2seqRNN from " + seq2seq_rnn.path_to_model)
+# seq2seq_sess = tf.Session()
+# seq2seq_saver = tf.train.Saver()
+# saver.restore(seq2seq_sess, tf.train.latest_checkpoint(seq2seq_rnn.path_to_model))
 
 print("loading saved ngram")
 ngram_model = ngram.NGRAM_model("./ngrams/models")
@@ -68,10 +68,7 @@ prompt_model.create_model("lewis_model2")
 prompt_model.set_model("lewis_model2")
 ngram_model.m = 2
 ngram_model.high = 100
-
 prompt_model.m = 2
-
-
 
 
 #TODO: when user logs in, redirect to the page they logged in from
@@ -155,10 +152,6 @@ def write(request):
     if "story_id" not in request.session.keys() or not Story.objects.filter(id = request.session["story_id"]).exists():
         newStory(request)
 
-    # if "mode" not in request.session.keys():
-    #     # using value instead of enum itself because enum is not JSON serializable so it can't be stored in session
-    #     request.session["mode"] = Mode.RNN.value
-
     story = Story.objects.get(id=request.session["story_id"])
     suggestion = ""
 
@@ -198,7 +191,7 @@ def write(request):
             story.mode = request.POST['mode']
             story.save()
 
-        if request.POST.get('prompt_mode'):
+        if request.POST.get('prompt_mode') and int(story.prompt_mode) != int(request.POST['prompt_mode']):
             story.prompt_mode = request.POST['prompt_mode']
             story.prompt = generatePrompt(story.prompt_mode)
             story.save()
