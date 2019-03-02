@@ -52,11 +52,11 @@ saver = tf.train.Saver()
 print("loading saved RNN from " + rnn.path_to_model)
 saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
 
-seq2seq_rnn = seq2seqRNN(args_dict, display_step, path_to_seq2seq_model, model_name, False)
-print("loading saved seq2seqRNN from " + seq2seq_rnn.path_to_model)
-seq2seq_sess = tf.Session()
-seq2seq_saver = tf.train.Saver()
-saver.restore(seq2seq_sess, tf.train.latest_checkpoint(seq2seq_rnn.path_to_model))
+# seq2seq_rnn = seq2seqRNN(args_dict, display_step, path_to_seq2seq_model, model_name, False)
+# print("loading saved seq2seqRNN from " + seq2seq_rnn.path_to_model)
+# seq2seq_sess = tf.Session()
+# seq2seq_saver = tf.train.Saver()
+# saver.restore(seq2seq_sess, tf.train.latest_checkpoint(seq2seq_rnn.path_to_model))
 
 print("loading saved ngram")
 ngram_model = ngram.NGRAM_model("./ngrams/models")
@@ -68,10 +68,7 @@ prompt_model.create_model("lewis_model2")
 prompt_model.set_model("lewis_model2")
 ngram_model.m = 2
 ngram_model.high = 100
-
 prompt_model.m = 2
-
-
 
 
 #TODO: when user logs in, redirect to the page they logged in from
