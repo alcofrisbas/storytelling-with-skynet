@@ -89,7 +89,7 @@
         </div>
 
         <div class="modal fade" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="settingsModalLabel" aria-hidden="true">
-          <div class="modal-dialog" role="document">
+          <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                   <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
@@ -100,32 +100,54 @@
               <form id="settings-form" method="post">
                   {% csrf_token %}
                   <div class="modal-body">
-                      <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="mode" id="rnn_mode" value="rnn_mode" {% if mode == 1 %} checked {% endif %}>
-                          <label class="form-check-label" for="rnn_mode">RNN</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="mode" id="ngram_mode" value="ngram_mode" {% if mode == 2 %} checked {% endif %}>
-                          <label class="form-check-label" for="ngram_mode">N-Gram</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="mode" id="none_mode" value="none_mode" {% if mode == 3 %} checked {% endif %}>
-                          <label class="form-check-label" for="none_mode">No suggestions</label>
-                        </div>
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 id="rnn-settings-title" class="card-title">RNN</h5>
-                                <h5 id="ngram-settings-title" class="card-title">N-Gram</h5>
-                                <h5 id="none-settings-title" class="card-title">No Suggestions</h5>
-                                <p class="card-text" id="rnn-settings-content" >This is about an RNN</p>
-                                <p class="card-text" id="ngram-settings-content" >This is about N-Grams</p>
-                                <p class="card-text" id="none-settings-content" >This is about nothing</p>
+                      <div class="container-fluid">
+                            <div class="row">
+                                 <div class="col-sm">
+                                     <label for="prompt_mode">Suggestion algorithm:</label>
+                                  </div>
+                                  <div class="col-sm">
+                                      <div class="form-group">
+                                          <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="mode" id="rnn_mode" value="rnn_mode" {% if mode == 1 %} checked {% endif %}>
+                                            <label class="form-check-label" for="rnn_mode">RNN</label>
+                                          </div>
+                                          <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="mode" id="ngram_mode" value="ngram_mode" {% if mode == 2 %} checked {% endif %}>
+                                            <label class="form-check-label" for="ngram_mode">N-Gram</label>
+                                          </div>
+                                          <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="mode" id="none_mode" value="none_mode" {% if mode == 3 %} checked {% endif %}>
+                                            <label class="form-check-label" for="none_mode">No suggestions</label>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div class="col-sm">
+                                      <h5 id="rnn-settings-title" class="card-title">RNN</h5>
+                                      <h5 id="ngram-settings-title" class="card-title">N-Gram</h5>
+                                      <h5 id="none-settings-title" class="card-title">No Suggestions</h5>
+                                      <p class="card-text" id="rnn-settings-content" >This is about an RNN</p>
+                                      <p class="card-text" id="ngram-settings-content" >This is about N-Grams</p>
+                                      <p class="card-text" id="none-settings-content" >This is about nothing</p>
+                                  </div>
                             </div>
-                        </div>
+                            <div class="row">
+                                <div class="col-sm">
+                                    <label for="prompt_mode">Prompts:</label>
+                                </div>
+                                <div class="col-sm">
+                                        <select id="prompt_mode">
+                                          <option>Lewis Carroll</option>
+                                          <option>No prompt</option>
+                                        </select>
+                                </div>
+                                <div class="col-sm">
+                                    Which author do you want prompts to be drawn from?
+                                </div>
+                            </div>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button class="btn btn-primary final" type="submit" value="true" name="apply">Save</button>
+                    <button class="btn btn-primary final" type="submit" value="true">Save</button>
                   </div>
               </form>
             </div>

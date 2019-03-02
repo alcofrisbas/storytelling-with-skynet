@@ -33,7 +33,7 @@ class Mode(Enum):
 args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000, "training_file": "simpleRNN/data/train.txt"}
 display_step = 1000
 path_to_model = "simpleRNN/models/"
-model_name = "dickens_model"
+model_name = "basic_model"
 
 print("instantiating RNN")
 rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
@@ -140,7 +140,7 @@ def write(request):
     if request.POST:
         if request.POST.get("text"):
             new_sentence = request.POST["text"]
-            story.sentences += new_sentence.strip() + "\n"
+            story.sentences += new_sentence.strip().replace("\n", "") + "\n"
             story.suggesting = not story.suggesting
             story.save()
             if request.session.get("mode") != Mode.NONE.value and story.suggesting:
