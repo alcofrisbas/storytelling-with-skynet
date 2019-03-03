@@ -202,7 +202,7 @@ class SimpleRNN:
             while step < self.training_iters:
                 all_pred = []
                 # Generate a minibatch. Add some randomness on selection process.
-                if sent_num >= len(self.training_data):
+                if sent_num+1 >= len(self.training_data):
                     sent_num = 0
                 symbols = self.training_data[sent_num]
                 if len(symbols) == 0:
