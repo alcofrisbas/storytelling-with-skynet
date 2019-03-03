@@ -1,4 +1,4 @@
-import sys
+import sys, os
 from pathlib import Path
 import argparse
 
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     batch_size=10
     to_train=False
     use_seq2seq = False
-    model_loc = "simpleRNN/models/basic_model/"
+    model_loc = "simpleRNN/models/"
 
     args = parser.parse_args(sys.argv[1:])
     if args.training_file:
@@ -75,6 +75,9 @@ if __name__ == '__main__':
         model_loc = "simpleRNN/seq2seq_models/"
     if args.directory:
         model_loc = args.directory
+
+    if not os.path.exists(model_loc):
+        os.mkdir(model_loc)
 
 
     train(training_file, model_loc, model_name, n_hidden, min_count, learning_rate, training_iters, n_input, batch_size, to_train, use_seq2seq)
