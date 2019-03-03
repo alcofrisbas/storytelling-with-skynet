@@ -209,7 +209,7 @@ def write(request):
     else:
         if story.mode != Mode.NONE.value and story.suggesting and story.sentences != "":
             last = story.sentences.split("\n")[-2]
-            suggestion = generateSuggestion(sess, last, story.mode)
+            suggestion = generateSuggestion(seq2seq_sess, last, story.mode)
 
     return render(request, 'webapp/write.html',
                   context={"story": story,
