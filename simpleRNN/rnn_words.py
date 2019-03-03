@@ -123,7 +123,7 @@ class SimpleRNN:
             acc_total = 0
             loss_total = 0
             self.writer.add_graph(session.graph)
-            for i in range(len(self.training_iters)):
+            for i in range(len(self.training_data)):
                 if self.training_data[i] == "]" or self.training_data[i] == "[":
                     self.training_data[i] = ""
             # will train for self.training_iters steps
