@@ -138,13 +138,13 @@ class SimpleRNN:
                 embedded_batch = []
                 for batch in symbols:
                     embedded_symbols = []
-                    print(batch)
+                    #print(batch)
                     for word in batch:
                         # convert each word from string to one-hot vector
                         try:
                             embedding = self.embedding_model.wv.vocab[word.lower()].index
                         except KeyError:
-                            print(word + " not in vocabulary")
+                            #print(word + " not in vocabulary")
                             embedding = len(self.input_embedding_matrix)-2
                         embedded_symbols.append(embedding)
                     embedded_batch.append(embedded_symbols)
