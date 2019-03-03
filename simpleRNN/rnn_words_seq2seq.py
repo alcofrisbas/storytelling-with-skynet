@@ -301,7 +301,7 @@ class SimpleRNN:
                     full_pred.append(word)
 
             full_pred.append(".")
-            otuput_sent = ""
+            output_sent = ""
             # capitalize first word
             full_pred[0] = full_pred[0].capitalize()
             for word in full_pred:
@@ -311,7 +311,7 @@ class SimpleRNN:
                     output_sent += "%s" % (word)
                 else:
                     output_sent +=  " %s" % (word)
-            return full_pred
+            return output_sent
         except Exception as e:
             print(e)
             return e

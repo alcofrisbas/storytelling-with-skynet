@@ -119,6 +119,8 @@ class NGRAM_model:
         self.model_name = model_name
         if self.models.get(model_name):
             self.root = self.models[model_name]
+        else:
+            raise Exception("model {} does not exists.".format(self.get_full_path()))
 
     def train(self,root):
         """
@@ -146,6 +148,7 @@ class NGRAM_model:
             if i > self.l:
                 break
         return root
+
     def save_model(self,root):
         """
         pickles a model to a file
@@ -162,7 +165,7 @@ class NGRAM_model:
         """
         start = time.time()
         self.model_name = model_name
-        with open(self.model_path+"/"+self.model_name, 'rb') as r:
+        with open(self.get_full_path(), 'rb') as r:
             self.models[model_name] = pickle.load(r, fix_imports=True, encoding='bytes')
         print("done loading model: {}, elapsed: {}s".format(model_name, str(int(time.time()-start))))
 
@@ -172,6 +175,7 @@ class NGRAM_model:
         l: max length of sentence
         m: gram depth
         """
+        
         if sent[-1] == ".":
             sent = sent[:-1]+ " STOP"
         sentence = word_tokenize(sent)
@@ -235,7 +239,6 @@ class NGRAM_model:
         self.model_name = model_name
         if os.path.exists(self.get_full_path()):
             self.load_model(self.model_name)
-
             return
         if not data:
             raise Exception("missing arg: data")
