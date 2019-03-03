@@ -294,15 +294,14 @@ class SimpleRNN:
                 predict_sent.append(self.index2word[word])
             full_pred = []
             for word in predict_sent:
-                if word == "." or word == "!" or word == "?":
-                    break
                 if word != "GO":
-                    print(word)
                     full_pred.append(word)
 
             full_pred.append(".")
             output_sent = ""
             # capitalize first word
+            if full_pred[0] == "'" or full_pred[0] == "\"":
+                full_pred[1] = full_pred[1].capitalize()
             full_pred[0] = full_pred[0].capitalize()
             for word in full_pred:
                 if word == "\",\"":
@@ -347,10 +346,7 @@ class SimpleRNN:
                     # remove GO character and stop when period appears
                     full_pred = []
                     for word in predict_sent:
-                        if word == "." or word == "!" or word == "?":
-                            break
                         if word != "GO":
-                            print(word)
                             full_pred.append(word)
 
                     full_pred.append(".")

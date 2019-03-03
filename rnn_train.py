@@ -43,14 +43,15 @@ if __name__ == '__main__':
     n_hidden=300
     min_count=1
     learning_rate=0.001
-    training_iters=1000
+    training_iters=10000
     n_input=6
     batch_size=10
     to_train=True
     use_seq2seq = False
-    model_loc = "simpleRNN/models/basic_model2/"
+    model_loc = "simpleRNN/models/basic_model1/"
 
     args = parser.parse_args(sys.argv[1:])
+    print(args)
     if args.training_file:
         training_file = args.training_file
     if args.model_name:

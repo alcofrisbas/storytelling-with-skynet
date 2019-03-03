@@ -123,7 +123,9 @@ class SimpleRNN:
             acc_total = 0
             loss_total = 0
             self.writer.add_graph(session.graph)
-
+            for i in range(len(self.training_data)):
+                if self.training_data[i] == "]" or self.training_data[i] == "[":
+                    self.training_data[i] = ""
             # will train for self.training_iters steps
             while step < self.training_iters:
                 # Generate a minibatch. Add some randomness on selection process.
@@ -140,7 +142,8 @@ class SimpleRNN:
                     for i in range(self.batch_size):
                         symbol = [str(self.training_data[j]) for j in range(offset+i, offset+self.n_input+i)]
                         symbols.append(symbol)
-
+                if len(symbols) != self.batch_size:
+                    print(symbols)
                 # construct the input of shape [self.batch_size, self.n_input]
                 embedded_batch = []
                 for batch in symbols:
