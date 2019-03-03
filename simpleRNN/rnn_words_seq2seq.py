@@ -294,10 +294,7 @@ class SimpleRNN:
                 predict_sent.append(self.index2word[word])
             full_pred = []
             for word in predict_sent:
-                if word == "." or word == "!" or word == "?":
-                    break
                 if word != "GO":
-                    print(word)
                     full_pred.append(word)
 
             full_pred.append(".")
@@ -347,10 +344,7 @@ class SimpleRNN:
                     # remove GO character and stop when period appears
                     full_pred = []
                     for word in predict_sent:
-                        if word == "." or word == "!" or word == "?":
-                            break
                         if word != "GO":
-                            print(word)
                             full_pred.append(word)
 
                     full_pred.append(".")
