@@ -270,6 +270,49 @@ class SimpleRNN:
             print("\ttensorboard --logdir=%s" % (self.logs_path))
             print("Point your web browser to: http://localhost:6006/")
 
+    def generate_suggestion(self, session, sentence):
+        sentence = sentence.strip()
+        input_sent = word_tokenize(sentence)
+        embedded_symbols = []
+        try:
+            for word in input_sent:
+                try:
+                    embedding = self.embedding_model.wv.vocab[word.lower()].index
+                except KeyError:
+                    print(word + " not in vocabulary")
+                    embedding = len(self.input_embedding_matrix)-2
+                embedded_symbols.append(embedding)
+            # embeded_symbols shape [1, n_input, n_hidden]
+            len_inputs = len(embedded_symbols)
+            embedded_symbols = [embedded_symbols]
+            onehot_pred = 0
+            predictions= session.run(self.probas, feed_dict={self.x: embedded_symbols, self.encoder_lengths: [len_inputs]})
+            predict_sent = []
+            for word in predictions[0]:
+                predict_sent.append(self.index2word[word])
+            full_pred = []
+            for word in predict_sent:
+                if word == "." or word == "!" or word == "?":
+                    break
+                if word != "GO":
+                    print(word)
+                    full_pred.append(word)
+
+            full_pred.append(".")
+            # capitalize first word
+            full_pred[0] = full_pred[0].capitalize()
+            for word in full_pred:
+                if word == "\",\"":
+                    word = ","
+                if word == "." or word == "!" or word == "," or word == "?" or word == ";" or word == ":":
+                    output_sent += "%s" % (word)
+                else:
+                    output_sent +=  " %s" % (word)
+            return full_pred
+        except Exception as e:
+            print(e)
+            return e
+
 
     def run(self):
         with tf.Session() as session:
