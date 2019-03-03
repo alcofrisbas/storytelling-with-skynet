@@ -284,6 +284,8 @@ class SimpleRNN:
                 embedded_symbols.append(embedding)
             # embeded_symbols shape [1, n_input, n_hidden]
             len_inputs = len(embedded_symbols)
+            while len(embedded_symbols) < self.padded_lengths:
+                embedded_symbols.append(len(self.input_embedding_matrix)-3)
             embedded_symbols = [embedded_symbols]
             onehot_pred = 0
             predictions= session.run(self.probas, feed_dict={self.x: embedded_symbols, self.encoder_lengths: [len_inputs]})
@@ -299,6 +301,7 @@ class SimpleRNN:
                     full_pred.append(word)
 
             full_pred.append(".")
+            otuput_sent = ""
             # capitalize first word
             full_pred[0] = full_pred[0].capitalize()
             for word in full_pred:
