@@ -37,7 +37,7 @@ if __name__ == '__main__':
     parser.add_argument("--directory", "-d", action="store")
 
 
-    training_file="simpleRNN/data/all_of_dickens1.txt"
+    training_file="simpleRNN/data/charles_dickens_great_expectations.txt"
     model_name="basic_model"
 
     n_hidden=300
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     batch_size=10
     to_train=False
     use_seq2seq = False
-    model_loc = "simpleRNN/models/"
+    model_loc = "simpleRNN/models/basic_model/"
 
     args = parser.parse_args(sys.argv[1:])
     if args.training_file:

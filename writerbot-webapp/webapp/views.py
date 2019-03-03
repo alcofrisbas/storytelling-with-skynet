@@ -42,28 +42,27 @@ class PromptMode(Enum):
     DICKENS = 2
     NONE = 3
 
-args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000, "training_file": "simpleRNN/data/train.txt"}
+args_dict = {"n_input": 10, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000, "training_file": "simpleRNN/data/train.txt"}
 display_step = 1000
 path_to_model = config("PATH_TO_RNN")#"simpleRNN/models/"
 path_to_seq2seq_model = config("PATH_TO_SEQ")#"simpleRNN/seq2seq_models/"
-
 model_name = config("RNN_MODEL_NAME")#"basic_model"
 
-# print("instantiating RNN")
-# sess = tf.Session()
-# rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
-# print("instantiating saver")
-# saver = tf.train.Saver()
-# print("loading saved RNN from " + rnn.path_to_model)
-# saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
+print("instantiating RNN")
+sess = tf.Session()
+rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
+print("instantiating saver")
+saver = tf.train.Saver()
+print("loading saved RNN from " + rnn.path_to_model)
+saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
 
-seq2seq_rnn = seq2seqRNN(args_dict, display_step, path_to_seq2seq_model, model_name, False)
-# with tf.Graph().as_default():
-seq2seq_sess = tf.Session()
-#with tf.variable_scope("seq2seq"):
-print("loading saved seq2seqRNN from " + seq2seq_rnn.path_to_model)
-seq2seq_saver = tf.train.Saver()
-seq2seq_saver.restore(seq2seq_sess, tf.train.latest_checkpoint(seq2seq_rnn.path_to_model))
+# seq2seq_rnn = seq2seqRNN(args_dict, display_step, path_to_seq2seq_model, model_name, False)
+# # with tf.Graph().as_default():
+# seq2seq_sess = tf.Session()
+# #with tf.variable_scope("seq2seq"):
+# print("loading saved seq2seqRNN from " + seq2seq_rnn.path_to_model)
+# seq2seq_saver = tf.train.Saver()
+# seq2seq_saver.restore(seq2seq_sess, tf.train.latest_checkpoint(seq2seq_rnn.path_to_model))
 
 print("loading saved ngram")
 ngram_model = ngram.NGRAM_model("./ngrams/models")
@@ -171,7 +170,7 @@ def write(request):
             story.save()
             if story.mode != Mode.NONE.value and story.suggesting:
                 #TODO: make this sensitive to mode
-                suggestion = generateSuggestion(seq2seq_sess, new_sentence, story.mode)
+                suggestion = generateSuggestion(sess, new_sentence, story.mode)
 
         if request.POST.get("title"):
             story.title = request.POST["title"]
@@ -210,7 +209,7 @@ def write(request):
     else:
         if story.mode != Mode.NONE.value and story.suggesting and story.sentences != "":
             last = story.sentences.split("\n")[-2]
-            suggestion = generateSuggestion(seq2seq_sess, last, story.mode)
+            suggestion = generateSuggestion(sess, last, story.mode)
 
     return render(request, 'webapp/write.html',
                   context={"story": story,

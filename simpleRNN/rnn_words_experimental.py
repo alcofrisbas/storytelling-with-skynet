@@ -149,7 +149,7 @@ class SimpleRNN:
                         try:
                             embedding = self.embedding_model.wv.vocab[word.lower()].index
                         except KeyError:
-                            print(word + " not in vocabulary")
+                            #print(word + " not in vocabulary")
                             embedding = len(self.input_embedding_matrix)-2
                         embedded_symbols.append(embedding)
                     embedded_batch.append(embedded_symbols)
@@ -190,14 +190,15 @@ class SimpleRNN:
                         symbols_out.append(symbol_out)
                     for batch in range(self.batch_size):
                         print("%s - [%s] vs [%s]" % (symbols_in[batch],symbols_out[batch],predictions[batch]))
-                # save a new model every 5000 iters
-                if step % 5000 == 0:
-                    saver = tf.train.Saver()# -*- coding: utf-8 -*-
 
-                    saver.save(session, self.path_to_model+"/"+self.model_name)
 
                 step += 1
                 offset += (self.n_input+1)
+                # save a new model every 5000 iters
+                if step % 1000 == 0:
+                    saver = tf.train.Saver()# -*- coding: utf-8 -*-
+
+                    saver.save(session, self.path_to_model+"/"+self.model_name)
 
             print("Optimization Finished!")
             print("Elapsed time: ", self.elapsed(time.time() - self.start_time))
@@ -206,6 +207,69 @@ class SimpleRNN:
             print("Point your web browser to: http://localhost:6006/")
 
     # generate a suggestion given a session and a string sentence
+    # def generate_suggestion(self, session, sentence):
+    #     sentence = sentence.strip()
+    #     input_sent = word_tokenize(sentence)
+    #     embedded_symbols = []
+    #     try:
+    #         for word in input_sent:
+    #             try:
+    #                 embedding = self.embedding_model.wv.vocab[word.lower()].index
+    #             except KeyError:
+    #                 print(word + " not in vocabulary")
+    #                 embedding = len(self.input_embedding_matrix)-2
+    #             embedded_symbols.append(embedding)
+    #         # embeded_symbols shape [1, n_input, n_hidden]
+    #         embedded_symbols = [embedded_symbols]
+    #         onehot_pred = 0
+    #         output_sent = ""
+    #         length = 0
+    #         while onehot_pred != "." and onehot_pred != "!" and onehot_pred != "?" and length < 23:
+    #             length += 1
+    #             onehot_pred = session.run(self.pred, feed_dict={self.x: embedded_symbols})
+    #             # if np.argmax(onehot_pred, 1)[0] == len(self.input_embedding_matrix)-2 or np.argmax(onehot_pred, 1)[0] == 0:
+    #             #     largest = 0
+    #             #     largest_index = 0
+    #             #     for i in range(len(onehot_pred[0])):
+    #             #         if onehot_pred[0][i] > largest:
+    #             #             largest = onehot_pred[0][i]
+    #             #             largest_index = i
+    #             #     onehot_pred[0][i] = 0
+    #             #     second_largest = 0
+    #             #     second_largest_index = 0
+    #             #     for i in range(len(onehot_pred[0])):
+    #             #         if onehot_pred[0][i] > second_largest:
+    #             #             second_largest = onehot_pred[0][i]
+    #             #             second_largest_index = i
+    #             #     onehot_pred = second_largest_index
+    #             # else:
+    #             #     onehot_pred = np.argmax(onehot_pred, 1)
+    #
+    #             onehot_pred = self.index2word[onehot_pred[0]]
+    #             if onehot_pred == "PAD" or onehot_pred == "UNK" or onehot_pred == "GO":
+    #                 continue
+    #             elif onehot_pred == "," or onehot_pred == ";" or onehot_pred == ":":
+    #                 output_sent += "%s" % (onehot_pred)
+    #             else:
+    #                 output_sent += " %s" % (onehot_pred)
+    #             embedded_symbols = embedded_symbols[0][1:]
+    #             embedded_symbols.append(self.embedding_model.wv.vocab[onehot_pred.lower()].index)
+    #             embedded_symbols = [embedded_symbols]
+    #
+    #         if output_sent != "":
+    #             output_sent = output_sent.strip().capitalize()
+    #             if onehot_pred in (".", "!", "?"):
+    #                 output_sent += "%s" % (onehot_pred)
+    #             else:
+    #                 output_sent += "."
+    #         else:
+    #             output_sent = "Sorry, I don't have any suggestions for that one."
+    #
+    #         return output_sent
+    #     except Exception as e:
+    #         print(e)
+    #         return e
+
     def generate_suggestion(self, session, sentence):
         sentence = sentence.strip()
         input_sent = word_tokenize(sentence)
