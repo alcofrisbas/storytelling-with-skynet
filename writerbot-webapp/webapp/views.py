@@ -56,13 +56,13 @@ saver = tf.train.Saver()
 print("loading saved RNN from " + rnn.path_to_model)
 saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
 
-# seq2seq_rnn = seq2seqRNN(args_dict, display_step, path_to_seq2seq_model, model_name, False)
-# # with tf.Graph().as_default():
-# seq2seq_sess = tf.Session()
-# #with tf.variable_scope("seq2seq"):
-# print("loading saved seq2seqRNN from " + seq2seq_rnn.path_to_model)
-# seq2seq_saver = tf.train.Saver()
-# seq2seq_saver.restore(seq2seq_sess, tf.train.latest_checkpoint(seq2seq_rnn.path_to_model))
+with tf.Graph().as_default():
+    seq2seq_rnn = seq2seqRNN(args_dict, display_step, path_to_seq2seq_model, model_name, False)
+    seq2seq_sess = tf.Session()
+    #with tf.variable_scope("seq2seq"):
+    print("loading saved seq2seqRNN from " + seq2seq_rnn.path_to_model)
+    seq2seq_saver = tf.train.Saver()
+    seq2seq_saver.restore(seq2seq_sess, tf.train.latest_checkpoint(seq2seq_rnn.path_to_model))
 
 print("loading saved ngram")
 ngram_model = ngram.NGRAM_model("./ngrams/models")
@@ -169,8 +169,12 @@ def write(request):
             story.suggesting = not story.suggesting
             story.save()
             if story.mode != Mode.NONE.value and story.suggesting:
-                #TODO: make this sensitive to mode
-                suggestion = generateSuggestion(sess, new_sentence, story.mode)
+                if story.mode == Mode.RNN.value or story.mode == Mode.NGRAM.value:
+                    suggestion = generateSuggestion(sess, new_sentence, story.mode)
+                elif story.mode == Mode.SEQ2SEQ.value:
+                    suggestion = generateSuggestion(seq2seq_sess, new_sentence, story.mode)
+                else:
+                    print("Unimplemented mode {}".format(story.mode))
 
         if request.POST.get("title"):
             story.title = request.POST["title"]
@@ -209,7 +213,12 @@ def write(request):
     else:
         if story.mode != Mode.NONE.value and story.suggesting and story.sentences != "":
             last = story.sentences.split("\n")[-2]
-            suggestion = generateSuggestion(sess, last, story.mode)
+            if story.mode == Mode.RNN.value or story.mode == Mode.NGRAM.value:
+                suggestion = generateSuggestion(sess, last, story.mode)
+            elif story.mode == Mode.SEQ2SEQ.value:
+                suggestion = generateSuggestion(seq2seq_sess, last, story.mode)
+            else:
+                print("Unimplemented mode {}".format(story.mode))
 
     return render(request, 'webapp/write.html',
                   context={"story": story,
