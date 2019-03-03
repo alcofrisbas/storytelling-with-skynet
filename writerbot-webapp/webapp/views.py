@@ -267,11 +267,7 @@ def generateSuggestion(session, newSentence, mode):
         if int(mode) == Mode.RNN.value:
             suggestion = rnn.generate_suggestion(session, newSentence)
         elif int(mode) == Mode.SEQ2SEQ.value:
-<<<<<<< HEAD
-            suggestion = "asdf"#suggestion = seq2seq.generate_suggestion(session, newSentence)
-=======
             suggestion = seq2seq_rnn.generate_suggestion(session, newSentence)
->>>>>>> a313dd073ae13b09e3899c6d5d14704504694a53
         elif int(mode) == Mode.NGRAM.value:
             suggestion = ngram_model.generate_with_constraints(newSentence)
         elif int(mode) == Mode.NONE.value:
