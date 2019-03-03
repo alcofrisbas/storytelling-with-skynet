@@ -46,9 +46,9 @@ if __name__ == '__main__':
     training_iters=1000
     n_input=6
     batch_size=10
-    to_train=False
+    to_train=True
     use_seq2seq = False
-    model_loc = "simpleRNN/models/"
+    model_loc = "simpleRNN/models/basic_model2/"
 
     args = parser.parse_args(sys.argv[1:])
     if args.training_file:
