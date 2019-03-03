@@ -300,6 +300,8 @@ class SimpleRNN:
             full_pred.append(".")
             output_sent = ""
             # capitalize first word
+            if full_pred[0] == "'" or full_pred[0] == "\"":
+                full_pred[1] = full_pred[1].capitalize()
             full_pred[0] = full_pred[0].capitalize()
             for word in full_pred:
                 if word == "\",\"":
