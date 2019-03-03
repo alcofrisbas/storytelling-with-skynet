@@ -7,6 +7,11 @@ from io import StringIO
 
 from webapp.models import Story
 from webapp.models import User
+import os
+
+from decouple import config
+
+
 
 import sys
 import os
@@ -37,14 +42,19 @@ class PromptMode(Enum):
     LEWIS = 1
     DICKENS = 2
     NONE = 3
-
 args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000, "training_file": "simpleRNN/data/train.txt"}
 display_step = 1000
+<<<<<<< HEAD
 path_to_model = "simpleRNN/models/"
 path_to_seq2seq_model = "simpleRNN/seq2seq_models/"
 model_name = "basic_model"
 
 
+=======
+path_to_model = config("PATH_TO_RNN")#"simpleRNN/models/"
+path_to_seq2seq_model = config("PATH_TO_SEQ")#"simpleRNN/seq2seq_models/"
+model_name = config("RNN_MODEL_NAME")#"basic_model"
+>>>>>>> 1232e7f51288ecf1822b2db8c72d37d6d30cdbb6
 print("instantiating RNN")
 sess = tf.Session()
 rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
