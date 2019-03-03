@@ -260,8 +260,9 @@ class SimpleRNN:
                             i = i + 2
                             j = j + 1
                 if step % 5000 == 0:
+                    print("saving checkpoint!")
                     saver = tf.train.Saver()# -*- coding: utf-8 -*-
-                    saver.save(session, "simpleRNN/seq2seq_models/"+self.model_name)
+                    saver.save(session, self.path_to_model+self.model_name)
                 step += 1
             print("Optimization Finished!")
             print("Elapsed time: ", self.elapsed(time.time() - self.start_time))
