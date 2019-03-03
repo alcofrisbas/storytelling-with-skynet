@@ -42,26 +42,28 @@ class PromptMode(Enum):
     LEWIS = 1
     DICKENS = 2
     NONE = 3
+
 args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000, "training_file": "simpleRNN/data/train.txt"}
 display_step = 1000
 path_to_model = config("PATH_TO_RNN")#"simpleRNN/models/"
 path_to_seq2seq_model = config("PATH_TO_SEQ")#"simpleRNN/seq2seq_models/"
 model_name = config("RNN_MODEL_NAME")#"basic_model"
-print("instantiating RNN")
-sess = tf.Session()
-rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
-print("instantiating saver")
-saver = tf.train.Saver()
-print("loading saved RNN from " + rnn.path_to_model)
-saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
 
-with tf.Graph().as_default():
-    seq2seq_sess = tf.Session()
-    #with tf.variable_scope("seq2seq"):
-    seq2seq_rnn = seq2seqRNN(args_dict, display_step, path_to_seq2seq_model, model_name, False)
-    print("loading saved seq2seqRNN from " + seq2seq_rnn.path_to_model)
-    seq2seq_saver = tf.train.Saver()
-    seq2seq_saver.restore(seq2seq_sess, tf.train.latest_checkpoint(seq2seq_rnn.path_to_model))
+# print("instantiating RNN")
+# sess = tf.Session()
+# rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)
+# print("instantiating saver")
+# saver = tf.train.Saver()
+# print("loading saved RNN from " + rnn.path_to_model)
+# saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
+
+seq2seq_rnn = seq2seqRNN(args_dict, display_step, path_to_seq2seq_model, model_name, False)
+# with tf.Graph().as_default():
+seq2seq_sess = tf.Session()
+#with tf.variable_scope("seq2seq"):
+print("loading saved seq2seqRNN from " + seq2seq_rnn.path_to_model)
+seq2seq_saver = tf.train.Saver()
+seq2seq_saver.restore(seq2seq_sess, tf.train.latest_checkpoint(seq2seq_rnn.path_to_model))
 
 print("loading saved ngram")
 ngram_model = ngram.NGRAM_model("./ngrams/models")
@@ -117,7 +119,7 @@ def newStory(request):
         old_story.delete()
 
     s = Story.objects.create(sentences="", title="Untitled",
-        prompt=generatePrompt(PromptMode.LEWIS.value))
+        prompt=generatePrompt(0))
     if request.user.is_authenticated:
         user = getOrCreateUser(request)
         s.author = user
@@ -167,7 +169,8 @@ def write(request):
             story.suggesting = not story.suggesting
             story.save()
             if story.mode != Mode.NONE.value and story.suggesting:
-                suggestion = generateSuggestion(sess, new_sentence, story.mode)
+                #TODO: make this sensitive to mode
+                suggestion = generateSuggestion(seq2seq_sess, new_sentence, story.mode)
 
         if request.POST.get("title"):
             story.title = request.POST["title"]
@@ -261,7 +264,7 @@ def generateSuggestion(session, newSentence, mode):
         if int(mode) == Mode.RNN.value:
             suggestion = rnn.generate_suggestion(session, newSentence)
         elif int(mode) == Mode.SEQ2SEQ.value:
-            suggestion = "Seq2Seq model not integrated yet."
+            suggestion = seq2seq_rnn.generate_suggestion(session, newSentence)
         elif int(mode) == Mode.NGRAM.value:
             suggestion = ngram_model.generate_with_constraints(newSentence)
         elif int(mode) == Mode.NONE.value:
