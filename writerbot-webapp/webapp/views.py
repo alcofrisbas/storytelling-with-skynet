@@ -22,8 +22,7 @@ import tensorflow as tf
 import random
 from webapp.words import ADJECTIVES, ANIMALS
 
-# little hacky shit to make pickling work for loading the ngram model
-# fastly.
+# little hacky shit to make pickling work for loading the ngram model fastly.
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'./'))
 from ngrams import ngram
 sys.modules["ngram"] = ngram
@@ -47,6 +46,7 @@ args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.
 display_step = 1000
 path_to_model = config("PATH_TO_RNN")#"simpleRNN/models/"
 path_to_seq2seq_model = config("PATH_TO_SEQ")#"simpleRNN/seq2seq_models/"
+
 model_name = config("RNN_MODEL_NAME")#"basic_model"
 
 # print("instantiating RNN")
@@ -68,11 +68,12 @@ seq2seq_saver.restore(seq2seq_sess, tf.train.latest_checkpoint(seq2seq_rnn.path_
 print("loading saved ngram")
 ngram_model = ngram.NGRAM_model("./ngrams/models")
 prompt_model = ngram.NGRAM_model("./ngrams/models")
-ngram_model.create_model("5max200000.model")
-#ngram_model.create_model("dickens_model")
-#ngram_model.set_model("lewis_model2")
-prompt_model.create_model("5max200000.model")
-prompt_model.set_model("5max200000.model")
+ngram_model.create_model("dickens_model")
+ngram_model.set_model("dickens_model")
+
+prompt_model.create_model("dickens_model")
+prompt_model.create_model("lewis_model2")
+prompt_model.set_model("dickens_model")
 ngram_model.m = 2
 ngram_model.high = 100
 prompt_model.m = 2
@@ -260,6 +261,8 @@ def generatePrompt(prompt_mode):
 
 
 def generateSuggestion(session, newSentence, mode):
+    print(int(mode))
+    print(newSentence)
     try:
         if int(mode) == Mode.RNN.value:
             suggestion = rnn.generate_suggestion(session, newSentence)
