@@ -124,8 +124,8 @@ class SimpleRNN:
             loss_total = 0
             self.writer.add_graph(session.graph)
             for i in range(len(self.training_iters)):
-                if self.training_iters[i] == "]" or self.training_iters[i] == "[":
-                    self.training_iters[i] = ""
+                if self.training_data[i] == "]" or self.training_data[i] == "[":
+                    self.training_data[i] = ""
             # will train for self.training_iters steps
             while step < self.training_iters:
                 # Generate a minibatch. Add some randomness on selection process.
