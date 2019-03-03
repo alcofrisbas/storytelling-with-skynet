@@ -33,7 +33,6 @@ class SimpleRNN:
         self.path_to_model = path_to_model
         self.model_name = model_name
         self.to_train = to_train
-
         self.start_time = time.time()
         # Target log path
         self.logs_path = '/tmp/tensorflow/rnn_word'
