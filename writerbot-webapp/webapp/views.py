@@ -44,11 +44,9 @@ class PromptMode(Enum):
     NONE = 3
 args_dict = {"n_input": 4, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000, "training_file": "simpleRNN/data/train.txt"}
 display_step = 1000
-
 path_to_model = config("PATH_TO_RNN")#"simpleRNN/models/"
 path_to_seq2seq_model = config("PATH_TO_SEQ")#"simpleRNN/seq2seq_models/"
 model_name = config("RNN_MODEL_NAME")#"basic_model"
-
 print("instantiating RNN")
 sess = tf.Session()
 rnn = SimpleRNN(args_dict, display_step, path_to_model, model_name)

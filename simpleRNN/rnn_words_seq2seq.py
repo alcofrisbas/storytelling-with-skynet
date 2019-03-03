@@ -259,16 +259,16 @@ class SimpleRNN:
                             print("%s - [%s] vs [%s]" % (self.training_data[i],self.training_data[i+1], all_pred[j]))
                             i = i + 2
                             j = j + 1
-
+                if step % 5000 == 0:
+                    saver = tf.train.Saver()# -*- coding: utf-8 -*-
+                    saver.save(session, "simpleRNN/seq2seq_models/"+self.model_name)
                 step += 1
             print("Optimization Finished!")
             print("Elapsed time: ", self.elapsed(time.time() - self.start_time))
             print("Run on command line.")
             print("\ttensorboard --logdir=%s" % (self.logs_path))
             print("Point your web browser to: http://localhost:6006/")
-            saver = tf.train.Saver()# -*- coding: utf-8 -*-
 
-            saver.save(session, "simpleRNN/seq2seq_models/"+self.model_name)
 
     def run(self):
         with tf.Session() as session:
