@@ -131,14 +131,20 @@ class SimpleRNN:
                     offset = random.randint(0, self.n_input+1)
                 symbols = []
                 # get a subset of words to read
-                for i in range(self.batch_size):
-                    symbol = [str(self.training_data[j]) for j in range(offset+i, offset+self.n_input+i)]
-                    symbols.append(symbol)
+                try:
+                    for i in range(self.batch_size):
+                        symbol = [str(self.training_data[j]) for j in range(offset+i, offset+self.n_input+i)]
+                        symbols.append(symbol)
+                except:
+                    offset = random.randint(0, self.n_input+1)
+                    for i in range(self.batch_size):
+                        symbol = [str(self.training_data[j]) for j in range(offset+i, offset+self.n_input+i)]
+                        symbols.append(symbol)
+
                 # construct the input of shape [self.batch_size, self.n_input]
                 embedded_batch = []
                 for batch in symbols:
                     embedded_symbols = []
-                    #print(batch)
                     for word in batch:
                         # convert each word from string to one-hot vector
                         try:
