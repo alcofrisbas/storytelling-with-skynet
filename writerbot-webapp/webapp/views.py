@@ -47,6 +47,8 @@ display_step = 1000
 path_to_model = config("PATH_TO_RNN")#"simpleRNN/models/"
 path_to_seq2seq_model = config("PATH_TO_SEQ")#"simpleRNN/seq2seq_models/"
 model_name = config("RNN_MODEL_NAME")#"basic_model"
+seq2seq_model_name = config("SEQ2SEQ_MODEL_NAME")#"seq2seq_model_name"
+seq2seq_args_dict = {"n_input": 20, "batch_size": 1, "n_hidden": 500, "learning_rate": 0.001, "training_iters":50000, "training_file": "simpleRNN/data/charles_dickens_great_expectations1.txt"}
 
 print("instantiating RNN")
 sess = tf.Session()
@@ -57,7 +59,7 @@ print("loading saved RNN from " + rnn.path_to_model)
 saver.restore(sess, tf.train.latest_checkpoint(rnn.path_to_model))
 
 with tf.Graph().as_default():
-    seq2seq_rnn = seq2seqRNN(args_dict, display_step, path_to_seq2seq_model, model_name, False)
+    seq2seq_rnn = seq2seqRNN(seq2seq_args_dict, display_step, path_to_seq2seq_model, seq2seq_model_name, False)
     seq2seq_sess = tf.Session()
     #with tf.variable_scope("seq2seq"):
     print("loading saved seq2seqRNN from " + seq2seq_rnn.path_to_model)
