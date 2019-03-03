@@ -26,5 +26,5 @@ venv*
 #ignore models
 simpleRNN/models
 simpleRNN/seq2seq_models
-#saves
+saves
 ngrams/models
