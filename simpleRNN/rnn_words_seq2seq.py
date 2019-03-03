@@ -208,7 +208,6 @@ class SimpleRNN:
                 if len(symbols) == 0:
                     symbols = ["PAD"]
                 onehot_batch = []
-                print(step)
                 for word in symbols:
                     try:
                         one_hot = self.embedding_model.wv.vocab[word.lower()].index
