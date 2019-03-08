@@ -143,15 +143,15 @@
                                             <h5 id="{{ val }}-settings-title" class="card-title to-hide">{{ name }}</h5>
                                             <p class="card-text to-hide" id="{{val}}-settings-content">
                                             {% if name == "RNN" %}
-                                                This is about an RNN
+                                                Use a recurrent neural network to predict the next sentence.
                                             {% elif name == "SEQ2SEQ" %}
-                                                This is about seq2seq
+                                                Use a sequence to sequence model to predict the next sentence.
                                             {% elif name == "NGRAM" %}
-                                                This is about N-Grams
+                                                Use an N-gram model to predict the next sentence.
                                             {% elif name == "NONE" %}
-                                                This is about nothing
+                                                Don't predict anything
                                             {% else %}
-                                                What is this even about?
+                                                Nothing here but us chickens
                                             {% endif %}</p>
                                         {% endfor %}
                                     </div>
