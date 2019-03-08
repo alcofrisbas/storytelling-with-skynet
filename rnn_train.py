@@ -80,5 +80,16 @@ if __name__ == '__main__':
     if not os.path.exists(model_loc):
         os.mkdir(model_loc)
 
-
+    print("training file:\t", training_file)
+    print("model name:\t", model_name)
+    print("model path:\t", model_loc)
+    print("n hidden:\t", n_hidden)
+    print("min count:\t", min_count)
+    print("learning rate:\t", learning_rate)
+    print("n input:\t", n_input)
+    print("batch size:\t", batch_size)
+    print("training:\t", to_train)
+    print("seq2seq:\t", use_seq2seq)
+    if not input("confirm these params:(y/N) ") == "y":
+        sys.exit(0)
     train(training_file, model_loc, model_name, n_hidden, min_count, learning_rate, training_iters, n_input, batch_size, to_train, use_seq2seq)

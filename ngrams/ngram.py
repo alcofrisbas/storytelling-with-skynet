@@ -122,7 +122,7 @@ class NGRAM_model:
         else:
             raise Exception("model {} does not exists.".format(self.get_full_path()))
 
-    def train(self,root):
+    def train(self,root, max_read = 5000000):
         """
         trains a ngram trie
         l: max iters
@@ -130,7 +130,7 @@ class NGRAM_model:
         display_step: change freq of print statements
         """
         with open(self.training_file+".tkn") as r:
-            s = r.read(5000000)
+            s = r.read(max_read)
         print("done reading files")
         words = s.split()
         words = [w.lower() if w != 'STOP' else w for w in words ]
@@ -175,7 +175,6 @@ class NGRAM_model:
         l: max length of sentence
         m: gram depth
         """
-        
         if sent[-1] == ".":
             sent = sent[:-1]+ " STOP"
         sentence = word_tokenize(sent)
@@ -228,7 +227,7 @@ class NGRAM_model:
         return s
 
 
-    def create_model(self, model_name, data=None):
+    def create_model(self, model_name, data=None, max_read=5000000):
         """
         slams a whole bunch of methods together so
         you can call one function to create, save, and
@@ -245,7 +244,7 @@ class NGRAM_model:
         self.training_file = data
         root = Trie("*")
         process_data(self.training_file)
-        root = self.train(root)
+        root = self.train(root, max_read=max_read)
         self.save_model(root)
         self.models[self.model_name] = root
         print("done creating model: {}, elapsed: {}s".format(model_name, str(int(time.time()-start))))
