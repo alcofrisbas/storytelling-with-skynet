@@ -166,7 +166,7 @@ class SimpleRNN:
                 start_tokens = tf.tile(tf.constant([self.start_token], dtype=tf.int32), [self.batch_size],
                     name = "start_tokens")
                 # a different helper for inference
-                inference_helper = tf.contrib.seq2seq.GreedyEmbeddingHelper(embedding=self.output_embedding_matrix,
+                inference_helper = tf.contrib.seq2seq.GreedyEmbeddingHelper(embedding=tf.cast(self.input_embedding_matrix, tf.float32),
                     start_tokens=start_tokens, end_token=self.end_token)
 
                 inference_decoder = tf.contrib.seq2seq.BasicDecoder(cell=decoder_cell,
