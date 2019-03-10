@@ -14,15 +14,6 @@ import gensim
 from numpy import genfromtxt
 
 
-"""
-learning_rate = 0.001
-training_iters = 50000
-n_input = 4
-batch_size = 2
-n_hidden = 300
-"""
-
-
 class SimpleRNN:
     # Parameters
     def __init__(self, d, display_step, path_to_model, model_name):
@@ -133,15 +124,13 @@ class SimpleRNN:
                     offset = random.randint(0, self.n_input+1)
                 symbols = []
                 # get a subset of words to read
-                try:
-                    for i in range(self.batch_size):
+                for i in range(self.batch_size):
+                    try:
                         symbol = [str(self.training_data[j]) for j in range(offset+i, offset+self.n_input+i)]
-                        symbols.append(symbol)
-                except:
-                    offset = random.randint(0, self.n_input+1)
-                    for i in range(self.batch_size):
+                    except:
+                        offset = random.randint(0, self.n_input+1)
                         symbol = [str(self.training_data[j]) for j in range(offset+i, offset+self.n_input+i)]
-                        symbols.append(symbol)
+                    symbols.append(symbol)
                 if len(symbols) != self.batch_size:
                     print(symbols)
                 # construct the input of shape [self.batch_size, self.n_input]
