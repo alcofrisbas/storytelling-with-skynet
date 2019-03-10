@@ -2,8 +2,8 @@
 from nltk.tokenize import sent_tokenize, word_tokenize
 
 
-file_to_read = "simpleRNN/data/charles_dickens_great_expectations.txt"
-file_to_write = "simpleRNN/data/charles_dickens_great_expectations1.txt"
+file_to_read = "simpleRNN/data/mixed1.txt"
+file_to_write = "simpleRNN/data/mixed1.seq2seq.txt"
 #accepts a filename and returns a string of contents
 def read(fname):
     with open(fname) as f:
