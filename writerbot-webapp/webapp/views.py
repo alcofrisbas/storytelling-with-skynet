@@ -30,12 +30,18 @@ sys.modules["ngram"] = ngram
 
 from enum import Enum
 
+# an enum representing the algorithm used to generate suggestions. Values used
+# in write page and generateSuggestion -- if you add any values, add handlers for
+# them there
 class Mode(Enum):
      RNN = 0
      SEQ2SEQ = 1
      NGRAM = 2
      NONE = 3
 
+# an enum representing the algorithm used to generate prompts. Values used
+# in write page and generatePrompt -- if you add any values, add handlers for
+# them there
 class PromptMode(Enum):
     SIMPLE = 0
     LEWIS = 1
@@ -48,7 +54,7 @@ path_to_model = config("PATH_TO_RNN")#"simpleRNN/models/"
 path_to_seq2seq_model = config("PATH_TO_SEQ")#"simpleRNN/seq2seq_models/"
 model_name = config("RNN_MODEL_NAME")#"basic_model"
 seq2seq_model_name = config("SEQ2SEQ_MODEL_NAME")#"seq2seq_model_name"
-seq2seq_args_dict = {"n_input": 20, "batch_size": 1, "n_hidden": 500, "learning_rate": 0.001, "training_iters":50000, "training_file": "simpleRNN/data/charles_dickens_great_expectations1.txt"}
+seq2seq_args_dict = {"n_input": 6, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters":50000, "training_file": "simpleRNN/data/charles_dickens_great_expectations1.txt"}
 
 print("instantiating RNN")
 sess = tf.Session()
@@ -80,13 +86,12 @@ ngram_model.high = 100
 prompt_model.m = 2
 
 
-#TODO: when user logs in, redirect to the page they logged in from
-#TODO: figure out how to clear empty stories and expired session data
-
-# Create your views here.
+#TODO: clear empty stories and expired session data with a cron job
 def home(request):
+    # if user is logged in, pass their stories as context. otherwise just use the current story
     if request.user.is_authenticated:
         user = getOrCreateUser(request)
+        # assign the current story to the user in case they started it while not logged in
         if request.session.get("story_id"):
             try:
                 cur_story = Story.objects.get(id=request.session.get("story_id"))
@@ -107,15 +112,27 @@ def home(request):
 
 
 def getOrCreateUser(request):
-    user, new = User.objects.get_or_create(email=request.user.email)
-    if new:
-        user.first_name = request.user.first_name
-        user.last_name = request.user.last_name
-        user.save()
-    return user
+    """
+    Retrieves the entry associated with the current user if logged in.
+    If no such entry is found, creates one with the current user's information.
+    If user is not logged in, returns None.
+    """
+    if request.user.is_authenticated:
+        user, new = User.objects.get_or_create(email=request.user.email)
+        if new:
+            user.first_name = request.user.first_name
+            user.last_name = request.user.last_name
+            user.save()
+        return user
+    else:
+        return None
 
 
 def newStory(request):
+    """
+    Creates a new story with default settings, assigned to the current user if logged in.
+    """
+    # clears the user's old story, if any, if they aren't logged in
     if request.session.get("story_id") and not request.user.is_authenticated:
         old_story = Story.objects.get(id=request.session.get("story_id"))
         old_story.delete()
@@ -132,32 +149,52 @@ def newStory(request):
     return redirect('/write')
 
 
-#TODO: error check
 def loadStory(request, id):
+    """
+    Loads the story identified by id unless it belongs to a different user, in which case
+    returns an error.
+    Returns an error if the story doesn't exist.
+    """
     if Story.objects.filter(id=id).exists():
-        request.session["story_id"] = id
-        return redirect('/write')
+        s = Story.objects.get(id=id)
+        if (not s.author.is_authenticated) or s.author == request.user:
+            request.session["story_id"] = id
+            return redirect('/write')
+        else:
+            return render(request, 'webapp/error.html',
+                          context={'message': "Sorry, you don't have permission to access that story. Try logging in."})
     else:
         return render(request, 'webapp/error.html', context= {'message': "Story not found."})
 
 
 def deleteStory(request, id):
+    """
+    Deletes the story identified by id if it belongs to the current user, otherwise
+    returns an error.
+    """
     if Story.objects.filter(id=id).exists():
         s = Story.objects.get(id=id)
-        if id == request.session.get("story_id"):
-            print("deleting request.session {}".format(id))
-            request.session.pop("story_id")
-        if s.author.email == request.user.email:
-            s.delete()
-            return redirect('/')
+        if request.user.is_authenticated:
+            if s.author.email == request.user.email:
+                if id == request.session.get("story_id"):
+                    print("deleting request.session {}".format(id))
+                    request.session.pop("story_id")
+                s.delete()
+                return redirect('/')
+            else:
+                return render(request, 'webapp/error.html',
+                                  context={'message': "Sorry, you don't have permission to delete that story."})
         else:
             return render(request, 'webapp/error.html',
-                          context={'message': "Sorry, you don't have permission to access that story. Try logging in."})
+                              context={'message': "Sorry, you don't have permission to access that story. Try logging in."})
     else:
         return render(request, 'webapp/error.html', context={'message': "Story not found."})
 
 
 def write(request):
+    """
+    Handles logic for the primary write page.
+    """
     if "story_id" not in request.session.keys() or not Story.objects.filter(id = request.session["story_id"]).exists():
         newStory(request)
 
@@ -186,7 +223,6 @@ def write(request):
             story.prompt = generatePrompt(story.prompt_mode)
             story.save()
 
-        # same functionality as "Start a new story" button
         if request.POST.get("new"):
             return redirect('/new_story')
 
@@ -194,7 +230,6 @@ def write(request):
             return redirect('/')
 
         if request.POST.get("export"):
-            print("exporting story...")
             myfile = StringIO()
             myfile.write(story.sentences)
             response = HttpResponse(myfile.getvalue(), content_type='text/plain')
@@ -249,6 +284,8 @@ def logout(request):
 
 
 def generatePrompt(prompt_mode):
+    """Generates a prompt according to prompt_mode, which should be a
+    value of the PromptMode enum."""
     if int(prompt_mode) == PromptMode.SIMPLE.value:
         adj = ADJECTIVES[random.randrange(0, len(ADJECTIVES))]
         noun = ANIMALS[random.randrange(0, len(ANIMALS))].lower()
@@ -271,6 +308,8 @@ def generatePrompt(prompt_mode):
 
 
 def generateSuggestion(session, newSentence, mode):
+    """Generates a suggestion sentence based on a tensorflow session, the previous
+    sentence, and a value of the Mode enum."""
     try:
         if int(mode) == Mode.RNN.value:
             suggestion = rnn.generate_suggestion(session, newSentence)
