@@ -46,12 +46,11 @@ if __name__ == '__main__':
     training_iters=10000
     n_input=6
     batch_size=10
-    to_train=True
+    to_train=False
     use_seq2seq = False
     model_loc = "simpleRNN/models/basic_model1/"
 
     args = parser.parse_args(sys.argv[1:])
-    print(args)
     if args.training_file:
         training_file = args.training_file
     if args.model_name:
@@ -79,6 +78,5 @@ if __name__ == '__main__':
 
     if not os.path.exists(model_loc):
         os.mkdir(model_loc)
-
 
     train(training_file, model_loc, model_name, n_hidden, min_count, learning_rate, training_iters, n_input, batch_size, to_train, use_seq2seq)

@@ -133,15 +133,13 @@ class SimpleRNN:
                     offset = random.randint(0, self.n_input+1)
                 symbols = []
                 # get a subset of words to read
-                try:
-                    for i in range(self.batch_size):
+                for i in range(self.batch_size):
+                    try:
                         symbol = [str(self.training_data[j]) for j in range(offset+i, offset+self.n_input+i)]
-                        symbols.append(symbol)
-                except:
-                    offset = random.randint(0, self.n_input+1)
-                    for i in range(self.batch_size):
+                    except:
+                        offset = random.randint(0, self.n_input+1)
                         symbol = [str(self.training_data[j]) for j in range(offset+i, offset+self.n_input+i)]
-                        symbols.append(symbol)
+                    symbols.append(symbol)
                 if len(symbols) != self.batch_size:
                     print(symbols)
                 # construct the input of shape [self.batch_size, self.n_input]

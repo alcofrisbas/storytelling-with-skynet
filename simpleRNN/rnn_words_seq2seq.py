@@ -163,6 +163,8 @@ class SimpleRNN:
 
                 valid_predictions = tf.identity(final_outputs.sample_id, name="valid_preds")
 
+
+
             else:
                 start_tokens = tf.tile(tf.constant([self.start_token], dtype=tf.int32), [self.batch_size],
                     name = "start_tokens")
@@ -177,8 +179,10 @@ class SimpleRNN:
                     maximum_iterations=self.padded_lengths)
 
                 logits = tf.identity(final_outputs.rnn_output, name="predictions")
+                print(logits)
                 batch_loss = None
                 valid_predictions = tf.identity(final_outputs.sample_id, name="valid_preds")
+
             return logits, batch_loss, valid_predictions
 
     def train(self):
@@ -288,6 +292,7 @@ class SimpleRNN:
                 embedded_symbols.append(len(self.input_embedding_matrix)-3)
             embedded_symbols = [embedded_symbols]
             onehot_pred = 0
+
             predictions= session.run(self.probas, feed_dict={self.x: embedded_symbols, self.encoder_lengths: [len_inputs]})
             predict_sent = []
             for word in predictions[0]:
@@ -337,8 +342,17 @@ class SimpleRNN:
                     while len(input_sent_one_hot) < self.padded_lengths:
                         input_sent_one_hot.append(len(self.input_embedding_matrix)-3)
                     input_sent = [input_sent_one_hot]
-                   # for i in range(23):
+                    """
+                    len_outputs = len_inputs
+                    outputs = [len(self.input_embedding_matrix)-3]
+                    for word in input_sent[0]:
+                        outputs.append(word)
+                    while (len(outputs) < self.padded_lengths+1):
+                        outputs.append(len(self.input_embedding_matrix)-1)
+                    outputs = [outputs]
+                    """
                     onehot_pred = session.run(self.probas, feed_dict={self.x: input_sent, self.encoder_lengths: [len_inputs]})
+                                                                        #self.y: outputs, self.decoder_lengths: [len_outputs]})
                     predict_sent = []
                     for word in onehot_pred[0]:
                         predict_sent.append(self.index2word[word])
