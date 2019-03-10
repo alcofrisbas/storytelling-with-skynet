@@ -9,14 +9,20 @@ import simpleRNN.rnn_words_seq2seq as seq2seq
 
 def train(training_file, root_path, model_name, n_hidden, min_count, learning_rate, training_iters, n_input, batch_size, to_train, use_seq2seq):
     my_file = Path(root_path + model_name + "_vocab.csv")
+    print(my_file)
+    print("simpleRNN/models/malcolm4/malcolm-model4_vocab.csv")
+    print("simpleRNN/models/malcolm4/malcolm-model4_vocab.csv" == my_file)
+    # if no embedding exists for the current model name, make one
     if not my_file.is_file():
         word2vec.create_embedding(training_file=training_file,
             root_path=root_path, model_name=model_name,
             n_hidden=n_hidden, min_count=min_count)
+    # use sequence to sequence if told to
     if use_seq2seq:
         seq2seq.run(learning_rate=learning_rate, training_iters=training_iters,
             n_input=n_input, batch_size=batch_size, n_hidden=n_hidden,
             path_to_model=root_path, model_name=model_name, train=to_train, training_file=training_file)
+    # otherwise use the basic rnn model
     else:
         rnn_words.run(learning_rate=learning_rate, training_iters=training_iters,
             n_input=n_input, batch_size=batch_size,n_hidden=n_hidden,
@@ -46,12 +52,11 @@ if __name__ == '__main__':
     training_iters=10000
     n_input=6
     batch_size=10
-    to_train=True
+    to_train=False
     use_seq2seq = False
     model_loc = "simpleRNN/models/basic_model1/"
 
     args = parser.parse_args(sys.argv[1:])
-    print(args)
     if args.training_file:
         training_file = args.training_file
     if args.model_name:
