@@ -7,26 +7,21 @@ Tenzin
 
 # To Run Our Code
 
-Install `virtualenv`:
+To make sure python dependencies are met:
 ```
-pip3 install virtualenv
-```
-
-run our init_setup.sh:
-```
-chmod +x init_setup.sh
-./init_setup.sh
+make dep_py
 ```
 
 Now, to train our neural network:
 ```
-venv/bin/python rnn_train.py -r True
+python(3) rnn_train.py <args in cli help>
 ```
 
 To start the webapp:
 ```
-venv/bin/python ./writerbot-webapp/manage.py runserver
+python(3) ./writerbot-webapp/manage.py runserver
 ```
+RNN and SEQ2SEQ model locations are stored in the .env file, as well as other keys.
 
 #### Please run all code from the root directory
 
