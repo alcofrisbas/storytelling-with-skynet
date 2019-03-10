@@ -62,10 +62,13 @@ def create_embedding(training_file, root_path, model_name,n_hidden, min_count):
 
     #add special tokens to the vocab
     for word in model.wv.index2word:
-        writer.writerow([word])
-    writer.writerow(["GO"])
-    writer.writerow(["UNK"])
-    writer.writerow(["PAD"])
+        file_csv.write(word)
+        file_csv.write('\n')
+    file_csv.write("GO")
+    file_csv.write('\n')
+    file_csv.write("UNK")
+    file_csv.write('\n')
+    file_csv.write("PAD")
 
 
     # convert the wv word vectors into a numpy matrix that is suitable for insertion
