@@ -9,14 +9,17 @@ import simpleRNN.rnn_words_seq2seq as seq2seq
 
 def train(training_file, root_path, model_name, n_hidden, min_count, learning_rate, training_iters, n_input, batch_size, to_train, use_seq2seq):
     my_file = Path(root_path + model_name + "_vocab.csv")
+    # if no embedding exists for the current model name, make one
     if not my_file.is_file():
         word2vec.create_embedding(training_file=training_file,
             root_path=root_path, model_name=model_name,
             n_hidden=n_hidden, min_count=min_count)
+    # use sequence to sequence if told to
     if use_seq2seq:
         seq2seq.run(learning_rate=learning_rate, training_iters=training_iters,
             n_input=n_input, batch_size=batch_size, n_hidden=n_hidden,
             path_to_model=root_path, model_name=model_name, train=to_train, training_file=training_file)
+    # otherwise use the basic rnn model
     else:
         rnn_words.run(learning_rate=learning_rate, training_iters=training_iters,
             n_input=n_input, batch_size=batch_size,n_hidden=n_hidden,
@@ -79,8 +82,6 @@ if __name__ == '__main__':
     if not os.path.exists(model_loc):
         os.mkdir(model_loc)
 
-<<<<<<< HEAD
-=======
     print("training file:\t", training_file)
     print("model name:\t", model_name)
     print("model path:\t", model_loc)
@@ -93,5 +94,4 @@ if __name__ == '__main__':
     print("seq2seq:\t", use_seq2seq)
     if not input("confirm these params:(y/N) ") == "y":
         sys.exit(0)
->>>>>>> a96910b2f9c3bcdbe469bdc4832296eebf8f6317
     train(training_file, model_loc, model_name, n_hidden, min_count, learning_rate, training_iters, n_input, batch_size, to_train, use_seq2seq)
