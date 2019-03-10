@@ -14,15 +14,6 @@ import gensim
 from numpy import genfromtxt
 
 
-"""
-learning_rate = 0.001
-training_iters = 50000
-n_input = 4
-batch_size = 2
-n_hidden = 300
-"""
-
-
 class SimpleRNN:
     # Parameters
     def __init__(self, d, display_step, path_to_model, model_name):
