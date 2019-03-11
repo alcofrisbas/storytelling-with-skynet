@@ -1,0 +1,11 @@
+# django/oauth2 keys. get your own for full functionality
+DJANGO_SECRET_KEY=0
+GOOGLE_CLIENT_ID=id
+GOOGLE_CLIENT_SECRET=secret
+
+#rnn model configs
+PATH_TO_RNN="simpleRNN/models/basic_model1/"
+RNN_MODEL_NAME="basic_model"
+
+PATH_TO_SEQ="simpleRNN/seq2seq_models/"
+SEQ2SEQ_MODEL_NAME="ben-model21"
