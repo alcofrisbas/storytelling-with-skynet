@@ -3,7 +3,7 @@
 ## Usage
 ``` python
 # create a model
-model = NGRAM_model("<path/to/model/location>")
+model = NGRAM_model("path/to/model/location")
 # warn: if the model does not already exist,
 # not having data will raise an exception
 model.create_model(model_name, [data=data_file_name, max_read=amount_to_read])
