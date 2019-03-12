@@ -32,6 +32,14 @@ cp .sampleenv .env
 ```
 Now, make sure that 
 1. there are trained models that the web-app can access
-Take me to [pookie](#train)
-2. the .env points to the right directories and model names 
+    * [Train a model](#train)
+2. the .env points to the right directories and model names
+```
+#rnn model configs
+PATH_TO_RNN="path/to/model"
+RNN_MODEL_NAME="model_name"
+
+PATH_TO_SEQ="path/to/model"
+SEQ2SEQ_MODEL_NAME="model_name"
+```
 #### Please run all code from the root directory
