@@ -170,7 +170,7 @@ class SimpleRNN:
                     start_tokens=start_tokens, end_token=self.end_token)
 
                 inference_decoder = tf.contrib.seq2seq.BasicDecoder(cell=decoder_cell,
-                    helper=inference_helper, initial_state=last_state, output_layer=output_layer)
+                    helper=inference_helper, initial_state=initial_state, output_layer=output_layer)
 
                 final_outputs, _final_state,_ = tf.contrib.seq2seq.dynamic_decode(
                     inference_decoder, output_time_major=False, impute_finished=True,
