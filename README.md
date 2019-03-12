@@ -30,6 +30,9 @@ In order for the webapp to run at all, the .env file needs to be configured.
 ```
 cp .sampleenv .env
 ```
+First, you'll need a django secret key. You'll also need a google client id
+if you want to make use of google accounts.
+
 Now, make sure that 
 1. there are trained models that the web-app can access
     * [Train a model](#train)
