@@ -17,7 +17,7 @@ model.generate_with_constraints("input sentence.")
 ### Further customizing of the ngram model:
 ```python
 model.depth = 5 # how deep to make the Trie -- max ngram query
-model.l = 1000000 how many words to train on
+model.l = 100000 how many words to train on
 model.display_step = 2000 # how often to print during training
 model.m = 3 # max depth of sentence-gen n-gram
 model.sent_length = 200 # max length of sentence gen in the
