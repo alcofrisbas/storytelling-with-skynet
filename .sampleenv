@@ -8,4 +8,4 @@ PATH_TO_RNN="simpleRNN/models/basic_model1/"
 RNN_MODEL_NAME="basic_model"
 
 PATH_TO_SEQ="simpleRNN/seq2seq_models/"
-SEQ2SEQ_MODEL_NAME="ben-model21"
+SEQ2SEQ_MODEL_NAME="basic_model"

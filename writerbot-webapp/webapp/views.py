@@ -48,7 +48,7 @@ class PromptMode(Enum):
     DICKENS = 2
     NONE = 3
 
-args_dict = {"n_input": 20, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000, "training_file": "simpleRNN/data/train.txt"}
+args_dict = {"n_input": 20, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters": 50000, "training_file": "simpleRNN/data/charles_dickens_great_expectations1.txt"}
 display_step = 1000
 path_to_model = config("PATH_TO_RNN")#"simpleRNN/models/"
 path_to_seq2seq_model = config("PATH_TO_SEQ")#"simpleRNN/seq2seq_models/"

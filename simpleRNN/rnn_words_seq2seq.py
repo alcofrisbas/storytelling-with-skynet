@@ -215,7 +215,6 @@ class SimpleRNN:
                     onehot_batch.append(len(self.input_embedding_matrix)-1)
 
                 onehot_batch = [onehot_batch]
-
                 # targets always starts with the GO character
                 targets = [len(self.input_embedding_matrix)-3]
                 for word in self.training_data[sent_num+1]:

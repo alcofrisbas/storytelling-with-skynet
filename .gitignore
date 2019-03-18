@@ -27,4 +27,3 @@ venv*
 simpleRNN/models
 simpleRNN/seq2seq_models
 saves
-ngrams/models
