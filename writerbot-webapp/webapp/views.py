@@ -54,7 +54,7 @@ path_to_model = config("PATH_TO_RNN")#"simpleRNN/models/"
 path_to_seq2seq_model = config("PATH_TO_SEQ")#"simpleRNN/seq2seq_models/"
 model_name = config("RNN_MODEL_NAME")#"basic_model"
 seq2seq_model_name = config("SEQ2SEQ_MODEL_NAME")#"seq2seq_model_name"
-seq2seq_args_dict = {"n_input": 6, "batch_size": 1, "n_hidden": 300, "learning_rate": 0.001, "training_iters":50000, "training_file": "simpleRNN/data/charles_dickens_great_expectations1.txt"}
+seq2seq_args_dict = {"n_input": 6, "batch_size": 1, "n_hidden": 500, "learning_rate": 0.001, "training_iters":50000, "training_file": "simpleRNN/data/charles_dickens_great_expectations1.txt"}
 
 print("instantiating RNN")
 sess = tf.Session()
