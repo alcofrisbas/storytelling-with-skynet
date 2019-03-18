@@ -117,6 +117,7 @@ class NGRAM_model:
     def set_model(self, model_name):
         # fail silently!
         self.model_name = model_name
+        print(self.models)
         if self.models.get(model_name):
             self.root = self.models[model_name]
         else:
