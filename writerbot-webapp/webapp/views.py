@@ -77,10 +77,18 @@ ngram_model = ngram.NGRAM_model("./ngrams/models")
 prompt_model = ngram.NGRAM_model("./ngrams/models")
 ngram_model.create_model("5max200000.model")
 ngram_model.set_model("5max200000.model")
+ngram_model.create_model("lewis_model2")
+ngram_model.set_model("lewis_model2")
+ngram_model.create_model("dickens_model")
+ngram_model.set_model("dickens_model")
 
 prompt_model.create_model("5max200000.model")
 #prompt_model.create_model("lewis_model2")
 prompt_model.set_model("5max200000.model")
+prompt_model.create_model("lewis_model2")
+prompt_model.set_model("lewis_model2")
+prompt_model.create_model("dickens_model")
+prompt_model.set_model("dickens_model")
 ngram_model.m = 2
 ngram_model.high = 100
 prompt_model.m = 2
