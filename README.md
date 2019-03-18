@@ -1,9 +1,18 @@
-# comps2018-19
+# Storytelling with Skynet
 
-Galen
-Malcolm
-Ben
-Tenzin
+## Authors
+
+- Benjamin Krischer Greene
+- Galen William Quinn Berger-Fletcher
+- Tenzin Dophen
+- Malcolm Grossman
+
+Computer Science, Carleton College
+
+18 March 2019
+
+Carried out under the guise of comps.
+
 
 # To Run Our Code
 
