@@ -7,7 +7,7 @@ bz2file==0.98
 certifi==2019.3.9
 chardet==3.0.4
 defusedxml==0.5.0
-Django==2.1.7
+Django==2.2.13
 django-tz-detect==0.2.9
 docutils==0.14
 gast==0.2.2
